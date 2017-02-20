@@ -1,8 +1,9 @@
 #Seasonal change in contact rate 
 #20/2/2017 Sean Browning
 #Utilize cosine function with a period of 365pi for a rough model 
+#Change initial values to R0 and easy to understand values
 #compare new vs old 
-#depends: initial values, parameters, 'adaptivetau', 'googleVis'
+#depends: initial values, parameters, 'adaptivetau', 'googleVis', 'stats'
 
 library(adaptivetau)
 library(googleVis)
