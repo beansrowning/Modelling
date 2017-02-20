@@ -37,7 +37,7 @@ RateF <- function(x, p, t) {
     E <- x["E"]
     I <- x["I"]
     R <- x["R"]
-  N <- S + E + I + R
+    N <- S + E + I + R
     #Rate Functions
   return(c(S * beta * (I/N), #infection
            E * f,            #Infectious
@@ -52,7 +52,7 @@ r=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=400)
 
 #Plotting 
 gvplot_dat <- data.frame(r[,c("time", "S", "I", "R"), drop = FALSE]) #store plot variables in a df
-gvisgraph  <- gvisLineChart(gvplot_dat_1, 
+gvisgraph  <- gvisLineChart(gvplot_dat, 
                            options = list(
                              title = "Measles SEIR Model",
                              hAxis="{title:'Time', titleTextStyle:{color:'black'}}",
