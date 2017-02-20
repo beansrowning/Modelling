@@ -26,8 +26,8 @@ init.values = c(
   R2O = 0,    
   R3Y = 0,
   R3O = 0,     #Recovered pop3
-  D1 = 1500,
-  D2 = 2000,
+  D1 = 0,
+  D2 = 1000,
   D3 = 2000
   )    
 
@@ -188,5 +188,5 @@ plotplot <- gvisMerge(gvisplot1,vac_tab, horizontal = FALSE, #merge table with v
 
 #plot (>ie 8 required for viewing, set firefox as default on remote desktop)
 plot(plotplot)
-print(max(gvplot_dat$I))
+
 
