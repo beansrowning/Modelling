@@ -140,8 +140,7 @@ RateF <- function(x, p, t) {
 parameters = list(beta=c(8e-8,9e-8), gamma=0.4e-3, alpha=3e-8, omega=c(1e-9,2e-9), V=c(1e-5,1e-3,1e-2))
 
 #Run the model
-set.seed(4)
-r=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=5000)
+r=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=1000)
 
 #Adding 3 variables to sum all of the SIR groups
 r <-cbind(r, S= rowSums(r[,c("S1Y", "S1O","S2Y", "S2O", "S3Y", "S3O")]), #
