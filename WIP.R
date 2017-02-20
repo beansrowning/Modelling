@@ -1,6 +1,7 @@
 #3 meta-population SIR model with 2 rates of infection 
 #Young & Old divisions, variable vaccine start times, constant birth and death rate
-#Sean Browning 17/2/2017
+#Constant infectious rate
+#Sean Browning 20/2/2017
 #Depends: 'adaptivetau', 'googleVis'
 
 library(adaptivetau)
@@ -15,11 +16,11 @@ init.values = c(
   S3Y = 10^4, #Susceptible pop3
   S3O = 10^4,
   I1Y = 10,   #Infected pop1
-  I1O = 10,
+  I1O = 5,
   I2Y = 0,    #Infected pop2
   I2O = 0,    
-  I3Y = 10,   #Infected pop3
-  I3O = 50,    
+  I3Y = 50,   #Infected pop3
+  I3O = 10,    
   R1Y = 0,    #Recovered pop1
   R1O = 0,
   R2Y = 0,    #Recovered pop2
