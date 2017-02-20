@@ -181,7 +181,7 @@ vac_tab <- gvisTable(vacdf, options = list(
 ))
 
 plotplot <- gvisMerge(gvisplot1,vac_tab, horizontal = FALSE, #merge table with vaccine program start times on bottom
-                      tableOptions="bgcolor=\"#CCCCCC\" cellspacing=1"
+                      tableOptions="bgcolor=\"#CCCCCC\" cellspacing=10"
 )
 #save to file
 #print(gvisplot, file = paste("SIR",runid,"html", sep = ".")) #check your wd
