@@ -6,6 +6,7 @@
 
 library(adaptivetau)
 library(googleVis)
+library(stats)
 
 #Defining initial values
 init.values = c(
@@ -88,28 +89,27 @@ transitions = list(
 parameters = list(beta=c(8e-8,9e-8), gamma=0.4e-3, alpha=3e-8, omega=c(1e-9,2e-9), V=c(1e-5,1e-3,1e-2))
 
 new_RateF <- function(x, p, t) {
-    #take beta parameters and make them vary by time 
-  beta1 <- (p$beta[1]-(.5*p$beta[1])cos(t/(365*pi))+(.1*p$beta[1])
-  beta2 <- (p$beta[2]-(.5*p$beta[2])cos(t/(365*pi))+(.1*p$beta[2])
-    #return rate functions
-  return(c(x["S1Y"] * (x["I1Y"]+x["I1O"])*beta1, #infection rates
-           x["S1Y"] * (x["I2Y"]+x["I2O"])*beta2,
-           x["S1Y"] * (x["I3Y"]+x["I3O"])*beta2,
-           x["S1O"] * (x["I1Y"]+x["I1O"])*beta1, 
-           x["S1O"] * (x["I2Y"]+x["I2O"])*beta2,
-           x["S1O"] * (x["I3Y"]+x["I3O"])*beta2,
-           x["S2Y"] * (x["I2Y"]+x["I2O"])*beta1,
-           x["S2Y"] * (x["I1Y"]+x["I1O"])*beta2,
-           x["S2Y"] * (x["I3Y"]+x["I3O"])*beta2,
-           x["S2O"] * (x["I2Y"]+x["I2O"])*beta1,
-           x["S2O"] * (x["I1Y"]+x["I1O"])*beta2,
-           x["S2O"] * (x["I3Y"]+x["I3O"])*beta2,
-           x["S3Y"] * (x["I3Y"]+x["I3O"])*beta1, 
-           x["S3Y"] * (x["I1Y"]+x["I1O"])*beta2,
-           x["S3Y"] * (x["I2Y"]+x["I2O"])*beta2,
-           x["S3O"] * (x["I3Y"]+x["I3O"])*beta1,
-           x["S3O"] * (x["I1Y"]+x["I1O"])*beta2,
-           x["S3O"] * (x["I2Y"]+x["I2O"])*beta2,
+  b1 <- abs((p$beta[1]-(.5*p$beta[1]))*cos(t/(365*pi))+(.1*p$beta[1]))
+  b2 <- abs((p$beta[2]-(.5*p$beta[2]))*cos(t/(365*pi))+(.1*p$beta[2]))
+  
+  return(c(x["S1Y"] * (x["I1Y"]+x["I1O"])*b1, #infection rates
+           x["S1Y"] * (x["I2Y"]+x["I2O"])*b2,
+           x["S1Y"] * (x["I3Y"]+x["I3O"])*b2,
+           x["S1O"] * (x["I1Y"]+x["I1O"])*b1, 
+           x["S1O"] * (x["I2Y"]+x["I2O"])*b2,
+           x["S1O"] * (x["I3Y"]+x["I3O"])*b2,
+           x["S2Y"] * (x["I2Y"]+x["I2O"])*b1,
+           x["S2Y"] * (x["I1Y"]+x["I1O"])*b2,
+           x["S2Y"] * (x["I3Y"]+x["I3O"])*b2,
+           x["S2O"] * (x["I2Y"]+x["I2O"])*b1,
+           x["S2O"] * (x["I1Y"]+x["I1O"])*b2,
+           x["S2O"] * (x["I3Y"]+x["I3O"])*b2,
+           x["S3Y"] * (x["I3Y"]+x["I3O"])*b1, 
+           x["S3Y"] * (x["I1Y"]+x["I1O"])*b2,
+           x["S3Y"] * (x["I2Y"]+x["I2O"])*b2,
+           x["S3O"] * (x["I3Y"]+x["I3O"])*b1,
+           x["S3O"] * (x["I1Y"]+x["I1O"])*b2,
+           x["S3O"] * (x["I2Y"]+x["I2O"])*b2,
            x["I1Y"] * p$gamma,             #recovery rates
            x["I1O"] * p$gamma,
            x["I2Y"] * p$gamma,
@@ -197,18 +197,19 @@ old_RateF <- function(x, p, t) {
 
 #runs 
 set.seed(100)
-r_1=ssa.adaptivetau(init.values, transitions, new_RateF, parameters, tf=1000)
-r_2=ssa.adaptivetau(init.values, transitions, old_RateF, parameters, tf=1000)
+r_1=ssa.adaptivetau(init.values, transitions, new_RateF, parameters, tf=5000)
+r_2=ssa.adaptivetau(init.values, transitions, old_RateF, parameters, tf=5000)
 
 #cleaning 
-giveSIR <- function(mat){
-    mat <- cbind(mat, S= rowSums(mat[,c("S1Y", "S1O","S2Y", "S2O", "S3Y", "S3O")]), #
-    I = rowSums(mat[,c("I1Y", "I1O", "I2Y", "I2O", "I3Y", "I3O")]), #
-    R = rowSums(mat[,c("R1Y", "R1O", "R2Y", "R2O", "R3Y", "R3O")]) #
+    r_1 <- cbind(r_1, S= rowSums(r_1[,c("S1Y", "S1O","S2Y", "S2O", "S3Y", "S3O")]), #
+    I = rowSums(r_1[,c("I1Y", "I1O", "I2Y", "I2O", "I3Y", "I3O")]), #
+    R = rowSums(r_1[,c("R1Y", "R1O", "R2Y", "R2O", "R3Y", "R3O")]) #
     ) 
-}
-giveSIR(r_1)
-giveSIR(r_2)
+    r_2 <- cbind(r_2, S= rowSums(r_2[,c("S1Y", "S1O","S2Y", "S2O", "S3Y", "S3O")]), #
+    I = rowSums(r_2[,c("I1Y", "I1O", "I2Y", "I2O", "I3Y", "I3O")]), #
+    R = rowSums(r_2[,c("R1Y", "R1O", "R2Y", "R2O", "R3Y", "R3O")]) #
+    ) 
+
 
 #Plotting 
 plotvars <- c("time", "S", "I", "R") #change to plot other populations 
@@ -222,7 +223,7 @@ gvisgraph_1 <- gvisLineChart(gvplot_dat_1,
                              height = 400
                            ))
 gvplot_dat_2 <- as.data.frame(r_2[,plotvars, drop = FALSE]) #store plot variables in a df
-gvisgraph_2 <- gvisLineChart(gvplot_dat, 
+gvisgraph_2 <- gvisLineChart(gvplot_dat_2, 
                            options = list(
                              title = "constant beta SIR Model",
                              hAxis="{title:'Time', titleTextStyle:{color:'black'}}",
@@ -230,7 +231,7 @@ gvisgraph_2 <- gvisLineChart(gvplot_dat,
                              width = 668,
                              height = 400
                            ))
-plotplot <- gvisMerge(gvisplot_1,gvisplot_2, horizontal = TRUE, 
+plotplot <- gvisMerge(gvisgraph_1,gvisgraph_2, horizontal = TRUE, 
                         tableOptions="bgcolor=\"#CCCCCC\" cellspacing=10")
                         
 #view
