@@ -87,8 +87,8 @@ transitions = list(
 )
 
 #Parameters: R0, infectious period (days), crude birth rate (per 1000),
-#under-5 mortality rate (per 1000 live births), crude death rate (per 1000), vaccine coverage %
-parameters = list(R0=c(14,16), infectious.period=7, birth.rate=10, death.rate=c(11,10), vaccination.rate=c(0.3,0.1,0.01))
+#crude under-5 mortality rate (per 1000), crude death rate (per 1000), vaccine coverage %
+parameters = list(R0=c(14,16), infectious.period=7, birth.rate=10, death.rate=c(10,10), vaccination.rate=c(0.3,0.1,0.01))
 
 new_RateF <- function(x, p, t) {
   #Parameters
@@ -96,7 +96,7 @@ new_RateF <- function(x, p, t) {
   b2 <- p$R0[2]/(p$infectious.period)
   gamma <- 1/p$infectious.period
   alpha <- p$birth.rate/365
-  omega <- p$death.rate
+  omega <- p$death.rate/365
   V <- p$vaccination.rate
     #Population Values
   S1 <- x["S1Y"] + x["S1O"]
@@ -142,21 +142,21 @@ new_RateF <- function(x, p, t) {
            (N1/1000) * alpha,             #birth rates per 1000 pop
            (N2/1000) * alpha,
            (N3/1000) * alpha,
-           ((N1/1000) * alpha)/1000 * omega[1],             #death rates
-           ((N1/1000) * alpha)/1000 * omega[1],             #under-5:
-           ((N1/1000) * alpha)/1000 * omega[1],             #per 1000 births
-           (x["S1O"]/1000) * omega[2],                      #crude:
-           (x["I1O"]/1000) * omega[2],                      #per 1000 pop
+           (x["S1Y"]/1000) * omega[1],             #death rates
+           (x["I1Y"]/1000) * omega[1],             #under-5:
+           (x["R1Y"]/1000) * omega[1],             #per 1000 
+           (x["S1O"]/1000) * omega[2],             #crude:
+           (x["I1O"]/1000) * omega[2],             #per 1000 pop
            (x["R1O"]/1000) * omega[2],
-           ((N2/1000) * alpha)/1000 * omega[1],
-           ((N2/1000) * alpha)/1000 * omega[1],
-           ((N2/1000) * alpha)/1000 * omega[1],
+           (x["S2Y"]/1000) * omega[1],
+           (x["I2Y"]/1000) * omega[1],
+           (x["R2Y"]/1000) * omega[1],
            (x["S2O"]/1000) * omega[2],
            (x["I2O"]/1000) * omega[2],
            (x["R2O"]/1000) * omega[2],
-           ((N3/1000) * alpha)/1000 * omega[1],
-           ((N3/1000) * alpha)/1000 * omega[1],
-           ((N3/1000) * alpha)/1000 * omega[1],
+           (x["S3Y"]/1000) * omega[1],
+           (x["I3Y"]/1000) * omega[1],
+           (x["R3Y"]/1000) * omega[1],
            (x["S3O"]/1000) * omega[2],
            (x["I3O"]/1000) * omega[2],
            (x["R3O"]/1000) * omega[2],
@@ -172,7 +172,7 @@ old_RateF <- function(x, p, t) {
   beta2 <- p$R0[2]/(p$infectious.period)
   gamma <- 1/p$infectious.period
   alpha <- p$birth.rate/365
-  omega <- p$death.rate
+  omega <- p$death.rate/365
   V <- p$vaccination.rate
     #Population Values
   S1 <- x["S1Y"] + x["S1O"]
@@ -189,53 +189,53 @@ old_RateF <- function(x, p, t) {
   N3 <- S3 + I3 + R3
   N <- N1 + N2 + N3
   return(c(x["S1Y"] * beta1 * (I1/(N1)), #infection rates
-           x["S1Y"] * beta2 * (I2/(N1)),
-           x["S1Y"] * beta2 * (I3/(N1)),
-           x["S1O"] * beta1 * (I1/(N1)),
-           x["S1O"] * beta2 * (I2/(N1)),
-           x["S1O"] * beta2 * (I3/(N1)),
-           x["S2Y"] * beta1 * (I2/(N2)),
-           x["S2Y"] * beta2 * (I1/(N2)),
-           x["S2Y"] * beta2 * (I3/(N2)),
-           x["S2O"] * beta1 * (I2/(N2)),
-           x["S2O"] * beta2 * (I1/(N2)),
-           x["S2O"] * beta2 * (I3/(N2)),
-           x["S3Y"] * beta1 * (I3/(N3)),
-           x["S3Y"] * beta2 * (I1/(N3)),
-           x["S3Y"] * beta2 * (I2/(N3)),
-           x["S3O"] * beta1 * (I3/(N3)),
-           x["S3O"] * beta2 * (I1/(N3)),
-           x["S3O"] * beta2 * (I2/(N3)),
-           x["I1Y"] * gamma,             #recovery rates
-           x["I1O"] * gamma,
-           x["I2Y"] * gamma,
-           x["I2O"] * gamma,
-           x["I3Y"] * gamma,
-           x["I3O"] * gamma,
-           (N1/1000) * alpha,             #birth rates per 1000 pop
-           (N2/1000) * alpha,
-           (N3/1000) * alpha,
-           ((N1/1000) * alpha)/1000 * omega[1],             #death rates
-           ((N1/1000) * alpha)/1000 * omega[1],             #under-5:
-           ((N1/1000) * alpha)/1000 * omega[1],             #per 1000 births
-           (x["S1O"]/1000) * omega[2],                      #crude:
-           (x["I1O"]/1000) * omega[2],                      #per 1000 pop
-           (x["R1O"]/1000) * omega[2],
-           ((N2/1000) * alpha)/1000 * omega[1],
-           ((N2/1000) * alpha)/1000 * omega[1],
-           ((N2/1000) * alpha)/1000 * omega[1],
-           (x["S2O"]/1000) * omega[2],
-           (x["I2O"]/1000) * omega[2],
-           (x["R2O"]/1000) * omega[2],
-           ((N3/1000) * alpha)/1000 * omega[1],
-           ((N3/1000) * alpha)/1000 * omega[1],
-           ((N3/1000) * alpha)/1000 * omega[1],
-           (x["S3O"]/1000) * omega[2],
-           (x["I3O"]/1000) * omega[2],
-           (x["R3O"]/1000) * omega[2],
-           x["S1Y"] * V[1] * (t>x["D1"]),
-           x["S2Y"] * V[2] * (t>x["D2"]),
-           x["S3Y"] * V[3] * (t>x["D3"])
+        x["S1Y"] * beta2 * (I2/(N1)),
+        x["S1Y"] * beta2 * (I3/(N1)),
+        x["S1O"] * beta1 * (I1/(N1)),
+        x["S1O"] * beta2 * (I2/(N1)),
+        x["S1O"] * beta2 * (I3/(N1)),
+        x["S2Y"] * beta1 * (I2/(N2)),
+        x["S2Y"] * beta2 * (I1/(N2)),
+        x["S2Y"] * beta2 * (I3/(N2)),
+        x["S2O"] * beta1 * (I2/(N2)),
+        x["S2O"] * beta2 * (I1/(N2)),
+        x["S2O"] * beta2 * (I3/(N2)),
+        x["S3Y"] * beta1 * (I3/(N3)),
+        x["S3Y"] * beta2 * (I1/(N3)),
+        x["S3Y"] * beta2 * (I2/(N3)),
+        x["S3O"] * beta1 * (I3/(N3)),
+        x["S3O"] * beta2 * (I1/(N3)),
+        x["S3O"] * beta2 * (I2/(N3)),
+        x["I1Y"] * gamma,             #recovery rates
+        x["I1O"] * gamma,
+        x["I2Y"] * gamma,
+        x["I2O"] * gamma,
+        x["I3Y"] * gamma,
+        x["I3O"] * gamma,
+        (N1/1000) * alpha,             #birth rates per 1000 pop
+        (N2/1000) * alpha,
+        (N3/1000) * alpha,
+        (x["S1Y"]/1000) * omega[1],             #death rates
+        (x["I1Y"]/1000) * omega[1],             #under-5:
+        (x["R1Y"]/1000) * omega[1],             #per 1000 
+        (x["S1O"]/1000) * omega[2],             #crude:
+        (x["I1O"]/1000) * omega[2],             #per 1000 pop
+        (x["R1O"]/1000) * omega[2],
+        (x["S2Y"]/1000) * omega[1],
+        (x["I2Y"]/1000) * omega[1],
+        (x["R2Y"]/1000) * omega[1],
+        (x["S2O"]/1000) * omega[2],
+        (x["I2O"]/1000) * omega[2],
+        (x["R2O"]/1000) * omega[2],
+        (x["S3Y"]/1000) * omega[1],
+        (x["I3Y"]/1000) * omega[1],
+        (x["R3Y"]/1000) * omega[1],
+        (x["S3O"]/1000) * omega[2],
+        (x["I3O"]/1000) * omega[2],
+        (x["R3O"]/1000) * omega[2],
+        x["S1Y"] * V[1] * (t>x["D1"]),
+        x["S2Y"] * V[2] * (t>x["D2"]),
+        x["S3Y"] * V[3] * (t>x["D3"])
   ))
  }
 
