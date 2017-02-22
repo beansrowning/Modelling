@@ -70,17 +70,18 @@ RateF <- function(x, p, t) {
   R <- R1 + R2
   N1 <- S1 + E1 + I1 + R1
   N2 <- S2 + E2 + I2 + R2
+  Nt <- N1 + N2
   #Rate Functions
-  return(c(S1 * beta * (I/N1), #young
+  return(c(S11 * beta[1] * (I/Nt), #pop1young
            E1 * f,
            I1 * gamma,
-           (N1/1000) * alpha * (1-v) ,
-           (N1/1000) * alpha * v,
+           (Nt/1000) * alpha * (1-v) ,
+           (Nt/1000) * alpha * v,
            (S1/1000) * omega[1],
            (E1/1000) * omega[1],
            (I1/1000) * omega[1],
            (R1/1000) * omega[1],
-           S2 * beta * (I/N2), #old
+           S2 * beta * (I/Nt), #old
            E2 * f,
            I2 * gamma,
            (S2/1000) * omega[2],

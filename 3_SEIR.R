@@ -21,28 +21,29 @@ init.values = c(
   E3 = c(0,0),
   I3 = c(20,2),
   R3 = c(0,0),
-  D = 100 #begining of vaccination
+  D = c(100,100,100) #Begining of vaccination
   )
 
 transitions = list(
+  #pop1
   #young
-  c(S1 = -1, E1 = +1), #Infection
-  c(E1 = -1, I1 = +1), #infectious
-  c(I1 = -1, R1 = +1),  #Recovery
-  c(S1 = +1), #Vaccinations
-  c(R1 = +1), #Deaths
-  c(S1 = -1),
-  c(E1 = -1),
-  c(I1 = -1),
-  c(R1 = -1),
+  c(S11 = -1, E11 = +1), #Infection
+  c(E11 = -1, I11 = +1), #infectious
+  c(I11 = -1, R11 1= +1),  #Recovery
+  c(S11 = +1), #Vaccinations
+  c(R11 = +1),
+  c(S11 = -1), #Deaths
+  c(E11 = -1),
+  c(I11 = -1),
+  c(R11 = -1),
   #old
-  c(S2 = -1, E2 = +1), #Infection
-  c(E2 = -1, I2 = +1), #infectious
-  c(I2 = -1, R2 = +1),  #Recovery
-  c(S2 = -1),
-  c(E2 = -1),
-  c(I2 = -1),
-  c(R2 = -1)
+  c(S12 = -1, E12 = +1), #Infection
+  c(E12 = -1, I12 = +1), #infectious
+  c(I12 = -1, R12 = +1),  #Recovery
+  c(S12 = -1), #Deaths
+  c(E12 = -1),
+  c(I12 = -1),
+  c(R12 = -1),
 )
 
 parameters = c(
@@ -56,7 +57,9 @@ parameters = c(
 
 RateF <- function(x, p, t) {
   #local parameters
-  beta <- p["R0"]/(p["infectious.period"])
+  beta <- c(p["R01"]/(p["infectious.period"]),
+            p["R02"]/(p["infectious.period"])
+        )
   f <- 1/p["latent.period"]
   gamma <- 1/p["infectious.period"]
   alpha <- p["birth.rate"]/365
@@ -64,10 +67,11 @@ RateF <- function(x, p, t) {
              p["death.rate2"]/365)
   v <- ifelse(t<x["D"], p["vacc.pro"], 0)
   #local population values
-  S1 <- x["S1"]
-  E1 <- x["E1"]
-  I1 <- x["I1"]
-  R1 <- x["R1"]
+  
+  S1 <- x["S11"] + x["S12"]
+  E1 <- x["E11"] + x["E12"]
+  I1 <- x["I11"] + x["I12"]
+  R1 <- x["R11"] + x["I12"]
   S2 <- x["S2"]
   E2 <- x["E2"]
   I2 <- x["I2"]
@@ -78,8 +82,9 @@ RateF <- function(x, p, t) {
   R <- R1 + R2
   N1 <- S1 + E1 + I1 + R1
   N2 <- S2 + E2 + I2 + R2
+  N1.t <- N1.y + N1.o
   #Rate Functions
-  return(c(S1 * beta * (I/N1), #young
+  return(c(S1 * beta[1] * (I/N1.t), #young
            E1 * f,
            I1 * gamma,
            (N1/1000) * alpha * (1-v) ,
@@ -88,7 +93,7 @@ RateF <- function(x, p, t) {
            (E1/1000) * omega[1],
            (I1/1000) * omega[1],
            (R1/1000) * omega[1],
-           S2 * beta * (I/N2), #old
+           S2 * beta * (I/N1.t), #old
            E2 * f,
            I2 * gamma,
            (S2/1000) * omega[2],
