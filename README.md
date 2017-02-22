@@ -12,7 +12,13 @@ A single population SEIR model of Measles, googleVis output
 
 * 1_SEIR - **Working**
 
-SEIR model with birth, deaths, and vaccinations
+SEIR model with birth, deaths, and vaccinations. Rates are approximated from
+worldbank and WHO data on the EU from 2016.
+
+* 3_SEIR - **Work in progress**
+
+1_SEIR scaled up to 3 populations. Working out the rate function and transitions
+to see if a single transition coupled with multiple rate functions is more optimal.
 
 * alternateSIRpresentation
 
