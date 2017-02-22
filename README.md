@@ -24,7 +24,7 @@ Allocated space for working on visualization code seprate from main file
 
 * seasonalbetawip - **Broken**
 
-An investigation in seasonal changes in transmission modeled using a cosine function. *(spoiler: that was a terrible idea)*
+An investigation in seasonal changes in transmission modeled using a cosine function. *(spoiler: that was a terrible idea)*  
 Also began reworking the rate function to accept more tangible numbers (R0, birthrate, etc.) for ease of understanding.
 
 * WIP - **Spaghetti**
