@@ -3,7 +3,7 @@ An MSc. Epi summer project *(sometimes)* building stochastic models in R
 
 ##Dependent Libraries
 * Adaptivetau
-* googleVis (html visualization output through json)
+* googleVis (js embedded html visualization)
 
 ##Files
 * Base_SEIR - **Working**
