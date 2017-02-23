@@ -1,13 +1,21 @@
 #model visualization work in progress
-#untested 23/2
+#not working, figure out data structures 23/2
 
-SIRplot <- function(mat,...,y.axis = "lin", x.range = c(0,(mat[length(mat),"time"])),parameters = NULL){
-    #store plot variables into a list 
-    plot_vars <- list(...) 
+SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.range = c(0,(mat[nrow(mat),"time"])),parameters = NULL){
+    #determine row numbers for given x range 
+    rag <- c(which(mat[,"time"] == x.range[1]), 
+             which(mat[,"time"] == x.range[2])
+             )
+    
     #store plot variables in a df
-    gvplot_dat <- data.frame(mat[x.range1[1]:x.range[2],plot_vars], stringsAsFactors = FALSE)
+    gvplot_dat <- data.frame()
+    for (i in 1:length(vars)) {
+      gvplot_dat <- cbind(gvplot_dat, mat[rag[1]:rag[2],vars[i]])
+      next()
+    }
+  
     #begin plotting 
-    if (parameters = NULL){ #no parameter table
+    if (is.null(parameters)) { #no parameter table
         g_graph <- gvisLineChart(gvplot_dat,
                  options = list(
                    title = "Model Output",
