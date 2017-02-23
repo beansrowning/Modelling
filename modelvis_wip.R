@@ -1,4 +1,5 @@
 #model visualization work in progress
+#untested 23/2
 
 SIRplot <- function(mat,...,y.axis = "lin", x.range = c(0,(mat[length(mat),"time"])),parameters = NULL){
     #store plot variables into a list 
@@ -26,6 +27,10 @@ SIRplot <- function(mat,...,y.axis = "lin", x.range = c(0,(mat[length(mat),"time
                    height = 400
                  ))
         paratab <- data.frame(Parameter = names(parameters), Value = parameters, stringsAsFactors = FALSE)
+        g_table <- gvisTable(para_tab,options = list(
+                   width = 200,
+                   height = 400
+                ))
         g_merge <- gvisMerge(g_graph,g_table, horizontal = TRUE,
                    tableOptions="bgcolor=\"#607D8B\" cellspacing=10" #coral blue number 5
                       )
