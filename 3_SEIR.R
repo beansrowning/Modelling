@@ -1,6 +1,6 @@
 #Three Population Measles SEIR Model with gVis output
-#21/2/2017 Sean Browning
-#Added birth, death, and vaccination rates
+#22/2/2017 Sean Browning
+#Added birth, death, and vaccination rates 
 #Two rates of infection
 #Depends: 'adaptivetau', 'googleVis'
 
@@ -21,7 +21,7 @@ init.values = c(
   E3 = c(0,0),
   I3 = c(20,2),
   R3 = c(0,0),
-  D = c(100,100,100) #Begining of vaccination
+  D = c(0,0,0) #Begining of vaccination
   )
 
 transitions = list(
@@ -29,7 +29,7 @@ transitions = list(
   #young
   c(S11 = -1, E11 = +1), #Infection
   c(E11 = -1, I11 = +1), #infectious
-  c(I11 = -1, R11 1= +1),  #Recovery
+  c(I11 = -1, R11 = +1),  #Recovery
   c(S11 = +1), #Vaccinations
   c(R11 = +1),
   c(S11 = -1), #Deaths
@@ -44,13 +44,51 @@ transitions = list(
   c(E12 = -1),
   c(I12 = -1),
   c(R12 = -1),
+  #pop2
+  #young
+  c(S21 = -1, E21 = +1), #Infection
+  c(E21 = -1, I21 = +1), #infectious
+  c(I21 = -1, R21 = +1), #Recovery
+  c(S21 = +1), #Vaccinations
+  c(R21 = +1),
+  c(S21 = -1), #Deaths
+  c(E21 = -1),
+  c(I21 = -1),
+  c(R21 = -1),
+  #old
+  c(S22 = -1, E22 = +1), #Infection
+  c(E22 = -1, I22 = +1), #infectious
+  c(I22 = -1, R22 = +1),  #Recovery
+  c(S22 = -1), #Deaths
+  c(E22 = -1),
+  c(I22 = -1),
+  c(R22 = -1),
+  #pop3
+  #young
+  c(S31 = -1, E31 = +1), #Infection
+  c(E31 = -1, I31 = +1), #infectious
+  c(I31 = -1, R31 = +1), #Recovery
+  c(S31 = +1), #Vaccinations
+  c(R31 = +1),
+  c(S31 = -1), #Deaths
+  c(E31 = -1),
+  c(I31 = -1),
+  c(R31 = -1),
+  #old
+  c(S32 = -1, E32 = +1), #Infection
+  c(E32 = -1, I32 = +1), #infectious
+  c(I32 = -1, R32 = +1),  #Recovery
+  c(S32 = -1), #Deaths
+  c(E32 = -1),
+  c(I32 = -1),
+  c(R32 = -1)
 )
 
 parameters = c(
-  R0 = 16,
+  R0 = c(16,14),
   infectious.period = 7, #days
   latent.period = 8, #days
-  vacc.pro = 0.9, #proportion
+  vacc.pro = c(0.9,0.75,0.6), #proportion
   birth.rate = 10, #per 1000, anum
   death.rate = c(10,10) #per 1000, anum
 )
@@ -65,54 +103,109 @@ RateF <- function(x, p, t) {
   alpha <- p["birth.rate"]/365
   omega <- c(p["death.rate1"]/365,
              p["death.rate2"]/365)
-  v <- ifelse(t<x["D"], p["vacc.pro"], 0)
+  v1 <- ifelse(t<x["D1"], p["vacc.pro1"], 0)
+  v2 <- ifelse(t<x["D2"], p["vacc.pro2"], 0)
+  v3 <- ifelse(t<x["D3"], p["vacc.pro2"], 0)
   #local population values
-  
   S1 <- x["S11"] + x["S12"]
   E1 <- x["E11"] + x["E12"]
   I1 <- x["I11"] + x["I12"]
   R1 <- x["R11"] + x["I12"]
-  S2 <- x["S2"]
-  E2 <- x["E2"]
-  I2 <- x["I2"]
-  R2 <- x["R2"]
-  S <- S1 + S2
-  E <- E1 + E2
-  I <- I1 + I2
-  R <- R1 + R2
-  N1 <- S1 + E1 + I1 + R1
-  N2 <- S2 + E2 + I2 + R2
+  N1.y <- x["S11"] + x["E11"] + x["I11"] + x["R11"]
+  N1.o <- x["S12"] + x["E12"] + x["I12"] + x["R12"]
   N1.t <- N1.y + N1.o
+  S2 <- x["S21"] + x["S22"]
+  E2 <- x["E21"] + x["E22"]
+  I2 <- x["I21"] + x["I22"]
+  R2 <- x["R21"] + x["I22"]
+  N2.y <- x["S21"] + x["E21"] + x["I21"] + x["R21"]
+  N2.o <- x["S22"] + x["E22"] + x["I22"] + x["R22"]
+  N2.t <- N2.y + N2.o
+  S3 <- x["S31"] + x["S32"]
+  E3 <- x["E31"] + x["E32"]
+  I3 <- x["I31"] + x["I32"]
+  R3 <- x["R31"] + x["I32"]
+  N3.y <- x["S31"] + x["E31"] + x["I31"] + x["R31"]
+  N3.o <- x["S32"] + x["E32"] + x["I32"] + x["R32"]
+  N3.t <- N3.y + N3.o
+  N.t <- N1.t + N2.t + N3.t
   #Rate Functions
-  return(c(S1 * beta[1] * (I/N1.t), #young
-           E1 * f,
-           I1 * gamma,
-           (N1/1000) * alpha * (1-v) ,
-           (N1/1000) * alpha * v,
-           (S1/1000) * omega[1],
-           (E1/1000) * omega[1],
-           (I1/1000) * omega[1],
-           (R1/1000) * omega[1],
-           S2 * beta * (I/N1.t), #old
-           E2 * f,
-           I2 * gamma,
-           (S2/1000) * omega[2],
-           (E2/1000) * omega[2],
-           (I2/1000) * omega[2],
-           (R2/1000) * omega[2]
+  return(c(x["S11"] * beta[1] * (I1/N.t) +  #young
+           x["S11"] * beta[2] * (I2/N.t) +
+           x["S11"] * beta[2] * (I3/N.t),
+           x["E11"] * f,
+           x["I11"] * gamma,
+           (N1.t/1000) * alpha * (1-v1) ,
+           (N1.t/1000) * alpha * v1,
+           (x["S11"]/1000) * omega[1],
+           (x["E11"]/1000) * omega[1],
+           (x["I11"]/1000) * omega[1],
+           (x["R11"]/1000) * omega[1],
+           x["S12"] * beta[1] * (I1/N.t) +  #old
+           x["S12"] * beta[2] * (I2/N.t) +
+           x["S12"] * beta[2] * (I3/N.t),
+           x["E12"] * f,
+           x["I12"] * gamma,
+           (x["S12"]/1000) * omega[2],
+           (x["E12"]/1000) * omega[2],
+           (x["I12"]/1000) * omega[2],
+           (x["R12"]/1000) * omega[2],
+           #pop2
+           x["S21"] * beta[1] * (I2/N.t) +  #young
+           x["S21"] * beta[2] * (I1/N.t) +
+           x["S21"] * beta[2] * (I3/N.t),
+           x["E21"] * f,
+           x["I21"] * gamma,
+           (N2.t/1000) * alpha * (1-v2) ,
+           (N2.t/1000) * alpha * v2,
+           (x["S21"]/1000) * omega[1],
+           (x["E21"]/1000) * omega[1],
+           (x["I21"]/1000) * omega[1],
+           (x["R21"]/1000) * omega[1],
+           x["S22"] * beta[1] * (I2/N.t) +  #old
+           x["S22"] * beta[2] * (I1/N.t) +
+           x["S22"] * beta[2] * (I3/N.t),
+           x["E22"] * f,
+           x["I22"] * gamma,
+           (x["S22"]/1000) * omega[2],
+           (x["E22"]/1000) * omega[2],
+           (x["I22"]/1000) * omega[2],
+           (x["R22"]/1000) * omega[2],
+           #pop3
+           x["S31"] * beta[1] * (I3/N.t) +  #young
+           x["S31"] * beta[2] * (I1/N.t) +
+           x["S31"] * beta[2] * (I2/N.t),
+           x["E31"] * f,
+           x["I31"] * gamma,
+           (N3.t/1000) * alpha * (1-v3) ,
+           (N3.t/1000) * alpha * v3,
+           (x["S31"]/1000) * omega[1],
+           (x["E31"]/1000) * omega[1],
+           (x["I31"]/1000) * omega[1],
+           (x["R31"]/1000) * omega[1],
+           x["S32"] * beta[1] * (I3/N.t) +  #old
+           x["S32"] * beta[2] * (I1/N.t) +
+           x["S32"] * beta[2] * (I2/N.t),
+           x["E32"] * f,
+           x["I32"] * gamma,
+           (x["S32"]/1000) * omega[2],
+           (x["E32"]/1000) * omega[2],
+           (x["I32"]/1000) * omega[2],
+           (x["R32"]/1000) * omega[2]
   ))
  }
 
 #runs
 set.seed(100)
-runs=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=50)
+runs=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=150)
 
 
 #Plotting
 gvplot_dat <- data.frame(time = runs[,"time"], #store plot variables in a df
-S = runs[,"S1"] + runs[,"S2"],
-I = runs[,"I1"] + runs[,"I1"],
-R = runs[,"R1"] + runs[,"R2"])
+S = runs[,"S11"] + runs[,"S12"] + runs[,"S21"] + runs[,"S22"] + runs[,"S31"] + runs[,"S32"],
+I = runs[,"I11"] + runs[,"I12"] + runs[,"I21"] + runs[,"I22"] + runs[,"I31"] + runs[,"I32"],
+R = runs[,"R11"] + runs[,"R12"] + runs[,"R21"] + runs[,"R22"] + runs[,"R31"] + runs[,"R32"]
+)
 gvisgraph  <- gvisLineChart(gvplot_dat,
                            options = list(
                              title = "Measles SEIR Model",
