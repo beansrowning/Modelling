@@ -9,13 +9,14 @@ SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.
     
     #store plot variables in a df
     gvplot_dat <- data.frame()
+    dim(gvplot_dat) <- c(rag[2],0)
     for (i in 1:length(vars)) {
       gvplot_dat <- cbind(gvplot_dat, mat[rag[1]:rag[2],vars[i]])
       next()
     }
   
     #begin plotting 
-    if (is.null(parameters)) { #no parameter table
+    if (is.null(parameters) == TRUE) { #no parameter table
         g_graph <- gvisLineChart(gvplot_dat,
                  options = list(
                    title = "Model Output",

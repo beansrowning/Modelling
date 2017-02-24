@@ -112,8 +112,8 @@ new_RateF <- function(x, p, t) {
   N2 <- S2 + I2 + R2
   N3 <- S3 + I3 + R3
   N <- N1 + N2 + N3
-  beta1 <- abs((b1-(.75*b1))*cos(t/(365*pi))+(.4*b1))
-  beta2 <- abs((b2-(.75*b2))*cos(t/(365*pi))+(.4*b2))
+  beta1 <- (b1*cos(t/(365*pi))+(1)
+  beta2 <- (b2*cos(t/(365*pi))+(1)
 
   return(c(x["S1Y"] * beta1 * (I1/(N1)), #infection rates
            x["S1Y"] * beta2 * (I2/(N1)),
