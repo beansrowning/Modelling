@@ -1,9 +1,9 @@
 #Three Population Measles SEIR Model
 #25/2/2017 Sean Browning
-#Added birth, death, and vaccination rates 
+#Added birth, death, and vaccination rates
 #Two rates of infection
 #offloaded visualization to a seprate function
-#Depends: 'adaptivetau', 'googleVis', modelvis_wip.R
+#Depends: 'adaptivetau', 'googleVis', modelvis.R
 library(adaptivetau)
 library(googleVis)
 
@@ -200,7 +200,7 @@ set.seed(100)
 runs=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=150)
 
 
-#Create summary measures for plotting 
+#Create summary measures for plotting
 runs <- cbind(runs, #store plot variables in a df
 S = rowSums(runs[,c("S11","S12","S21","S22","S31","S32")]),
 I = rowSums(runs[,c("I11","I12","I21","I22","I31","I32")]),

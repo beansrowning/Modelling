@@ -1,5 +1,5 @@
 # Modelling
-A MSc. Epi summer project *(sometimes)* building stochastic models in R
+A MSc. Epi summer project *(sometimes)* building stochastic models in R  
 By: Sean Browning LSHTM 2017
 
 ##Dependent Libraries
