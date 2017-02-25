@@ -1,9 +1,9 @@
-#Three Population Measles SEIR Model with gVis output
-#22/2/2017 Sean Browning
+#Three Population Measles SEIR Model
+#25/2/2017 Sean Browning
 #Added birth, death, and vaccination rates 
 #Two rates of infection
-#Depends: 'adaptivetau', 'googleVis'
-
+#offloaded visualization to a seprate function
+#Depends: 'adaptivetau', 'googleVis', modelvis_wip.R
 library(adaptivetau)
 library(googleVis)
 
@@ -200,26 +200,20 @@ set.seed(100)
 runs=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=150)
 
 
-#Plotting
-gvplot_dat <- data.frame(time = runs[,"time"], #store plot variables in a df
-S = runs[,"S11"] + runs[,"S12"] + runs[,"S21"] + runs[,"S22"] + runs[,"S31"] + runs[,"S32"],
-I = runs[,"I11"] + runs[,"I12"] + runs[,"I21"] + runs[,"I22"] + runs[,"I31"] + runs[,"I32"],
-R = runs[,"R11"] + runs[,"R12"] + runs[,"R21"] + runs[,"R22"] + runs[,"R31"] + runs[,"R32"]
+#Create summary measures for plotting 
+runs <- cbind(runs, #store plot variables in a df
+S = rowSums(runs[,c("S11","S12","S21","S22","S31","S32")]),
+I = rowSums(runs[,c("I11","I12","I21","I22","I31","I32")]),
+R = rowSums(runs[,c("R11","R12","R21","R22","R31","R32")]),
+S1 = rowSums(runs[,c("S11","S12")]),
+I1 = rowSums(runs[,c("I11","I12")]),
+R1 = rowSums(runs[,c("R11","R12")]),
+S2 = rowSums(runs[,c("S21","S22")]),
+I2 = rowSums(runs[,c("I21","I22")]),
+R2 = rowSums(runs[,c("R21","R22")]),
+S3 = rowSums(runs[,c("S31","S32")]),
+I3 = rowSums(runs[,c("I31","I32")]),
+R3 = rowSums(runs[,c("R31","R32")])
 )
-gvisgraph  <- gvisLineChart(gvplot_dat,
-                           options = list(
-                             title = "Measles SEIR Model",
-                             hAxis="{title:'Time', titleTextStyle:{color:'black'}}",
-                             vAxis="{title:'Count', titleTextStyle:{color:'black'}, scaleType: 'lin'}",
-                             width = 668,
-                             height = 400
-                           ))
-para_tab <- data.frame(Parameter = names(parameters), Value = parameters, stringsAsFactors = FALSE)
-gvistable <- gvisTable(para_tab,options = list(
-                            width = 200,
-                            height = 400
-                           ))
-plot <- gvisMerge(gvisgraph,gvistable, horizontal = TRUE,
-                        tableOptions="bgcolor=\"#607D8B\" cellspacing=10" #coral blue number 5
-                           )
-plot(plot)
+#plot overall SIR
+SIRplot(runs, vars = c("time", "S", "I", "R"), parameters = parameters)
