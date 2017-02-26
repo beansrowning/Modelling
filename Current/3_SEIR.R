@@ -4,8 +4,13 @@
 #Two rates of infection
 #offloaded visualization to a seprate function
 #Depends: 'adaptivetau', 'googleVis', modelvis.R
-library(adaptivetau)
-library(googleVis)
+if(!require(adaptivetau)){
+  install.packages("adaptivetau")
+  suppressPackageStartupMessages(library(adaptivetau))
+
+} else {
+  suppressPackageStartupMessages(library(adaptivetau))
+}
 
 #Defining input
 init.values = c(

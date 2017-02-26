@@ -1,14 +1,19 @@
 #model visualization work in progress
 #working 25/2/2017
-
+if(!require(googleVis)){
+  install.packages("googleVis")
+  suppressPackageStartupMessages(library(googleVis))
+} else {
+  suppressPackageStartupMessages(library(googleVis))
+}
 SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.range = c(0,(mat[nrow(mat),"time"])),parameters = NULL){
     #determine row numbers for given x.range
     rag <- which(mat[,"time"] >= x.range[1] & mat[,"time"] <= x.range[2])
     x.range <- c(rag[1],rag[length(rag)])
-    
+
     #subset plot variables from matrix and store in a df
     gvplot_dat <- as.data.frame(runs[x.range[1]:x.range[2],vars])
-    
+
     #begin plotting
     if (y.axis == "lin") {
       if (is.null(parameters) == TRUE) { #no parameter table
