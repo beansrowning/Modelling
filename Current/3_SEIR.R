@@ -11,7 +11,7 @@ if(!require(adaptivetau)){
 } else {
   suppressPackageStartupMessages(library(adaptivetau))
 }
-
+script.dir <- dirname(sys.frame(1)$ofile); source(script.dir/"modelvis.R")
 #Defining input
 init.values = c(
   S1 = c(10^4,10^5),
