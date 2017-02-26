@@ -11,7 +11,11 @@ if(!require(adaptivetau)){
 } else {
   suppressPackageStartupMessages(library(adaptivetau))
 }
-script.dir <- dirname(sys.frame(1)$ofile); source(script.dir/"modelvis.R")
+
+#Source model visualization 
+script.dir <- dirname(sys.frame(1)$ofile); 
+source(paste0(script.dir,"/modelvis.R"))
+
 #Defining input
 init.values = c(
   S1 = c(10^4,10^5),
@@ -49,7 +53,7 @@ transitions = list(
   c(E12 = -1),
   c(I12 = -1),
   c(R12 = -1),
-  c(I12 = +1) #migration event
+  c(I12 = +1), #migration event
   #pop2
   #young
   c(S21 = -1, E21 = +1), #Infection
@@ -69,7 +73,7 @@ transitions = list(
   c(E22 = -1),
   c(I22 = -1),
   c(R22 = -1),
-  c(I22 = +1) #migration event
+  c(I22 = +1), #migration event
   #pop3
   #young
   c(S31 = -1, E31 = +1), #Infection
@@ -211,7 +215,7 @@ RateF <- function(x, p, t) {
 
 #runs
 set.seed(100)
-runs=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=3600)
+runs=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=365)
 
 
 #Create summary measures for plotting
