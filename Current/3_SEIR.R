@@ -44,6 +44,7 @@ transitions = list(
   c(E12 = -1),
   c(I12 = -1),
   c(R12 = -1),
+  c(I12 = +1) #migration event
   #pop2
   #young
   c(S21 = -1, E21 = +1), #Infection
@@ -63,6 +64,7 @@ transitions = list(
   c(E22 = -1),
   c(I22 = -1),
   c(R22 = -1),
+  c(I22 = +1) #migration event
   #pop3
   #young
   c(S31 = -1, E31 = +1), #Infection
@@ -81,7 +83,8 @@ transitions = list(
   c(S32 = -1), #Deaths
   c(E32 = -1),
   c(I32 = -1),
-  c(R32 = -1)
+  c(R32 = -1),
+  c(I32 = +2) #migration event
 )
 
 parameters = c(
@@ -91,7 +94,8 @@ parameters = c(
   vacc.pro = c(0.6,0.6,0.6), #proportion
   birth.rate = 10, #per 1000, anum
   young.size = 5, #years in the young division
-  death.rate = 10 #per 1000, anum
+  death.rate = 10, #per 1000, anum
+  migration.events = 2 #per anum
 )
 
 RateF <- function(x, p, t) {
@@ -107,6 +111,7 @@ RateF <- function(x, p, t) {
   v1 <- ifelse(t<x["D1"], p["vacc.pro1"], 0)
   v2 <- ifelse(t<x["D2"], p["vacc.pro2"], 0)
   v3 <- ifelse(t<x["D3"], p["vacc.pro2"], 0)
+  migration <- p["migration.events"]/365
   #local population values
   S1 <- x["S11"] + x["S12"]
   E1 <- x["E11"] + x["E12"]
@@ -151,6 +156,7 @@ RateF <- function(x, p, t) {
            (x["E12"]/1000) * omega,
            (x["I12"]/1000) * omega,
            (x["R12"]/1000) * omega,
+           migration,
            #pop2
            x["S21"] * beta[1] * (I2/N.t) +  #young
            x["S21"] * beta[2] * (I1/N.t) +
@@ -172,6 +178,7 @@ RateF <- function(x, p, t) {
            (x["E22"]/1000) * omega,
            (x["I22"]/1000) * omega,
            (x["R22"]/1000) * omega,
+           migration,
            #pop3
            x["S31"] * beta[1] * (I3/N.t) +  #young
            x["S31"] * beta[2] * (I1/N.t) +
@@ -192,7 +199,8 @@ RateF <- function(x, p, t) {
            (x["S32"]/1000) * omega,
            (x["E32"]/1000) * omega,
            (x["I32"]/1000) * omega,
-           (x["R32"]/1000) * omega
+           (x["R32"]/1000) * omega,
+           migration
   ))
  }
 
