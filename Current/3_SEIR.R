@@ -6,11 +6,9 @@
 #Depends: 'adaptivetau', 'googleVis', modelvis.R
 if(!require(adaptivetau)){
   install.packages("adaptivetau")
+}
   suppressPackageStartupMessages(library(adaptivetau))
 
-} else {
-  suppressPackageStartupMessages(library(adaptivetau))
-}
 
 #Source model visualization 
 script.dir <- dirname(sys.frame(1)$ofile); 
@@ -39,8 +37,8 @@ transitions = list(
   c(S11 = -1, E11 = +1), #Infection
   c(E11 = -1, I11 = +1), #infectious
   c(I11 = -1, R11 = +1),  #Recovery
-  c(S11 = +1), #Vaccinations
-  c(R11 = +1),
+  c(S11 = +1), #Birth
+  c(R11 = +1), #vaccination
   c(S11 = -1, S12 = +1), #aging
   c(E11 = -1, E12 = +1),
   c(I11 = -1, I12 = +1),
