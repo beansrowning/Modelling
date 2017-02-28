@@ -11,7 +11,6 @@ suppressPackageStartupMessages(library(adaptivetau))
 #Source model visualization
 script.dir <- dirname(sys.frame(1)$ofile); source(paste0(script.dir,"/modelvis.R"))
 
-
 #Defining input
 init.values = c(
   S = c(81821,182724),
@@ -21,32 +20,17 @@ init.values = c(
   D = 0 #begining of vaccination
   )
 
-transitions = list(
-  #young
-  c(S1 = -1, E1 = +1), #Infection
-  c(E1 = -1, I1 = +1), #infectious
-  c(I1 = -1, R1 = +1),  #Recovery
-  c(S1 = +1), #Birth
-  c(R1 = +1), #Vaccination
-  #c(S1 = -1, R1 = +1), #catch-up programme
-  c(S1 = -1, S2 = +1), #age out
-  c(E1 = -1, E1 = +1),
-  c(I1 = -1, I2 = +1),
-  c(R1 = -1, R2 = +1),
-  c(I1 = +1), #migrated infection
-  #old
-  c(S2 = -1, E2 = +1), #Infection
-  c(E2 = -1, I2 = +1), #infectious
-  c(I2 = -1, R2 = +1),  #Recovery
-  c(S2 = -1), #death
-  c(E2 = -1),
-  c(I2 = -1),
-  c(R2 = -1),
-  c(I2 = +1) #migrated infection
-)
+transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
+  rbind(c("S1","E1","I1"),-1,c("E1","I1","R1"),+1),
+  rbind(c("S1","R1"),+1),
+  rbind(c("S1","E1","I1","R1"),-1,c("S2","E2","I2","R2"),+1),
+  rbind("I1",+1),
+  rbind(c("S2","E2","I2"),-1,c("E2","I2","R2"),+1),
+  rbind(c("S2","E2","I2","R2"),-1),
+  rbind("I2",+1)
+  )
 
-parameters = c(
-  #Kyrgyzstan
+parameters = c( #Kyrgyzstan
   R0 = 16,
   infectious.period = 7, #days
   latent.period = 8, #days
@@ -109,12 +93,11 @@ RateF <- function(x, p, t) {
 #runs
 runs=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=365)
 
-
 #Summary Measures
 runs <- cbind(runs,
 S = rowSums(runs[,c("S1","S2")]),
-I = rowSums(runs[,c("I1", "I2")]),
-R = rowSums(runs[,c("R1", "R2")])
+I = rowSums(runs[,c("I1","I2")]),
+R = rowSums(runs[,c("R1","R2")])
 )
 #Plot
 SIRplot(runs, vars = c("time", "S", "I", "R"), parameters = parameters)
