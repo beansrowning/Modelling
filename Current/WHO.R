@@ -1,4 +1,4 @@
-#WHO EURO 1 population measles model
+#WHO EURO 1 population measles model (Diagnostic)
 #28/2/2017 Sean Browning
 #Kyrgyzstan data (96% vac in 1-20, 95% in 20-inf)
 #Depends: 'adaptivetau', 'googleVis', modelvis.R
@@ -15,12 +15,12 @@ script.dir <- dirname(sys.frame(1)$ofile); source(paste0(script.dir,"/modelvis.R
 init.values = c(
   S = c(81821,182724),
   E = c(0,0),
-  I = c(0,0),
+  I = c(0,0,0),
   R = c(1963692,3471763),
   D = 0 #begining of vaccination
   )
 
-transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
+transitions = ssa.maketrans(c("S1","E1","I1","R1","I3","S2","E2","I2","R2"),
   rbind(c("S1","E1","I1"),-1,c("E1","I1","R1"),+1),
   rbind(c("S1","R1"),+1),
   rbind(c("S1","E1","I1","R1"),-1,c("S2","E2","I2","R2"),+1),
@@ -38,7 +38,7 @@ parameters = c( #Kyrgyzstan
   young.size = 20, # years
   birth.rate = 25.9, #per 1000, anum
   death.rate = 5.4, #per 1000, anum
-  migr.event = 20 #date of introduction 
+  migr.event = 30 #date of introduction 
 )
 
 RateF <- function(x, p, t) {
@@ -50,7 +50,7 @@ RateF <- function(x, p, t) {
   omega <- p["death.rate"]/365
   v <- ifelse(t<x["D"], p["vacc.pro"], 0)
   age.out <- 1/(p["young.size"]*365)
-  new <- ifelse((p["migr.event"]-1) < t%%365 && t%%365 >= p["migr.event"],1,0) 
+  new <- ifelse((p["migr.event"]-1) < t && t <= p["migr.event"],1,0) 
   #local population values
   S1 <- x["S1"]
   E1 <- x["E1"]
@@ -68,12 +68,11 @@ RateF <- function(x, p, t) {
   N2 <- S2 + E2 + I2 + R2
   Nt <- N1 + N2
   #Rate Functions
-  return(c(S1 * beta[1] * (I/Nt), #pop1young
+  return(c(S1 * beta[1] * (I/Nt), #young
            E1 * f,
            I1 * gamma,
            (Nt/1000) * alpha * (1-v) ,
            (Nt/1000) * alpha * v,
-           #S1 * v,
            S1 * age.out,
            E1 * age.out,
            I1 * age.out,
@@ -91,13 +90,14 @@ RateF <- function(x, p, t) {
  }
  
 #runs
-runs_i=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=365)
+run=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=365)
 
 #Summary Measures
-runs_i <- cbind(runs,
-S_i = rowSums(runs_i[,c("S1","S2")]),
-I_i = rowSums(runs_i[,c("I1","I2")]),
-R_i = rowSums(runs_i[,c("R1","R2")])
+run <- cbind(run,
+S = rowSums(run[,c("S1","S2")]),
+I = rowSums(run[,c("I1","I2")]),
+R = rowSums(run[,c("R1","R2")])
 )
 #Plot
-SIRplot(runs_i, vars = c("time", "S", "I", "R"), parameters = parameters)
+#plotting only the compartment that stores those cases introduced
+SIRplot(run, vars = c("time","I3"), parameters = parameters)  #"S", "I", "R"
