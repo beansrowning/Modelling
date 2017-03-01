@@ -11,7 +11,7 @@ SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.
     x.range <- c(rag[1],rag[length(rag)])
 
     #subset plot variables from matrix and store in a df
-    gvplot_dat <- as.data.frame(runs[x.range[1]:x.range[2],vars])
+    gvplot_dat <- as.data.frame(mat[x.range[1]:x.range[2],vars])
 
     #begin plotting
     if (y.axis == "lin") {
