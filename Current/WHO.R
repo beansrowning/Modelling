@@ -30,6 +30,17 @@ transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
   rbind("I2",+1)
   )
 
+  parameters = c( #Kyrgyzstan
+    R0 = 16,
+    infectious.period = 7, #days
+    latent.period = 8, #days
+    vacc.pro = 0.95, #proportion
+    young.size = 20, # years
+    birth.rate = 25.9, #per 1000, anum
+    death.rate = 5.4, #per 1000, anum
+    migr.event = 0 #date of introduction
+  )
+
 RateF <- function(x, p, t) {
   #local parameters
   beta <- p["R0"]/(p["infectious.period"])
@@ -39,7 +50,7 @@ RateF <- function(x, p, t) {
   omega <- p["death.rate"]/365
   v <- ifelse(t<x["D"], p["vacc.pro"], 0)
   age.out <- 1/(p["young.size"]*365)
-  new <- ifelse(t%%365=migr.event,1,0) 
+  new <- ifelse(t%%365=migr.event,1,0)
   #local population values
   S1 <- x["S1"]
   E1 <- x["E1"]
@@ -79,27 +90,14 @@ RateF <- function(x, p, t) {
   ))
  }
 
-for(i in 1:2){
-parameters = c( #Kyrgyzstan
-  R0 = 16,
-  infectious.period = 7, #days
-  latent.period = 8, #days
-  vacc.pro = 0.95, #proportion
-  young.size = 20, # years
-  birth.rate = 25.9, #per 1000, anum
-  death.rate = 5.4, #per 1000, anum
-  migr.event = 0+i #date of introduction 
-)
-#runs
-runs_i=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=365)
+#run
+run=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=365)
 
 #Summary Measures
-runs_i <- cbind(runs,
-S_i = rowSums(runs[,c("S1","S2")]),
-I_i = rowSums(runs[,c("I1","I2")]),
-R_i = rowSums(runs[,c("R1","R2")])
+run <- cbind(run,
+S = rowSums(run[,c("S1","S2")]),
+I = rowSums(run[,c("I1","I2")]),
+R = rowSums(run[,c("R1","R2")])
 )
 #Plot
-SIRplot(runs_i, vars = c("time", "S", "I", "R"), parameters = parameters)
-next()
-}
+SIRplot(run, vars = c("time", "S", "I", "R"), parameters = parameters)
