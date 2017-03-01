@@ -24,10 +24,10 @@ transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
   rbind(c("S1","E1","I1"),-1,c("E1","I1","R1"),+1),
   rbind(c("S1","R1"),+1),
   rbind(c("S1","E1","I1","R1"),-1,c("S2","E2","I2","R2"),+1),
-  rbind("I1",+1),
+  rbind("I3",+1),
   rbind(c("S2","E2","I2"),-1,c("E2","I2","R2"),+1),
   rbind(c("S2","E2","I2","R2"),-1),
-  rbind("I2",+1)
+  rbind("I3",+1)
   )
   
 parameters = c( #Kyrgyzstan
@@ -38,7 +38,7 @@ parameters = c( #Kyrgyzstan
   young.size = 20, # years
   birth.rate = 25.9, #per 1000, anum
   death.rate = 5.4, #per 1000, anum
-  migr.event = 0 #date of introduction 
+  migr.event = 20 #date of introduction 
 )
 
 RateF <- function(x, p, t) {
@@ -50,7 +50,7 @@ RateF <- function(x, p, t) {
   omega <- p["death.rate"]/365
   v <- ifelse(t<x["D"], p["vacc.pro"], 0)
   age.out <- 1/(p["young.size"]*365)
-  new <- ifelse(t%%365==p["migr.event"],1,0) 
+  new <- ifelse((p["migr.event"]-1) < t%%365 && t%%365 >= p["migr.event"],1,0) 
   #local population values
   S1 <- x["S1"]
   E1 <- x["E1"]
