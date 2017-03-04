@@ -84,10 +84,11 @@ RateF <- function(x, p, t) {
  }
  
 #runs
-SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters, t_int, i_num, tf = 365){
+SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters, t_int, i_num,age = "a", tf = 365){
     t_2 <- tf - t_int
+    inf_grp <- ifelse(age == "a","I2","I1")
     run_1 <- ssa.adaptivetau(i, t, RF, P, t_int)
-    run_1[nrow(run_1),"I2"] = run_1[nrow(run_1),"I2"] + i_num
+    run_1[nrow(run_1),inf_grp] = run_1[nrow(run_1),inf_grp] + i_num
     init.2 = c(c(run_1[nrow(run_1),"S1"],run_1[nrow(run_1),"S2"]),
                c(run_1[nrow(run_1),"E1"],run_1[nrow(run_1),"E2"]),
                c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"]),
