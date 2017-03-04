@@ -90,7 +90,7 @@ SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters
     run_1[nrow(run_1),"I2"] = run_1[nrow(run_1),"I2"] + i_num
     init.2 = c(c(run_1[nrow(run_1),"S1"],run_1[nrow(run_1),"S2"]),
                c(run_1[nrow(run_1),"E1"],run_1[nrow(run_1),"E2"]),
-               c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"],
+               c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"]),
                c(run_1[nrow(run_1),"R1"],run_1[nrow(run_1),"R2"]),
                c(run_1[nrow(run_1),"D"]))
     run_2 <- ssa.adaptivetau(init.2, t, RF, P, t_2)
@@ -98,7 +98,7 @@ SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters
                     run_2[,-1])
     run <<- rbind(run_1,run_2[-1,])
     }
-SIR_run(t_int=10,i_num=1) #insert 1 person 
+SIR_run(t_int=10,i_num=1) #insert 1 person at time 10
 #Summary Measures
 run <- cbind(run,
 S = rowSums(run[,c("S1","S2")]),
