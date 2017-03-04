@@ -26,7 +26,7 @@ transitions = ssa.maketrans(c("S1","E1","I1","R1","I3","S2","E2","I2","R2"),
   rbind(c("S1","E1","I1","R1"),-1,c("S2","E2","I2","R2"),+1),
   rbind("I3",+1),
   rbind(c("S2","E2","I2"),-1,c("E2","I2","R2"),+1),
-  rbind(c("S2","E2","I2","R2"),-1),
+  rbind(c("S2","E2","I2","R2"),-1)
   rbind("I3",+1)
   )
   
@@ -88,15 +88,15 @@ RateF <- function(x, p, t) {
  }
  
 #runs
-SIR_run <- function(init.values = init.values, transitions = transitions, RateF = RateF, Parameters = parameters, t_int, i_num, tf = 365){
+SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters, t_int, i_num, tf = 365){
     t_2 <- tf - t_int
-    run_1 <- ssa.adaptivetau(init.values, transitions, RateF, parameters, t_int)
+    run_1 <- ssa.adaptivetau(i, t, RF, P, t_int)
     run_1[nrow(run_1),"I3"] = run_1[nrow(run_1),"I3"] + i_num
     init.2 = c( S = c(run_1[nrow(run_1),"S1"],run_1[nrow(run_1),"S2"]),
                     c(run_1[nrow(run_1),"E1"],run_1[nrow(run_1),"E2"]),
                     c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"],run_1[nrow(run_1),"I3"]),
                     c(run_1[nrow(run_1),"R1"],run_1[nrow(run_1),"R2"]))
-    run_2 <- ssa.adaptivetau(init.2, transitions, RateF, parameters,t_2)
+    run_2 <- ssa.adaptivetau(init.2, t, RF, P, t_2)
     run_2 <- cbind(apply(run_2[,"time", drop=FALSE],function(x) x+run_1[nrow(run_1),"time"]),
                     run_2[,-1])
     run <<- rbind(run_1,run_2)
