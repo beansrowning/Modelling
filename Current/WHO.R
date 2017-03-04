@@ -95,7 +95,7 @@ SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters
     init.2 = c( S = c(run_1[nrow(run_1),"S1"],run_1[nrow(run_1),"S2"]),
                     c(run_1[nrow(run_1),"E1"],run_1[nrow(run_1),"E2"]),
                     c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"],run_1[nrow(run_1),"I3"]),
-                    c(run_1[nrow(run_1),"R1"],run_1[nrow(run_1),"R2"])
+                    c(run_1[nrow(run_1),"R1"],run_1[nrow(run_1),"R2"]),
                     c(run_1[nrow(run_1),"D"]))
     run_2 <- ssa.adaptivetau(init.2, t, RF, P, t_2)
     run_2 <- cbind(apply(run_2[,"time", drop=FALSE],function(x) x+run_1[nrow(run_1),"time"]),
