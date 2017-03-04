@@ -1,4 +1,4 @@
-#WHO EURO 1 population measles model (Diagnostic)
+#WHO EURO 1 population measles model 
 #28/2/2017 Sean Browning
 #Kyrgyzstan data (96% vac in 1-20, 95% in 20-inf)
 #Depends: 'adaptivetau', 'googleVis', modelvis.R
@@ -38,7 +38,6 @@ parameters = c( #Kyrgyzstan
   young.size = 20, # years
   birth.rate = 25.9, #per 1000, anum
   death.rate = 5.4, #per 1000, anum
-  migr.event = 30 #date of introduction 
 )
 
 RateF <- function(x, p, t) {
@@ -50,7 +49,6 @@ RateF <- function(x, p, t) {
   omega <- p["death.rate"]/365
   v <- ifelse(t<x["D"], p["vacc.pro"], 0)
   age.out <- 1/(p["young.size"]*365)
-  new <- ifelse((p["migr.event"]-1) < t && t <= p["migr.event"],1,0) 
   #local population values
   S1 <- x["S1"]
   E1 <- x["E1"]
@@ -77,7 +75,7 @@ RateF <- function(x, p, t) {
            E1 * age.out,
            I1 * age.out,
            R1 * age.out,
-           new,
+           0,
            S2 * beta * (I/Nt), #old
            E2 * f,
            I2 * gamma,
@@ -85,13 +83,25 @@ RateF <- function(x, p, t) {
            (E2/1000) * omega,
            (I2/1000) * omega,
            (R2/1000) * omega,
-           new
+           0
   ))
  }
  
 #runs
-run=ssa.adaptivetau(init.values, transitions, RateF, parameters, tf=365)
-
+SIR_run <- function(init.values = init.values, transitions = transitions, RateF = RateF, Parameters = parameters, t_int, i_num, tf = 365){
+    t_2 <- tf - t_int
+    run_1 <- ssa.adaptivetau(init.values, transitions, RateF, parameters, t_int)
+    run_1[nrow(run_1),"I3"] = run_1[nrow(run_1),"I3"] + i_num
+    init.2 = c( S = c(run_1[nrow(run_1),"S1"],run_1[nrow(run_1),"S2"]),
+                    c(run_1[nrow(run_1),"E1"],run_1[nrow(run_1),"E2"]),
+                    c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"],run_1[nrow(run_1),"I3"]),
+                    c(run_1[nrow(run_1),"R1"],run_1[nrow(run_1),"R2"]))
+    run_2 <- ssa.adaptivetau(init.2, transitions, RateF, parameters,t_2)
+    run_2 <- cbind(apply(run_2[,"time", drop=FALSE],function(x) x+run_1[nrow(run_1),"time"]),
+                    run_2[,-1])
+    run <<- rbind(run_1,run_2)
+    }
+SIR_run(t_int=10,i_num=1) #insert 1 person 
 #Summary Measures
 run <- cbind(run,
 S = rowSums(run[,c("S1","S2")]),
