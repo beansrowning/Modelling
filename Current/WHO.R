@@ -15,19 +15,17 @@ script.dir <- dirname(sys.frame(1)$ofile); source(paste0(script.dir,"/modelvis.R
 init.values = c(
   S = c(81821,182724),
   E = c(0,0),
-  I = c(0,0,0),
+  I = c(0,0),
   R = c(1963692,3471763),
   D = 0 #begining of vaccination
   )
 
-transitions = ssa.maketrans(c("S1","E1","I1","R1","I3","S2","E2","I2","R2"),
+transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
   rbind(c("S1","E1","I1"),-1,c("E1","I1","R1"),+1),
   rbind(c("S1","R1"),+1),
   rbind(c("S1","E1","I1","R1"),-1,c("S2","E2","I2","R2"),+1),
-  rbind("I3",+1),
   rbind(c("S2","E2","I2"),-1,c("E2","I2","R2"),+1),
-  rbind(c("S2","E2","I2","R2"),-1),
-  rbind("I3",+1)
+  rbind(c("S2","E2","I2","R2"),-1)
   )
   
 parameters = c( #Kyrgyzstan
@@ -75,15 +73,13 @@ RateF <- function(x, p, t) {
            E1 * age.out,
            I1 * age.out,
            R1 * age.out,
-           0,
            S2 * beta * (I/Nt), #old
            E2 * f,
            I2 * gamma,
            (S2/1000) * omega,
            (E2/1000) * omega,
            (I2/1000) * omega,
-           (R2/1000) * omega,
-           0
+           (R2/1000) * omega
   ))
  }
  
@@ -91,16 +87,16 @@ RateF <- function(x, p, t) {
 SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters, t_int, i_num, tf = 365){
     t_2 <- tf - t_int
     run_1 <- ssa.adaptivetau(i, t, RF, P, t_int)
-    run_1[nrow(run_1),"I3"] = run_1[nrow(run_1),"I3"] + i_num
+    run_1[nrow(run_1),"I2"] = run_1[nrow(run_1),"I2"] + i_num
     init.2 = c(c(run_1[nrow(run_1),"S1"],run_1[nrow(run_1),"S2"]),
                c(run_1[nrow(run_1),"E1"],run_1[nrow(run_1),"E2"]),
-               c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"],run_1[nrow(run_1),"I3"]),
+               c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"],
                c(run_1[nrow(run_1),"R1"],run_1[nrow(run_1),"R2"]),
                c(run_1[nrow(run_1),"D"]))
     run_2 <- ssa.adaptivetau(init.2, t, RF, P, t_2)
-    run_2 <- cbind(apply(run_2[,"time", drop=FALSE],function(x) x+run_1[nrow(run_1),"time"]),
+    run_2 <- cbind(apply(run_2[,"time", drop=FALSE],2,function(x) x+run_1[nrow(run_1),"time"]),
                     run_2[,-1])
-    run <<- rbind(run_1,run_2)
+    run <<- rbind(run_1,run_2[-1,])
     }
 SIR_run(t_int=10,i_num=1) #insert 1 person 
 #Summary Measures
@@ -111,4 +107,4 @@ R = rowSums(run[,c("R1","R2")])
 )
 #Plot
 #plotting only the compartment that stores those cases introduced
-SIRplot(run, vars = c("time","I3"), parameters = parameters)  #"S", "I", "R"
+SIRplot(run, vars = c("time","I"), parameters = parameters)  #"S", "I", "R"
