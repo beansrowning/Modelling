@@ -26,7 +26,7 @@ transitions = ssa.maketrans(c("S1","E1","I1","R1","I3","S2","E2","I2","R2"),
   rbind(c("S1","E1","I1","R1"),-1,c("S2","E2","I2","R2"),+1),
   rbind("I3",+1),
   rbind(c("S2","E2","I2"),-1,c("E2","I2","R2"),+1),
-  rbind(c("S2","E2","I2","R2"),-1)
+  rbind(c("S2","E2","I2","R2"),-1),
   rbind("I3",+1)
   )
   
@@ -37,7 +37,7 @@ parameters = c( #Kyrgyzstan
   vacc.pro = 0.95, #proportion
   young.size = 20, # years
   birth.rate = 25.9, #per 1000, anum
-  death.rate = 5.4, #per 1000, anum
+  death.rate = 5.4 #per 1000, anum
 )
 
 RateF <- function(x, p, t) {
