@@ -1,6 +1,6 @@
 #Model visualization functions
 #working 3/13
-#imports: googleVis,ggplot2,plyr
+#imports: googleVis,ggplot2,plyr(not really)
 
 if(!require(googleVis)){
   install.packages("googleVis")
