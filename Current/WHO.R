@@ -1,7 +1,7 @@
-#WHO EURO 1 population measles model
+#WHO EURO 1 population measles model 
 #28/2/2017 Sean Browning
-#Kyrgyzstan data (96% vac in 1-20, 95% in 20-inf)
-#Depends: 'adaptivetau', 'googleVis', ggplot2, modelvis.R
+#Kyrgyzstan data (95.6% vac in 1-14, 95.6% in 15-inf)
+#Depends: 'adaptivetau', 'googleVis', modelvis.R
 
 if(!require(adaptivetau)){
   install.packages("adaptivetau")
@@ -9,16 +9,15 @@ if(!require(adaptivetau)){
 suppressPackageStartupMessages(library(adaptivetau))
 
 #Source model visualization
-#must be in the same directory as this file
-source(paste0(dirname(sys.frame(1)$ofile),"/modelvis.R"))
+script.dir <- dirname(sys.frame(1)$ofile); source(paste0(script.dir,"/modelvis.R"))
 
 #Defining input
 init.values = c(
-  S = c(81821,182724),
+  S = c(81400,180700),
   E = c(0,0),
   I = c(0,0),
-  R = c(1963692,3471763),
-  D = 0 #begining of vaccination
+  R = c(1768600,3926300),
+  D = 0 #begining of vaccination programme
   )
 
 transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
@@ -28,13 +27,13 @@ transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
   rbind(c("S2","E2","I2"),-1,c("E2","I2","R2"),+1),
   rbind(c("S2","E2","I2","R2"),-1)
   )
-
+  
 parameters = c( #Kyrgyzstan
   R0 = 16,
   infectious.period = 7, #days
   latent.period = 8, #days
-  vacc.pro = 0.95, #proportion
-  young.size = 20, # years
+  vacc.pro = 0.95, #proportion vacc at birth
+  young.size = 14, #years in the young compartment
   birth.rate = 25.9, #per 1000, anum
   death.rate = 5.4 #per 1000, anum
 )
@@ -46,7 +45,7 @@ RateF <- function(x, p, t) {
   gamma <- 1/p["infectious.period"]
   alpha <- p["birth.rate"]/365
   omega <- p["death.rate"]/365
-  v <- ifelse(t<x["D"], p["vacc.pro"], 0)
+  v <- ifelse(t>x["D"], p["vacc.pro"], 0)
   age.out <- 1/(p["young.size"]*365)
   #local population values
   S1 <- x["S1"]
@@ -65,7 +64,7 @@ RateF <- function(x, p, t) {
   N2 <- S2 + E2 + I2 + R2
   Nt <- N1 + N2
   #Rate Functions
-  return(c(S1 * beta * (I/Nt), #young
+  return(c(S1 * beta[1] * (I/Nt), #young
            E1 * f,
            I1 * gamma,
            (Nt/1000) * alpha * (1-v) ,
@@ -83,7 +82,7 @@ RateF <- function(x, p, t) {
            (R2/1000) * omega
   ))
  }
-
+ 
 #runs
 SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters, t_int, i_num,age = "a", tf = 365){
     t_2 <- tf - t_int
@@ -109,5 +108,4 @@ R = rowSums(run[,c("R1","R2")])
 )
 #Plot
 #plotting only the compartment that stores those cases introduced
-#SIRplot(run, vars = c("time","I"), parameters = parameters)  #"S", "I", "R"
-
+SIRplot(run, vars = c("time","I"), parameters = parameters)  #"S", "I", "R"

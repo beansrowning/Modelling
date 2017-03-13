@@ -98,8 +98,8 @@ SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.
 #Batch Plot
 #runs specified number of batches and gives ggplot2 output
 #default function: SIR_run (insertion of infected individuals at a given time-point)
-batch_plot <- function(FUN = "SIR_run", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = NULL, i_number = NULL){
-  if(FUN == "SIR_run"){
+batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = NULL, i_number = NULL){
+  if(FUN == "1_ins"){
     #throw some errors
     if(is.null(grp) == TRUE){
       stop("No group specified!")
@@ -112,7 +112,8 @@ batch_plot <- function(FUN = "SIR_run", batch = 100, fun_list = list(init.values
     }
 
     #pretty much the same wrapper I wrote in the old one
-    SIR_r <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]], P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[[5]]){
+    1_ins <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]], 
+    P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[[5]]){
           t_2 <- tf - t_int
           inf_grp <- ifelse(age == "a","I2","I1")
           run_1 <- ssa.adaptivetau(i, t, RF, P, t_int)
@@ -165,6 +166,24 @@ batch_plot <- function(FUN = "SIR_run", batch = 100, fun_list = list(init.values
     plot(graph)
     assign("graph",graph,envir = .GlobalEnv) #for editing or saving
   }
+  #if(FUN == "mul_ins"){
+    #throw some errors
+    #if(is.null(grp) == TRUE){
+        stop("No group specified!")
+    }
+   #if(is.null(occ) == TRUE{
+       stop("No rate of insertion specified!")
+    }
+    #if(is.null(ins.start) == TRUE){
+        stop("No start time specified!")
+    }
+    
+    #function 
+    #mul_ins <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]], 
+        #P = fun_list[[4]], ins = occ, i_num = i_number,i_start = ins.start,age = grp, tf = fun_list[[5]]
+        #)
+    
+    #}
   else{
     stop("I haven't coded for that option yet, you dunce!")
   }
