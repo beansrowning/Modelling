@@ -1,7 +1,7 @@
-#WHO EURO 1 population measles model 
+#WHO EURO 1 population measles model
 #28/2/2017 Sean Browning
 #Kyrgyzstan data (96% vac in 1-20, 95% in 20-inf)
-#Depends: 'adaptivetau', 'googleVis', modelvis.R
+#Depends: 'adaptivetau', 'googleVis', ggplot2, modelvis.R
 
 if(!require(adaptivetau)){
   install.packages("adaptivetau")
@@ -9,7 +9,8 @@ if(!require(adaptivetau)){
 suppressPackageStartupMessages(library(adaptivetau))
 
 #Source model visualization
-script.dir <- dirname(sys.frame(1)$ofile); source(paste0(script.dir,"/modelvis.R"))
+#must be in the same directory as this file
+source(paste0(dirname(sys.frame(1)$ofile),"/modelvis.R"))
 
 #Defining input
 init.values = c(
@@ -27,7 +28,7 @@ transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
   rbind(c("S2","E2","I2"),-1,c("E2","I2","R2"),+1),
   rbind(c("S2","E2","I2","R2"),-1)
   )
-  
+
 parameters = c( #Kyrgyzstan
   R0 = 16,
   infectious.period = 7, #days
@@ -64,7 +65,7 @@ RateF <- function(x, p, t) {
   N2 <- S2 + E2 + I2 + R2
   Nt <- N1 + N2
   #Rate Functions
-  return(c(S1 * beta[1] * (I/Nt), #young
+  return(c(S1 * beta * (I/Nt), #young
            E1 * f,
            I1 * gamma,
            (Nt/1000) * alpha * (1-v) ,
@@ -82,7 +83,7 @@ RateF <- function(x, p, t) {
            (R2/1000) * omega
   ))
  }
- 
+
 #runs
 SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters, t_int, i_num,age = "a", tf = 365){
     t_2 <- tf - t_int
@@ -108,4 +109,5 @@ R = rowSums(run[,c("R1","R2")])
 )
 #Plot
 #plotting only the compartment that stores those cases introduced
-SIRplot(run, vars = c("time","I"), parameters = parameters)  #"S", "I", "R"
+#SIRplot(run, vars = c("time","I"), parameters = parameters)  #"S", "I", "R"
+
