@@ -98,7 +98,7 @@ SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.
 #Batch Plot
 #runs specified number of batches and gives ggplot2 output
 #default function: SIR_run (insertion of infected individuals at a given time-point)
-batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = NULL, i_number = NULL){
+batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = NULL, i_number = NULL, occ = 1){
   if(FUN == "1_ins"){
     #throw some errors
     if(is.null(grp) == TRUE){
@@ -178,19 +178,28 @@ batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, 
         stop("No start time specified!")
     }
     
-    #function 
+    #multi-insertion function 
     mul_ins <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]], 
         P = fun_list[[4]], ins = occ, i_num = i_number,i_start = ins.start,age = grp, tf = fun_list[[5]]
         ){
         #local inits
         inf_grp <- ifelse(age == "a","I2","I1")
         res_df = data.frame(time = NULL,I = NULL,iter = NULL)
-        #define first run
+        #define first run, given time delay
+        if(i_start > 0){
         results = as.data.frame(ssa.adaptivetau(i,t,RF,P,i_start))
         results = cbind(results,iter = 1)
+        }
         #loop insertion runs
-        for(i in occ){
-            if(i == 1){
+        for(i in 1:occ){
+            if(i == 1 && i_start == 0){ #if no delay
+                t_first = tf*(1/occ)
+                i[inf_grp] = i[inf_grp] + i_num
+                results = as.data.frame(ssa.adaptivetau(i,t,RF,P,t_first))
+                results = cbind(results,iter = 1)
+                res_df <<- rbind(res_df,results[,c("time","I","iter"),drop = FALSE])
+                
+            else{
                init_new = c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
                           c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
                           c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
@@ -205,10 +214,8 @@ batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, 
                 results = rbind(results,run)
                 res_df <<- results[,c("time","I","inter"),drop = FALSE]
                 } 
-            else{
-                
     
-    }
+            }
     }}
   else{
     stop("I haven't coded for that option yet, you dunce!")
