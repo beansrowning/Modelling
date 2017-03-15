@@ -166,24 +166,50 @@ batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, 
     plot(graph)
     assign("graph",graph,envir = .GlobalEnv) #for editing or saving
   }
-  #if(FUN == "mul_ins"){
+  if(FUN == "mul_ins"){
     #throw some errors
-    #if(is.null(grp) == TRUE){
+    if(is.null(grp) == TRUE){
         stop("No group specified!")
     }
-   #if(is.null(occ) == TRUE{
+   if(is.null(occ) == TRUE{
        stop("No rate of insertion specified!")
     }
-    #if(is.null(ins.start) == TRUE){
+   if(is.null(ins.start) == TRUE){
         stop("No start time specified!")
     }
     
     #function 
-    #mul_ins <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]], 
-        #P = fun_list[[4]], ins = occ, i_num = i_number,i_start = ins.start,age = grp, tf = fun_list[[5]]
-        #)
+    mul_ins <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]], 
+        P = fun_list[[4]], ins = occ, i_num = i_number,i_start = ins.start,age = grp, tf = fun_list[[5]]
+        ){
+        #local inits
+        inf_grp <- ifelse(age == "a","I2","I1")
+        res_df = data.frame(time = NULL,I = NULL,iter = NULL)
+        #define first run
+        results = as.data.frame(ssa.adaptivetau(i,t,RF,P,i_start))
+        results = cbind(results,iter = 1)
+        #loop insertion runs
+        for(i in occ){
+            if(i == 1){
+               init_new = c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
+                          c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
+                          c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
+                          c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
+                          c(results[nrow(results),"D"]))
+                init_new[inf_grp] = init_new[inf_grp] + i_num
+                t_new = (tf-i_start*(i/occ))+results[nrow(results),"time"]
+                run = as.data.frame(ssa.adaptivetau(init_new,t,RF,P,t_new))
+                run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
+                run[,-1])
+                run = cbind(run,iter = i)
+                results = rbind(results,run)
+                res_df <<- results[,c("time","I","inter"),drop = FALSE]
+                } 
+            else{
+                
     
-    #}
+    }
+    }}
   else{
     stop("I haven't coded for that option yet, you dunce!")
   }
