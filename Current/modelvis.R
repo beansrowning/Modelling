@@ -205,7 +205,8 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
                          c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
                          c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
                          c(results[nrow(results),"D"]))
-              t_new = round((tf-i_start*(1/occ))) #+results[nrow(results),"time"]
+              t_new = i_start + ((tf-i_start)*(i/occ)-(tf-i_start)*((i-1)/occ)
+              #t_new = round((tf-i_start*(1/occ))) +results[nrow(results),"time"]
               run = ssa.adaptivetau(init_new,t,RF,P,t_new)
               run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
                 run[,-1]) #offset time by the final time of the past run
