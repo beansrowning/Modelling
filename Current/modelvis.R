@@ -230,8 +230,8 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
                 #aes(x=t_2,y=ave),
                 #size=0.5)
     #graph = graph + labs(title= paste(batch,"SIR Iterations"),
-                         x = "Time (days)",
-                         y = "Infected (count)")
+                         #x = "Time (days)",
+                         #y = "Infected (count)")
     #graph = graph + theme_bw()
     #plot(graph)
     #assign("graph",graph,envir = .GlobalEnv) #for editing or saving
