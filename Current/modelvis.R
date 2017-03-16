@@ -183,21 +183,21 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
         P = fun_list[[4]], ins = occ, i_num = i_number,i_start = insertion,age = grp, tf = fun_list[[5]]
         ){
         inf_grp <- ifelse(age == "a","I2","I1")
-        count = 0
+        count = integer()
         #define first run, given time delay
         if(i_start > 0){
         results <- ssa.adaptivetau(init,t,RF,P,i_start)
         }
+        #first run if no delay
+        if(i_start == 0){
+            t_first = tf*(1/occ)
+            init_new <- init
+            init_new[inf_grp] = init[inf_grp] + i_num
+            results <<- ssa.adaptivetau(init_new,t,RF,P,t_first)
+            throw_1 <<- "this shit is broken"
+        }
         #loop insertion runs
         for(i in 1:occ){
-            if(i == 1 && i_start == 0){ #if no delay
-                t_first = tf*(1/occ)
-                init_new <- init
-                init_new[inf_grp] = init[inf_grp] + i_num
-                results <<- ssa.adaptivetau(init_new,t,RF,P,t_first)
-                throw_1 <<- "this shit is broken"
-            }
-            else{
               results[nrow(results),inf_grp] = results[nrow(results),inf_grp] + i_num #add infected
               init_new <- c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
                          c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
@@ -210,8 +210,6 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
                 run[,-1]) #offset time by the final time of the past run
               results <<- rbind(results,run[-1,]) #drop the first row
               count <<- count + 1
-              next()
-                }
           }
       }
 
