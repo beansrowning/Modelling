@@ -185,7 +185,9 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
         inf_grp <- ifelse(age == "a","I2","I1")
         #define first run given time delay
         if(i_start > 0){
-        results <- ssa.adaptivetau(init,t,RF,P,i_start)
+            results <<- ssa.adaptivetau(init,t,RF,P,i_start)
+            throw_2 <<- "this is working"
+        
         }
         #first run if no delay
         if(i_start == 0){
