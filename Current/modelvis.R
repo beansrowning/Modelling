@@ -192,7 +192,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
             if(i == 1 && i_start == 0){ #if no delay
                 t_first = tf*(1/occ)
                 init[inf_grp] = init[inf_grp] + i_num
-                results <- ssa.adaptivetau(init,t,RF,P,t_first)
+                results <<- ssa.adaptivetau(init,t,RF,P,t_first)
             }
             else{
               results[inf_grp] = results[inf_grp] + i_num #add infected
