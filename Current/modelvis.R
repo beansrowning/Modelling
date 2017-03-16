@@ -220,9 +220,9 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
       mul_ins()
       results <- cbind(results, I = rowSums(results[,c("I1","I2")]))
       results <- cbind(results,iter=i)
-      plot_dat <<- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
+      plot_dat <- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
     }
-
+    assign("plot_dat",plot_dat,envir=.GlobalEnv)
     #graphing
     #graph = ggplot(plot_dat)
     #graph = graph + geom_point(aes(x=time, y=I), alpha=0.1, size=1)
