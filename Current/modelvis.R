@@ -194,6 +194,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
                 init_new <- init
                 init_new[inf_grp] = init[inf_grp] + i_num
                 results <<- ssa.adaptivetau(init_new,t,RF,P,t_first)
+                throw_1 <<- "this shit is broken"
             }
             else{
               results[nrow(results),inf_grp] = results[nrow(results),inf_grp] + i_num #add infected
