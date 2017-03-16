@@ -98,8 +98,8 @@ SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.
 #Batch Plot
 #runs specified number of batches and gives ggplot2 output
 #default function: SIR_run (insertion of infected individuals at a given time-point)
-batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = NULL, i_number = NULL, occ = 1){
-  if(FUN == "1_ins"){
+batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = NULL, i_number = NULL, occ = 1){
+  if(FUN == "ins_1"){
     #throw some errors
     if(is.null(grp) == TRUE){
       stop("No group specified!")
@@ -112,7 +112,7 @@ batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, 
     }
 
     #pretty much the same wrapper I wrote in the old one
-    1_ins <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]], 
+    ins_1 <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
     P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[[5]]){
           t_2 <- tf - t_int
           inf_grp <- ifelse(age == "a","I2","I1")
@@ -132,13 +132,13 @@ batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, 
           }
 
     #run a whole bunch of times and store into a df
-    plot_dat <- data.frame(time = 1, I = 1, iter = 1)
+    plot_dat <- data.frame(time = 0, I = 0, iter = 0)
     for(num in 1:batch){
       SIR_r()
       run <- cbind(run, iter = num)
       plot_dat <- rbind(plot_dat,run)
     }
-
+    plot_dat <- plot_dat[-1,] #drop starting value (how do you do this better?)
     #trim and store into a new dataframe
     plot_dat$t_2 <- round(plot_dat$time,0)
     #plot_dat_2 <- unique(plot_dat)
@@ -171,52 +171,72 @@ batch_plot <- function(FUN = "1_ins", batch = 100, fun_list = list(init.values, 
     if(is.null(grp) == TRUE){
         stop("No group specified!")
     }
-   if(is.null(occ) == TRUE{
+    if(is.null(occ) == TRUE){
        stop("No rate of insertion specified!")
     }
-   if(is.null(ins.start) == TRUE){
+    if(is.null(insertion) == TRUE){
         stop("No start time specified!")
     }
-    
-    #multi-insertion function 
-    mul_ins <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]], 
-        P = fun_list[[4]], ins = occ, i_num = i_number,i_start = ins.start,age = grp, tf = fun_list[[5]]
+
+    #multi-insertion function
+    mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
+        P = fun_list[[4]], ins = occ, i_num = i_number,i_start = insertion,age = grp, tf = fun_list[[5]]
         ){
-        #local inits
         inf_grp <- ifelse(age == "a","I2","I1")
-        res_df = data.frame(time = NULL,I = NULL,iter = NULL)
         #define first run, given time delay
         if(i_start > 0){
-        results = as.data.frame(ssa.adaptivetau(i,t,RF,P,i_start))
-        results = cbind(results,iter = 1)
+        results <- ssa.adaptivetau(init,t,RF,P,i_start)
         }
         #loop insertion runs
         for(i in 1:occ){
             if(i == 1 && i_start == 0){ #if no delay
                 t_first = tf*(1/occ)
                 i[inf_grp] = i[inf_grp] + i_num
-                results = as.data.frame(ssa.adaptivetau(i,t,RF,P,t_first))
-                results = cbind(results,iter = 1)
-                res_df <<- rbind(res_df,results[,c("time","I","iter"),drop = FALSE])
-                
-            else{
-               init_new = c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
-                          c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
-                          c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
-                          c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
-                          c(results[nrow(results),"D"]))
-                init_new[inf_grp] = init_new[inf_grp] + i_num
-                t_new = (tf-i_start*(i/occ))+results[nrow(results),"time"]
-                run = as.data.frame(ssa.adaptivetau(init_new,t,RF,P,t_new))
-                run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
-                run[,-1])
-                run = cbind(run,iter = i)
-                results = rbind(results,run)
-                res_df <<- results[,c("time","I","inter"),drop = FALSE]
-                } 
-    
+                results <- ssa.adaptivetau(init,t,RF,P,t_first)
             }
-    }}
+            else{
+              results[inf_grp] = results[inf_grp] + i_num #add infected
+              init_new = c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
+                         c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
+                         c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
+                         c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
+                         c(results[nrow(results),"D"]))
+              t_new = (tf-i_start*(1/occ))+results[nrow(results),"time"]
+              run = ssa.adaptivetau(init_new,t,RF,P,t_new)
+              run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
+                run[,-1]) #offset time by the final time of the past run
+              results <<- rbind(results,run[-1,]) #drop the first row
+                }
+          }
+      }
+
+    #batch runs
+    plot_dat = data.frame(time = NULL,I = NULL,iter = NULL)
+    for(i in 1:batch){
+      mul_ins()
+      results <- cbind(results, I = rowSums(results[,c("I1","I2")]))
+      results <- cbind(results,iter=i)
+      plot_dat <<- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
+    }
+
+    #graphing
+    graph = ggplot(plot_dat)
+    graph = graph + geom_point(aes(x=time, y=I), alpha=0.1, size=1)
+    #graph = graph + geom_ribbon(data = sum_dat,
+                  #aes(x=t_2,ymin=lb,ymax=ub),
+                  #alpha = 0.25)
+    #graph = graph + geom_line(data = sum_dat,
+                #aes(x=t_2,y=ave),
+                #size=0.5)
+    graph = graph + labs(title= paste(batch,"SIR Iterations"),
+                         x = "Time (days)",
+                         y = "Infected (count)")
+    graph = graph + theme_bw()
+    plot(graph)
+    assign("graph",graph,envir = .GlobalEnv) #for editing or saving
+
+
+  }
   else{
     stop("I haven't coded for that option yet, you dunce!")
   }

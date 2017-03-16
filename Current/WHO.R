@@ -1,4 +1,4 @@
-#WHO EURO 1 population measles model 
+#WHO EURO 1 population measles model
 #28/2/2017 Sean Browning
 #Kyrgyzstan data (95.6% vac in 1-14, 95.6% in 15-inf)
 #Depends: 'adaptivetau', 'googleVis', modelvis.R
@@ -27,7 +27,7 @@ transitions = ssa.maketrans(c("S1","E1","I1","R1","S2","E2","I2","R2"),
   rbind(c("S2","E2","I2"),-1,c("E2","I2","R2"),+1),
   rbind(c("S2","E2","I2","R2"),-1)
   )
-  
+
 parameters = c( #Kyrgyzstan
   R0 = 16,
   infectious.period = 7, #days
@@ -82,7 +82,7 @@ RateF <- function(x, p, t) {
            (R2/1000) * omega
   ))
  }
- 
+
 #runs
 SIR_run <- function(i = init.values, t = transitions, RF = RateF, P = parameters, t_int, i_num,age = "a", tf = 365){
     t_2 <- tf - t_int
