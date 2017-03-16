@@ -185,13 +185,13 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
         inf_grp <- ifelse(age == "a","I2","I1")
         #define first run, given time delay
         if(i_start > 0){
-        results <<- ssa.adaptivetau(init,t,RF,P,i_start)
+        results <- ssa.adaptivetau(init,t,RF,P,i_start)
         }
         #loop insertion runs
         for(i in 1:occ){
             if(i == 1 && i_start == 0){ #if no delay
                 t_first = tf*(1/occ)
-                i[inf_grp] = i[inf_grp] + i_num
+                init[inf_grp] = init[inf_grp] + i_num
                 results <- ssa.adaptivetau(init,t,RF,P,t_first)
             }
             else{
