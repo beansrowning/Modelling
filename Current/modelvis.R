@@ -185,7 +185,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
         inf_grp <- ifelse(age == "a","I2","I1")
         #define first run, given time delay
         if(i_start > 0){
-        results <- ssa.adaptivetau(init,t,RF,P,i_start)
+        results <<- ssa.adaptivetau(init,t,RF,P,i_start)
         }
         #loop insertion runs
         for(i in 1:occ){
@@ -196,7 +196,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
             }
             else{
               results[inf_grp] = results[inf_grp] + i_num #add infected
-              init_new = c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
+              init_new <- c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
                          c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
                          c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
                          c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
