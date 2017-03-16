@@ -183,7 +183,6 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
         P = fun_list[[4]], ins = occ, i_num = i_number,i_start = insertion,age = grp, tf = fun_list[[5]]
         ){
         inf_grp <- ifelse(age == "a","I2","I1")
-        count = integer()
         #define first run, given time delay
         if(i_start > 0){
         results <- ssa.adaptivetau(init,t,RF,P,i_start)
@@ -209,7 +208,6 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
               run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
                 run[,-1]) #offset time by the final time of the past run
               results <<- rbind(results,run[-1,]) #drop the first row
-              count <<- count + 1
           }
       }
 
