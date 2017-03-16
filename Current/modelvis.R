@@ -98,7 +98,7 @@ SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.
 #Batch Plot
 #runs specified number of batches and gives ggplot2 output
 #default function: SIR_run (insertion of infected individuals at a given time-point)
-batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = NULL, i_number = NULL, occ = 1){
+batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0, i_number = NULL, occ = 2){
   if(FUN == "ins_1"){
     #throw some errors
     if(is.null(grp) == TRUE){
@@ -191,11 +191,12 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
         for(i in 1:occ){
             if(i == 1 && i_start == 0){ #if no delay
                 t_first = tf*(1/occ)
-                init[inf_grp] = init[inf_grp] + i_num
-                results <<- ssa.adaptivetau(init,t,RF,P,t_first)
+                init_new <- init
+                init_new[inf_grp] = init[inf_grp] + i_num
+                results <<- ssa.adaptivetau(init_new,t,RF,P,t_first)
             }
             else{
-              results[inf_grp] = results[inf_grp] + i_num #add infected
+              results[nrow(results),inf_grp] = results[nrow(results),inf_grp] + i_num #add infected
               init_new <- c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
                          c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
                          c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
@@ -220,20 +221,20 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
     }
 
     #graphing
-    graph = ggplot(plot_dat)
-    graph = graph + geom_point(aes(x=time, y=I), alpha=0.1, size=1)
+    #graph = ggplot(plot_dat)
+    #graph = graph + geom_point(aes(x=time, y=I), alpha=0.1, size=1)
     #graph = graph + geom_ribbon(data = sum_dat,
                   #aes(x=t_2,ymin=lb,ymax=ub),
                   #alpha = 0.25)
     #graph = graph + geom_line(data = sum_dat,
                 #aes(x=t_2,y=ave),
                 #size=0.5)
-    graph = graph + labs(title= paste(batch,"SIR Iterations"),
+    #graph = graph + labs(title= paste(batch,"SIR Iterations"),
                          x = "Time (days)",
                          y = "Infected (count)")
-    graph = graph + theme_bw()
-    plot(graph)
-    assign("graph",graph,envir = .GlobalEnv) #for editing or saving
+    #graph = graph + theme_bw()
+    #plot(graph)
+    #assign("graph",graph,envir = .GlobalEnv) #for editing or saving
 
 
   }
