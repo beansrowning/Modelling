@@ -209,7 +209,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
               run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
                 run[,-1]) #offset time by the final time of the past run
               results <<- rbind(results,run[-1,]) #drop the first row
-              count = count + 1
+              count <<- count + 1
               next()
                 }
           }
