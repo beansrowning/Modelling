@@ -229,11 +229,10 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
 
     #run a whole bunch of times and store into a df
     plot_dat <- data.frame(time = 0, I = 0, iter = 0)
-    foreach(i=1:batch){ %dopar%
-      ins_1()
-      run <- cbind(run, iter = i)
-      plot_dat <- rbind(plot_dat,run)
-    }
+    foreach(i=1:batch) %dopar%
+      + ins_1()
+      + run <- cbind(run, iter = i)
+      + plot_dat <- rbind(plot_dat,run)
     plot_dat <- plot_dat[-1,] #drop starting value (how do you do this better?)
     #trim and store into a new dataframe
     plot_dat$t_2 <- round(plot_dat$time,0)
@@ -276,12 +275,12 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
 
     #batch runs
     plot_dat = data.frame(time = NULL,I = NULL,iter = NULL)
-    foreach(i=1:batch){ %dopar%
-      mul_ins()
-      results <- cbind(results, I = rowSums(results[,c("I1","I2")]))
-      results <- cbind(results,iter=i)
-      plot_dat <- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
-    }
+    foreach(i=1:batch) %dopar%
+      + mul_ins()
+      + results <- cbind(results, I = rowSums(results[,c("I1","I2")]))
+      + results <- cbind(results,iter=i)
+      + plot_dat <- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
+    
 
     #store plot data globally
     assign("plot_dat",plot_dat,envir=.GlobalEnv)
