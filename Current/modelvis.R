@@ -229,7 +229,7 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
 
     #run a whole bunch of times and store into a df
     plot_dat <- data.frame(time = 0, I = 0, iter = 0)
-    foreach(i=1:batch)){ %dopar%
+    foreach(i=1:batch){ %dopar%
       ins_1()
       run <- cbind(run, iter = i)
       plot_dat <- rbind(plot_dat,run)
