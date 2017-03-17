@@ -111,26 +111,6 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
       stop("No number of infected specified!")
     }
 
-    #pretty much the same wrapper I wrote in the old one
-    ins_1 <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
-    P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[[5]]){
-          t_2 <- tf - t_int
-          inf_grp <- ifelse(age == "a","I2","I1")
-          run_1 <- ssa.adaptivetau(i, t, RF, P, t_int)
-          run_1[nrow(run_1),inf_grp] = run_1[nrow(run_1),inf_grp] + i_num
-          init.2 = c(c(run_1[nrow(run_1),"S1"],run_1[nrow(run_1),"S2"]),
-                     c(run_1[nrow(run_1),"E1"],run_1[nrow(run_1),"E2"]),
-                     c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"]),
-                     c(run_1[nrow(run_1),"R1"],run_1[nrow(run_1),"R2"]),
-                     c(run_1[nrow(run_1),"D"]))
-          run_2 <- ssa.adaptivetau(init.2, t, RF, P, t_2)
-          run_2 <- cbind(apply(run_2[,"time", drop=FALSE],2,function(x) x+run_1[nrow(run_1),"time"]),
-                          run_2[,-1])
-          run <- rbind(run_1,run_2[-1,])
-          run <- cbind(run, I = rowSums(run[,c("I1","I2")]))
-          run <<- run[,c("time","I"), drop = FALSE]
-          }
-
     #run a whole bunch of times and store into a df
     plot_dat <- data.frame(time = 0, I = 0, iter = 0)
     for(num in 1:batch){
@@ -178,60 +158,6 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
         stop("Something is wrong with your start time,partner.")
     }
 
-    #multi-insertion function
-    mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
-        P = fun_list[[4]], ins = occ, i_num = i_number,i_start = insertion,age = grp, tf = fun_list[[5]]
-        ){
-        inf_grp <- ifelse(age == "a","I2","I1")
-
-        #run given time delay
-        if(i_start > 0){
-            results <- ssa.adaptivetau(init,t,RF,P,i_start)
-            throw_2 <<- "starttime > 0"
-            for(i in 1:occ){
-                  results[nrow(results),inf_grp] = results[nrow(results),inf_grp] + i_num #add infected
-                  #accounting for time 0 starts
-                  init_new <- c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
-                             c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
-                             c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
-                             c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
-                             c(results[nrow(results),"D"]))
-                  t_new = ((tf-i_start)*(i/occ)-(tf-i_start)*((i-1)/occ))
-                  #more accounting for time 0 starts
-                  run = ssa.adaptivetau(init_new,t,RF,P,t_new)
-                  run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
-                    run[,-1]) #offset time by the final time of the past run
-                  results <- rbind(results,run[-1,]) #drop the first row
-              }
-        }
-        #run if no delay
-        if(i_start == 0){
-            t_first = tf*(1/occ)
-            init_new <- init
-            init_new[inf_grp] = init[inf_grp] + i_num
-            results <<- ssa.adaptivetau(init_new,t,RF,P,t_first)
-            throw_1 <<- "starttime == 0"
-            #insertion loops
-            for(i in 1:(occ-1)){
-                  results[nrow(results),inf_grp] = results[nrow(results),inf_grp] + i_num #add infected
-                  #accounting for time 0 starts
-                  init_new <- c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
-                             c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
-                             c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
-                             c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
-                             c(results[nrow(results),"D"]))
-                  t_new = ((tf-i_start)*(i/occ)-(tf-i_start)*((i-1)/occ))
-                  #more accounting for time 0 starts
-                  run = ssa.adaptivetau(init_new,t,RF,P,t_new)
-                  run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
-                    run[,-1]) #offset time by the final time of the past run
-                  results <- rbind(results,run[-1,]) #drop the first row
-                }
-        }
-        #store results of run globally
-        assign("results",results,envir=.GlobalEnv)
-      }
-
     #batch runs
     plot_dat = data.frame(time = NULL,I = NULL,iter = NULL)
     for(i in 1:batch){
@@ -273,3 +199,78 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
     stop("I haven't coded for that option yet, you dunce!")
   }
 }
+
+#One-insertion (probably depreciated as the same can be done by mul_ins 3/17)
+ins_1 <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
+P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[[5]]){
+      t_2 <- tf - t_int
+      inf_grp <- ifelse(age == "a","I2","I1")
+      run_1 <- ssa.adaptivetau(i, t, RF, P, t_int)
+      run_1[nrow(run_1),inf_grp] = run_1[nrow(run_1),inf_grp] + i_num
+      init.2 = c(c(run_1[nrow(run_1),"S1"],run_1[nrow(run_1),"S2"]),
+                 c(run_1[nrow(run_1),"E1"],run_1[nrow(run_1),"E2"]),
+                 c(run_1[nrow(run_1),"I1"],run_1[nrow(run_1),"I2"]),
+                 c(run_1[nrow(run_1),"R1"],run_1[nrow(run_1),"R2"]),
+                 c(run_1[nrow(run_1),"D"]))
+      run_2 <- ssa.adaptivetau(init.2, t, RF, P, t_2)
+      run_2 <- cbind(apply(run_2[,"time", drop=FALSE],2,function(x) x+run_1[nrow(run_1),"time"]),
+                      run_2[,-1])
+      run <- rbind(run_1,run_2[-1,])
+      run <- cbind(run, I = rowSums(run[,c("I1","I2")]))
+      run <<- run[,c("time","I"), drop = FALSE]
+      }
+
+
+#multi-insertion function
+mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
+    P = fun_list[[4]], ins = occ, i_num = i_number,i_start = insertion,age = grp, tf = fun_list[[5]]
+    ){
+    inf_grp <- ifelse(age == "a","I2","I1")
+
+    #run given time delay
+    if(i_start > 0){
+        results <- ssa.adaptivetau(init,t,RF,P,i_start)
+        throw_2 <<- "starttime > 0"
+        for(i in 1:occ){
+              results[nrow(results),inf_grp] = results[nrow(results),inf_grp] + i_num #add infected
+              #accounting for time 0 starts
+              init_new <- c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
+                         c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
+                         c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
+                         c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
+                         c(results[nrow(results),"D"]))
+              t_new = ((tf-i_start)*(i/occ)-(tf-i_start)*((i-1)/occ))
+              #more accounting for time 0 starts
+              run = ssa.adaptivetau(init_new,t,RF,P,t_new)
+              run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
+                run[,-1]) #offset time by the final time of the past run
+              results <- rbind(results,run[-1,]) #drop the first row
+          }
+    }
+    #run if no delay
+    if(i_start == 0){
+        t_first = tf*(1/occ)
+        init_new <- init
+        init_new[inf_grp] = init[inf_grp] + i_num
+        results <<- ssa.adaptivetau(init_new,t,RF,P,t_first)
+        throw_1 <<- "starttime == 0"
+        #insertion loops
+        for(i in 1:(occ-1)){
+              results[nrow(results),inf_grp] = results[nrow(results),inf_grp] + i_num #add infected
+              #accounting for time 0 starts
+              init_new <- c(c(results[nrow(results),"S1"],results[nrow(results),"S2"]),
+                         c(results[nrow(results),"E1"],results[nrow(results),"E2"]),
+                         c(results[nrow(results),"I1"],results[nrow(results),"I2"]),
+                         c(results[nrow(results),"R1"],results[nrow(results),"R2"]),
+                         c(results[nrow(results),"D"]))
+              t_new = ((tf-i_start)*(i/occ)-(tf-i_start)*((i-1)/occ))
+              #more accounting for time 0 starts
+              run = ssa.adaptivetau(init_new,t,RF,P,t_new)
+              run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
+                run[,-1]) #offset time by the final time of the past run
+              results <- rbind(results,run[-1,]) #drop the first row
+            }
+    }
+    #store results of run globally
+    assign("results",results,envir=.GlobalEnv)
+  }
