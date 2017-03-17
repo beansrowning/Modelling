@@ -11,9 +11,18 @@ if(!require(ggplot2)){
 if(!require(plyr)){
   install.packages("plyr")
 }
-suppressPackageStartupMessages(library(googleVis))
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(plyr))
+if(!require(doParallel)){
+  install.packages("doParallel")
+}
+if(!require(foreach)){
+  install.packages("foreach")
+}
+library(googleVis)
+library(ggplot2)
+library(plyr)
+library(parallel)
+library(doParallel)
+library(foreach)
 
 #SIRplot
 #generic post-run plot yielding interactive googleVis output.
@@ -98,7 +107,8 @@ SIRplot <- function(mat,vars = c("time", "S11", "I11", "R11"),y.axis = "lin", x.
 #Batch Plot
 #runs specified number of batches and gives ggplot2 output
 #default function: SIR_run (insertion of infected individuals at a given time-point)
-batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0, i_number = NULL, occ = 2){
+batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = 
+list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0, i_number = NULL, occ = 2){
   if(FUN == "ins_1"){
     #throw some errors
     if(is.null(grp) == TRUE){
@@ -200,6 +210,111 @@ batch_plot <- function(FUN = "mul_ins", batch = 100, fun_list = list(init.values
   }
 }
 
+#multi-core enabled batch_plot
+batch_plot_mc <- function(FUN = "mul_ins", batch = 100, fun_list =
+list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0, i_number = NULL, occ = 2){
+  core <- detectCores(logical=FALSE)
+  registerDoParallel(cores=core)
+  if(FUN == "ins_1"){
+    #throw some errors
+    if(is.null(grp) == TRUE){
+      stop("No group specified!")
+    }
+    if(is.null(insertion) == TRUE){
+      stop("No insertion time selected!")
+    }
+    if(is.null(i_number) == TRUE){
+      stop("No number of infected specified!")
+    }
+
+    #run a whole bunch of times and store into a df
+    plot_dat <- data.frame(time = 0, I = 0, iter = 0)
+    foreach(i=1:batch)){ %dopar%
+      ins_1()
+      run <- cbind(run, iter = i)
+      plot_dat <- rbind(plot_dat,run)
+    }
+    plot_dat <- plot_dat[-1,] #drop starting value (how do you do this better?)
+    #trim and store into a new dataframe
+    plot_dat$t_2 <- round(plot_dat$time,0)
+    #plot_dat_2 <- unique(plot_dat)
+
+    #Create summary measures from the runs
+    #sum_dat <- ddply(plot_dat_2,.variables = "t_2",
+                     #summarize,
+                     #ave = mean(I),
+                     #lb = quantile(I,0.25),
+                     #ub = quantile(I,0.75))
+
+    #plotting
+    graph = ggplot(plot_dat)
+    graph = graph + geom_point(aes(x=time, y=I), alpha=0.1, size=1)
+    #graph = graph + geom_ribbon(data = sum_dat,
+                  #aes(x=t_2,ymin=lb,ymax=ub),
+                  #alpha = 0.25)
+    #graph = graph + geom_line(data = sum_dat,
+                #aes(x=t_2,y=ave),
+                #size=0.5)
+    graph = graph + labs(title= paste(batch,"SIR Iterations"),
+                         x = "Time (days)",
+                         y = "Infected (count)")
+    graph = graph + theme_bw()
+    plot(graph)
+    assign("graph",graph,envir = .GlobalEnv) #for editing or saving
+  }
+  if(FUN == "mul_ins"){
+    #throw some errors
+    if(is.null(grp) == TRUE){
+        stop("No infection group specified!")
+    }
+    if(is.null(occ) == TRUE){
+       stop("Number of insertions not specified!")
+    }
+    if(is.null(insertion) == TRUE || insertion < 0){
+        stop("Something is wrong with your start time,partner.")
+    }
+
+    #batch runs
+    plot_dat = data.frame(time = NULL,I = NULL,iter = NULL)
+    foreach(i=1:batch){ %dopar%
+      mul_ins()
+      results <- cbind(results, I = rowSums(results[,c("I1","I2")]))
+      results <- cbind(results,iter=i)
+      plot_dat <- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
+    }
+
+    #store plot data globally
+    assign("plot_dat",plot_dat,envir=.GlobalEnv)
+    plot_dat$t_2 <- round(plot_dat$time,0)
+    #plot_dat_2 <- unique(plot_dat)
+
+    #Create summary measures from the runs
+    sum_dat <- ddply(plot_dat,.variables = "t_2",
+                     summarize,
+                     ave = mean(I),
+                     lb = quantile(I,0.25),
+                     ub = quantile(I,0.75))
+
+    #graphing
+    graph = ggplot(plot_dat)
+    graph = graph + geom_point(aes(x=time, y=I), alpha=0.1, size=1)
+    #graph = graph + geom_ribbon(data = sum_dat,
+                  #aes(x=t_2,ymin=lb,ymax=ub),
+                  #alpha = 0.25)
+    #graph = graph + geom_line(data = sum_dat,
+                #aes(x=t_2,y=ave),
+                #size=0.5)
+    graph = graph + labs(title= paste(batch,"SIR Iterations"),
+                         x = "Time (days)",
+                         y = "Infected (count)")
+    graph = graph + theme_bw()
+    plot(graph)
+    assign("graph",graph,envir = .GlobalEnv) #for editing or saving
+  }
+  else{
+    stop("I haven't coded for that option yet, you dunce!")
+  }
+}
 #One-insertion (probably depreciated as the same can be done by mul_ins 3/17)
 ins_1 <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
 P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[[5]]){
