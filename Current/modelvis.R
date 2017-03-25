@@ -353,11 +353,12 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
     
     #batch runs
     plot_dat = data.frame(time = NULL,I = NULL,iter = NULL)
-    foreach(i=1:batch) %dopar%
-      + mul_ins()
-      + results <- cbind(results, I = rowSums(results[,c("I1","I2")]))
-      + results <- cbind(results,iter=i)
-      + plot_dat <- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
+    foreach(1:batch, .packages='adaptivetau') %dopar% {
+      mul_ins()
+      results <- cbind(results, I = rowSums(results[,c("I1","I2")]))
+      results <- cbind(results,iter=i)
+      plot_dat <- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
+    }
     
 
     #store plot data globally
