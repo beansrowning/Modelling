@@ -457,7 +457,7 @@ mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
               run = ssa.adaptivetau(init_new,t,RF,P,t_new)
               run = cbind(apply(run[,"time", drop=FALSE],2,function(x) x+results[nrow(results),"time"]),
                 run[,-1]) #offset time by the final time of the past run
-              results <- rbind(results,run[-1,]) #drop the first row
+              results <- rbind(results,run[-1,]) #drop the first ro
             }
     }
     #store results of run globally
