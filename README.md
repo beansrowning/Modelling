@@ -2,12 +2,12 @@
 A MSc. Epi summer project *(sometimes)* building stochastic models in R  
 By: Sean Browning, LSHTM 2017
 
-##Dependent Libraries
+## Dependent Libraries
 * Adaptivetau
 * googleVis (js embedded html visualization)
 * ggplot2
 
-##Directories
+## Directories
 * Current  
 Current files being actively developed
 * Scrap  
