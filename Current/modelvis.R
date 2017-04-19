@@ -106,11 +106,29 @@ SIRplot <- function(mat, vars = c("time", "S11", "I11", "R11"), y.axis = "lin",
 
 
 batch_plot <- function(FUN = "mul_ins", batch = 100, 
-                       fun_list = list(init.values, transitions, RateF, parameters,365), 
+                       fun_list = list(init.values, transitions, RateF, parameters, 365), 
                        grp = NULL, insertion = 0, i_number = NULL, occ = 2) {
     # Runs ssa.adaptivetau specified number of times and plots results with ggplot2
+    # -Added Functionality to insert infected individuals at a given time
+    # -"mul_ins" adds functionality to insert individuals at spaced intervals
+    #  after the first insertion.  
+    # Automatically plots data as geom_points on a cumulative graph 
+    # Moving average functionality to be added 
     # Args: 
-    #   FUN : "mul_ins"
+    #   FUN : Name of insertion function to utilize
+    #            mul_ins: newer, inserts one infected person then adds more routinely 
+    #            ins_1: older, depreciated single point insertion run 
+    #   batch : number of desired ssa runs 
+    #   fun_list : list of parameters read into ssa.adaptivetau through FUN 
+    #   grp : "y" or "a" to indicate which age group to insert into
+    #   insertion : Time point of first insertion (in days) 
+    #   i_number : Number of infected persons to insert each time 
+    #   occ : How many total insertion events should occur 
+    # Returns:
+    #   run : left over matrix of last run data in batch for silly reasons
+    #   plot_dat : data frame of time and infected counts for each run
+    #   graph : ggplot2 graph data for additional editing or saving 
+
   if (FUN == "ins_1") {
     #throw some errors
     if (is.null(grp) == TRUE) {
@@ -151,7 +169,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100,
     }
     plot_dat <- plot_dat[-1, ] #drop starting value (how do you do this better?)
     #trim and store into a new dataframe
-    plot_dat$t_2 <- round(plot_dat$time, 0)
+    #plot_dat$t_2 <- round(plot_dat$time, 0)
     #plot_dat_2 <- unique(plot_dat)
 
     #Create summary measures from the runs
