@@ -140,7 +140,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100,
     if (is.null(i_number) == TRUE) {
       stop("No number of infected specified!")
     }
-    
+
     ins_1 <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
     P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[[5]]){
           t_2 <- tf - t_int
@@ -408,6 +408,7 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
     plot(graph)
     assign("graph",graph,envir = .GlobalEnv) #for editing or saving
 }
+
 #One-insertion (probably depreciated as the same can be done by mul_ins 3/17)
 ins_1 <- function(i = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
 P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[[5]]){
@@ -427,7 +428,6 @@ P = fun_list[[4]], t_int = insertion, i_num = i_number,age = grp, tf = fun_list[
       run <- cbind(run, I = rowSums(run[,c("I1","I2")]))
       run <<- run[,c("time","I"), drop = FALSE]
       }
-
 
 #multi-insertion function
 mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
