@@ -4,7 +4,7 @@ By: Sean Browning, LSHTM 2017
 
 ## Dependent Libraries
 * Adaptivetau
-* googleVis (js embedded html visualization)
+* googleVis (HTML5 visualizations)
 * ggplot2
 
 ## Directories
