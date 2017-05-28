@@ -1,13 +1,11 @@
 # Workspace for a function to detect if an epidemic has occured 
 # 05/02/2017
-# imports: ggplot2, magrittr (tidyverse)
+# imports: tidyverse
 
-if (!require(ggplot2)) {
- install.packages("ggplot2")
+if (!require(tidyverse)) {
+  install.packages("tidyverse")
 }
-if (!require(magrittr)) {
-  install.packages("magrittr")
-}
+library(tidyverse)
 
 
 Epi_detect <-  function(result) {
