@@ -84,6 +84,7 @@ mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
       results <- rbind(results, run[-1, ]) #drop the first row
     }
   }
+  
   #run if no delay
   if (i_start == 0) {
     t_first <- tf*(1/occ)
@@ -109,6 +110,8 @@ mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
       results <- rbind(results,run[-1, ]) #drop the first row
     }
   }
+  
   #store results of run globally
   assign("results", results, envir = .GlobalEnv)
 }
+

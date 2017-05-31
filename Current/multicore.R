@@ -10,7 +10,8 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
   # Runs ssa.adaptivetau specified number of times and plots results with ggplot2
   # 'mul_ins' adds functionality to insert individuals at spaced intervals
   #   after the first insertion.
-  # Sets up a PSOCK clutster to use all cores of the PC running it WILL NOT RUN IN VM
+  # Sets up a PSOCK clutster to use all cores of the PC running 
+  # it WILL NOT RUN IN a VM!
   # Args:
   #   batch : number of desired ssa runs
   #   fun_list : list of parameters read into ssa.adaptivetau
@@ -27,6 +28,7 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
 
   core <- detectCores(logical = FALSE)
   cl <- makePSOCKcluster(core)
+
   registerDoParallel(cl)
 
   if (is.null(grp) == TRUE) {
@@ -38,35 +40,35 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
   if (is.null(insertion) == TRUE || insertion < 0) {
     stop("Something is wrong with your start time, partner.")
   }
-
+  
   mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
     P = fun_list[[4]], ins = occ, i_num = i_number, i_start = insertion, age = grp,
     tf = fun_list[[5]]) {
     inf_grp <- ifelse(age == "a", "I2", "I1")
-
+  
     # run given time delay
     if (i_start > 0) {
-
+  
       results <- ssa.adaptivetau(init, t, RF, P, i_start)
-
+  
       for (i in 1:occ) {
-
+  
         results[nrow(results), inf_grp] <- results[nrow(results), inf_grp] +
           i_num  #add infected
-
+  
         # accounting for time 0 starts
-
+  
         init_new <- results[nrow(results), ]
         init_new <- init_new[c("S1","S2","E1","E2","I1","I2","R1","R2","D"), drop = FALSE]
-
+  
         t_new <- ((tf - i_start) * (i/occ) - (tf - i_start) * ((i - 1)/occ))
-
+  
         # more accounting for time 0 starts
         run <- ssa.adaptivetau(init_new, t, RF, P, t_new)
-
+  
         run <- cbind(apply(run[, "time", drop = FALSE], 2, function(x) x +
           results[nrow(results), "time"]), run[, -1])  #offset time by the final time of the past run
-
+  
         results <- rbind(results, run[-1, ])  #drop the first row
       }
     }
@@ -78,16 +80,16 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
       results <<- ssa.adaptivetau(init_new, t, RF, P, t_first)
       # insertion loops
       for (i in 1:(occ - 1)) {
-
+  
         results[nrow(results), inf_grp] <- results[nrow(results), inf_grp] +
           i_num  #add infected
         # accounting for time 0 starts
-
+  
         init_new <- results[nrow(results), ]
         init_new <- init_new[c("S1","S2","E1","E2","I1","I2","R1","R2","D"), drop = FALSE]
-
+  
         t_new <- ((tf - i_start) * (i/occ) - (tf - i_start) * ((i - 1)/occ))
-
+  
         # more accounting for time 0 starts
         run <- ssa.adaptivetau(init_new, t, RF, P, t_new)
         run <- cbind(apply(run[, "time", drop = FALSE], 2, function(x) x +
@@ -98,6 +100,7 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
     # store results of run globally
     assign("results", results, envir = .GlobalEnv)
   }
+  
   par_run <- function() {
     results <- mul_ins()
     results <- cbind(results, I = rowSums(results[, c("I1", "I2")]))
@@ -119,4 +122,8 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
   plot_dat$t_2 <- round(plot_dat$time, 0)
 
   stopCluster(cl)  # Stop PSOCK cluster
+  remove(cl)
+  registerDoSEQ()
 }
+
+
