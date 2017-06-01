@@ -3,3 +3,4 @@
 *.Rhistory
 *.bat
 .Rproj.user
+*.zedstate
