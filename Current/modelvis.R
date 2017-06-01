@@ -27,19 +27,20 @@ library(foreach)
 
 
 SIRplot <- function(mat, vars = c("time", "S11", "I11", "R11"), y.axis = "lin",
-                   x.range = c(0, (mat[nrow(mat), "time"])), parameters = NULL) {
+                    x.range = c(0, (mat[nrow(mat), "time"])),
+                    parameters = NULL) {
     # Generic post ssa run plot yielding interactive googleVis output.
-    # Quite slow for large datasets, REQUIRES IE9+ 
+    # Quite slow for large datasets, REQUIRES IE9+
     #
     # Args:
     #   mat : Resulting matrix from ssa run
     #   vars : Character vector of column names from mat to plot
     #   y.axis : Y axis Scale; "lin" for linear, "log" for logarithmic
-    #   x.range : Range of X axis, numerical vector 
+    #   x.range : Range of X axis, numerical vector
     #   parameters : Table of parameters to plot alongside graph (optional)
-    # Returns: 
+    # Returns:
     #   Plots in default browser window
-    
+
     #determine row numbers for given x.range
     rag <- which(mat[, "time"] >= x.range[1] & mat[, "time"] <= x.range[2])
     x.range <- c(rag[1], rag[length(rag)])
@@ -105,29 +106,29 @@ SIRplot <- function(mat, vars = c("time", "S11", "I11", "R11"), y.axis = "lin",
 }
 
 
-batch_plot <- function(FUN = "mul_ins", batch = 100, 
-                       fun_list = list(init.values, transitions, RateF, parameters, 365), 
+batch_plot <- function(FUN = "mul_ins", batch = 100,
+                       fun_list = list(init.values, transitions, RateF, parameters, 365),
                        grp = NULL, insertion = 0, i_number = NULL, occ = 2) {
     # Runs ssa.adaptivetau specified number of times and plots results with ggplot2
     # -Added Functionality to insert infected individuals at a given time
     # -"mul_ins" adds functionality to insert individuals at spaced intervals
-    #  after the first insertion.  
-    # Automatically plots data as geom_points on a cumulative graph 
-    # Moving average functionality to be added 
-    # Args: 
+    #  after the first insertion.
+    # Automatically plots data as geom_points on a cumulative graph
+    # Moving average functionality to be added
+    # Args:
     #   FUN : Name of insertion function to utilize
-    #            mul_ins: newer, inserts one infected person then adds more routinely 
-    #            ins_1: older, depreciated single point insertion run 
-    #   batch : number of desired ssa runs 
-    #   fun_list : list of parameters read into ssa.adaptivetau through FUN 
+    #            mul_ins: newer, inserts one infected person then adds more routinely
+    #            ins_1: older, depreciated single point insertion run
+    #   batch : number of desired ssa runs
+    #   fun_list : list of parameters read into ssa.adaptivetau through FUN
     #   grp : "y" or "a" to indicate which age group to insert into
-    #   insertion : Time point of first insertion (in days) 
-    #   i_number : Number of infected persons to insert each time 
-    #   occ : How many total insertion events should occur 
+    #   insertion : Time point of first insertion (in days)
+    #   i_number : Number of infected persons to insert each time
+    #   occ : How many total insertion events should occur
     # Returns:
     #   run : left over matrix of last run data in batch for silly reasons
     #   plot_dat : data frame of time and infected counts for each run
-    #   graph : ggplot2 graph data for additional editing or saving 
+    #   graph : ggplot2 graph data for additional editing or saving
 
   if (FUN == "ins_1") {
     #throw some errors
@@ -159,7 +160,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100,
           run <- cbind(run, I = rowSums(run[, c("I1", "I2")]))
           run <<- run[, c("time", "I"), drop = FALSE]
           }
-          
+
     #run a whole bunch of times and store into a df
     plot_dat <- data.frame(time = 0, I = 0, iter = 0)
     for(num in 1:batch){
@@ -206,12 +207,12 @@ batch_plot <- function(FUN = "mul_ins", batch = 100,
     if (is.null(insertion) == TRUE || insertion < 0) {
         stop("Something is wrong with your start time,partner.")
     }
-    
+
     mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
                         P = fun_list[[4]], ins = occ, i_num = i_number,
                         i_start = insertion, age = grp, tf = fun_list[[5]]) {
       inf_grp <- ifelse(age == "a", "I2", "I1")
-  
+
       #run given time delay
       if (i_start > 0) {
           results <- ssa.adaptivetau(init, t, RF, P, i_start)
@@ -259,7 +260,7 @@ batch_plot <- function(FUN = "mul_ins", batch = 100,
       #store results of run globally
       assign("results", results, envir = .GlobalEnv)
     }
-    
+
     #batch runs
     plot_dat = data.frame(time = NULL, I = NULL, iter = NULL)
     for (i in 1:batch) {
@@ -306,7 +307,7 @@ batch_plot_mc <- function(batch = 1000, fun_list =
 list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0, i_number = NULL, occ = 2){
   core <- detectCores(logical=FALSE)
   registerDoParallel(cores=core)
-  
+
     if(is.null(grp) == TRUE){
         stop("No infection group specified!")
     }
@@ -316,12 +317,12 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
     if(is.null(insertion) == TRUE || insertion < 0){
         stop("Something is wrong with your start time, partner.")
     }
-    
+
     mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
       P = fun_list[[4]], ins = occ, i_num = i_number,i_start = insertion,age = grp, tf = fun_list[[5]]
       ){
       inf_grp <- ifelse(age == "a","I2","I1")
-  
+
       #run given time delay
       if(i_start > 0){
           results <- ssa.adaptivetau(init,t,RF,P,i_start)
@@ -369,7 +370,7 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
       #store results of run globally
       assign("results",results,envir=.GlobalEnv)
     }
-    
+
     #batch runs
     plot_dat = data.frame(time = NULL,I = NULL,iter = NULL)
     foreach(1:batch, .packages='adaptivetau') %dopar% {
@@ -378,7 +379,7 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
       results <- cbind(results,iter=i)
       plot_dat <- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
     }
-    
+
 
     #store plot data globally
     assign("plot_dat",plot_dat,envir=.GlobalEnv)
