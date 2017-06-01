@@ -1,4 +1,5 @@
-# Multicore work 28/5/2017
+# Multicore batchplot for Benchmark
+# 01/06/2017
 
 library(adaptivetau)
 library(parallel)
@@ -7,11 +8,11 @@ library(foreach)
 
 batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transitions,
   RateF, parameters, 365), grp = NULL, insertion = 0, i_number = NULL, occ = 2) {
-  # Runs ssa.adaptivetau specified number of times and plots results with ggplot2
-  # 'mul_ins' adds functionality to insert individuals at spaced intervals
-  #   after the first insertion.
-  # Sets up a PSOCK clutster to use all cores of the PC running 
-  # it WILL NOT RUN IN a VM!
+  # Runs a specified number of adaptivetau simulations utilizing multithreaded 
+  # processing by assigning CPU cores to a parallel socket cluster.
+  # It will not, therefore, run in a virtual machine. UNIX untested. 
+  # Performance increase over base function is close to sqrt(t) on 4 cores
+  #
   # Args:
   #   batch : number of desired ssa runs
   #   fun_list : list of parameters read into ssa.adaptivetau
@@ -25,7 +26,6 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
   #   graph : ggplot2 graph data for additional editing or saving
 
   # Set up PSOCK Cluster
-
   core <- detectCores(logical = FALSE)
   cl <- makePSOCKcluster(core)
 
@@ -44,6 +44,7 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
   mul_ins <- function(init = fun_list[[1]], t = fun_list[[2]], RF = fun_list[[3]],
     P = fun_list[[4]], ins = occ, i_num = i_number, i_start = insertion, age = grp,
     tf = fun_list[[5]]) {
+    
     inf_grp <- ifelse(age == "a", "I2", "I1")
   
     # run given time delay
@@ -72,6 +73,7 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
         results <- rbind(results, run[-1, ])  #drop the first row
       }
     }
+   
     # run if no delay
     if (i_start == 0) {
       t_first <- tf * (1/occ)
@@ -97,8 +99,7 @@ batch_plot_mc <- function(batch = 10000, fun_list = list(init.values, transition
         results <- rbind(results, run[-1, ])  #drop the first row
       }
     }
-    # store results of run globally
-    assign("results", results, envir = .GlobalEnv)
+    return(results)
   }
   
   par_run <- function() {
