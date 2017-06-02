@@ -1,5 +1,5 @@
 # Epidemic Detector
-# 01/06/2017
+# 1 Jun 2017
 
 Epi_detect <- function(result, verbose = FALSE) {
   # Calculates the length of time between two periods of zero cases
@@ -56,17 +56,3 @@ Epi_detect <- function(result, verbose = FALSE) {
     print("Outbreak lengths saved as 'outbreaks'")
   }
 }
-
-# For debugging :
-# set.seed(1234)
-
-# a <- data.frame(time = c(seq(1, 100), seq(1, 100)),
-#                 I = rpois(200, 1), iter = c(rep(1, 100), rep(2, 100)))
-
-
-# d <- data.frame(time = c(1, 500, seq(1, 50)),
-#                 I = c(0, 0, rpois(50, 1)), iter = c(1, 1, rep(2, 50)))
-
-
-# Epi_detect(a) #No
-# Epi_detect(d) #Yes
