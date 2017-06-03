@@ -103,17 +103,18 @@ batch_plot_mc2 <- function(batch = 10000,
   }
   # batch runs
   plot_dat <- data.frame(time = NULL, I = NULL, iter = NULL)
-  plot_dat <- foreach(i = 1:batch, .packages = "adaptivetau", .combine = rbind)
-               %dopar% {
+  plot_dat <- foreach(i = 1:batch, .packages = "adaptivetau", 
+                      .combine = rbind) %dopar% {
       par_run()
 
     }
 
   # store plot data globally
   plot_dat <- as.data.frame(plot_dat)
-  assign("plot_dat2_mc2", plot_dat, envir = .GlobalEnv)
+  # assign("plot_dat2_mc2", plot_dat, envir = .GlobalEnv) (for benchmarking)
   plot_dat$t_2 <- round(plot_dat$time, 0)
 
-  stopImplicitCluster(cl)  # Stop PSOCK cluster
+  stopCluster(cl)  # Stop PSOCK cluster
+  registerDoSEQ()
   remove(cl)
 }
