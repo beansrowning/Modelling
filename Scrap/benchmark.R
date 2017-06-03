@@ -90,7 +90,7 @@ bench <<- microbenchmark(streamlined = batch_plot_mc2(batch = 10000,
                         base = batch_plot_mc(batch = 10000,
                                       grp = "a",
                                       insertion = 10,
-                                      i_number = 20), times = 50)
+                                      i_number = 20), times = 100)
 
 
 autoplot(bench)
