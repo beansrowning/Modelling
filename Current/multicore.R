@@ -1,12 +1,12 @@
-# Multicore batchplot for Benchmark
-# 2 Jun 2017
+# Multicore Batch Run
+# 4 Jun 2017
 
 require("adaptivetau")
 require("parallel")
 require("doParallel")
 require("foreach")
 
-batch_plot_mc2 <- function(batch = 10000,
+batch_run_mc <- function(batch = 10000,
                           fun_list = list(init.values, transitions,
                           RateF, parameters, 365),
                           grp = NULL, insertion = 0,
@@ -17,23 +17,16 @@ batch_plot_mc2 <- function(batch = 10000,
   # Performance increase over base function is close to sqrt(t) on 4 cores
   #
   # Args:
-  #   batch : number of desired ssa runs
-  #   fun_list : list of parameters read into ssa.adaptivetau
-  #   FUN grp : 'y' or 'a' to indicate which age group to insert into
+  #   batch : Number of desired ssa runs
+  #   fun_list : List of parameters passed to ssa.adaptivetau
+  #   grp : 'y' or 'a' to indicate which age strata to insert into
   #   insertion : Time point of first insertion (in days)
   #   i_number : Number of infected persons to insert each time
-  #   occ : How manytotal insertion events should occur
+  #   occ : How many total insertion events should occur
   # Returns:
-  #   run : left over matrix of last run data in batch for silly reasons
   #   plot_dat : data frame of time and infected counts for each run
-  #   graph : ggplot2 graph data for additional editing or saving
 
-  # Set up PSOCK Cluster
-  core <- detectCores(logical = FALSE)
-  cl <- makePSOCKcluster(core)
-
-  registerDoParallel(cl)
-
+  # Throw some errors 
   if (is.null(grp) == TRUE) {
     stop("No infection group specified!")
   }
@@ -43,56 +36,23 @@ batch_plot_mc2 <- function(batch = 10000,
   if (is.null(insertion) == TRUE || insertion < 0) {
     stop("Something is wrong with your start time, partner.")
   }
+  
+  # Set up PSOCK Cluster
+  core <- detectCores(logical = FALSE)
+  cl <- makePSOCKcluster(core)
+  registerDoParallel(cl)
+  
+  # Assign args to globalEnv for mul_ins to acess
+  batch <<- batch 
+  fun_list <<- fun_list
+  grp <<- grp
+  insertion <<- insertion
+  i_number <<- i_number
+  occ <<- occ
+  
+  clusterExport(cl, c("mul_ins", "batch", "fun_list",
+                      "grp", "insertion", "i_number", "occ"))
 
-  mul_ins <- function() {
-    # __inherits__
-    init <- fun_list[[1]]
-    t <- fun_list[[2]]
-    RF <- fun_list[[3]]
-    P <- fun_list[[4]]
-    ins <- occ
-    i_num <- i_number
-    i_start <- insertion
-    age <- grp
-    tf <- fun_list[[5]]
-    inf_grp <- ifelse(age == "a", "I2", "I1")
-
-    if (i_start == 0) {
-      t_start <- tf * (1 / ins)
-      init[inf_grp] <- init[inf_grp] + i_num
-      ins <- ins - 1
-    } else {
-      t_start <- i_start
-    }
-
-    results <- ssa.adaptivetau(init, t, RF, P, t_start)
-
-    for (i in 1:ins) {
-      # add infected
-      results[nrow(results), inf_grp] <- results[nrow(results), inf_grp] +
-        i_num
-
-      # Set results from first run as init for next run
-
-      init_new <- results[nrow(results), ]
-      init_new <- init_new[c("S1", "S2", "E1", "E2", "I1",
-                             "I2", "R1", "R2", "D"), drop = FALSE]
-
-      # Calculate new run length
-      t_new <- (tf - i_start) * (i / ins) - (tf - i_start) * ((i - 1) / ins)
-
-      # Run with new inits
-      run <- ssa.adaptivetau(init_new, t, RF, P, t_new)
-
-      # Offset time by the final time of the past run
-      run <- cbind(apply(run[, "time", drop = FALSE], 2, function(x) x +
-        results[nrow(results), "time"]), run[, -1])
-
-      # Drop duplicated first row
-      results <- rbind(results, run[-1, ])
-    }
-    return(results)
-  }
 
   par_run <- function() {
     results <- mul_ins()
@@ -101,6 +61,7 @@ batch_plot_mc2 <- function(batch = 10000,
     results <- results[, c("time", "I", "iter"), drop = FALSE]
     return(results)
   }
+  
   # batch runs
   plot_dat <- data.frame(time = NULL, I = NULL, iter = NULL)
   plot_dat <- foreach(i = 1:batch, .packages = "adaptivetau", 
@@ -109,12 +70,84 @@ batch_plot_mc2 <- function(batch = 10000,
 
     }
 
-  # store plot data globally
+  # Return Plot Data for analysis and plotting 
   plot_dat <- as.data.frame(plot_dat)
-  assign("plot_dat2_mc2", plot_dat, envir = .GlobalEnv)
-  plot_dat$t_2 <- round(plot_dat$time, 0)
+  return(plot_dat)
 
-  stopCluster(cl)  # Stop PSOCK cluster
+  # Stop PSOCK cluster
+  stopCluster(cl) 
   registerDoSEQ()
-  remove(cl)
+  
+  # Garbage Collection
+  rm(cl)
+  rm(batch, envir = .GlobalEnv)
+  rm(fun_list, envir = .GlobalEnv)
+  rm(grp, envir = .GlobalEnv)
+  rm(insertion, envir = .GlobalEnv)
+  rm(i_number, envir = .GlobalEnv)
+  rm(occ, envir = .GlobalEnv)
+}
+
+mul_ins <- function() {
+  # - batch_run_mc subroutine interfacing with ssa.apaptivetau
+  # - Allows for single or multiple insertions of infected persons
+  #   at any time point. 
+  # - If multiple insertions are called, it will space them out equally
+  #   over the specified run length. 
+  # - Appends ssa run matrices together, and adjusts for time offset.
+  # Args:
+  #   None, inherits from batch_run_mc
+  # Returns:
+  #   results : matrix of conglomerated run data
+
+  # __inherits__
+  init <- fun_list[[1]]
+  t <- fun_list[[2]]
+  RF <- fun_list[[3]]
+  P <- fun_list[[4]]
+  ins <- occ
+  i_num <- i_number
+  i_start <- insertion
+  age <- grp
+  tf <- fun_list[[5]]
+  inf_grp <- ifelse(age == "a", "I2", "I1")
+
+  # Check for first insertion
+  if (i_start == 0) {
+    t_start <- tf * (1 / ins)
+    init[inf_grp] <- init[inf_grp] + i_num
+    ins <- ins - 1
+  } else {
+    t_start <- i_start
+  }
+  
+  # First run 
+  results <- ssa.adaptivetau(init, t, RF, P, t_start)
+  
+  # Subsequent runs
+  for (i in 1:ins) {
+    # Add infected
+    results[nrow(results), inf_grp] <- results[nrow(results), inf_grp] +
+      i_num
+
+    # Set results from first run as init for next run
+
+    init_new <- results[nrow(results), ]
+    init_new <- init_new[c("S1", "S2", "E1", "E2", "I1",
+                           "I2", "R1", "R2", "D"), drop = FALSE]
+
+    # Calculate new run length
+    t_new <- (tf - i_start) * (i / ins) - (tf - i_start) * ((i - 1) / ins)
+
+    # Run with new inits
+    run <- ssa.adaptivetau(init_new, t, RF, P, t_new)
+
+    # Offset time by the final time of the past run
+    run <- cbind(apply(run[, "time", drop = FALSE], 2, function(x) x +
+      results[nrow(results), "time"]), run[, -1])
+
+    # Drop duplicated first row
+    results <- rbind(results, run[-1, ])
+  }
+  return(results)
 }
