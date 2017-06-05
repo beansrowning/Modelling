@@ -122,7 +122,7 @@ mul_ins <- function() {
   }
   
   # First run 
-  results <- ssa.adaptivetau(init, t, RF, P, t_start)
+  results <- ssa.adaptivetau(init, t, RF, P, t_start, tl.params = list(maxtau = 360))
   
   # Subsequent runs
   for (i in 1:ins) {
@@ -140,7 +140,7 @@ mul_ins <- function() {
     t_new <- (tf - i_start) * (i / ins) - (tf - i_start) * ((i - 1) / ins)
 
     # Run with new inits
-    run <- ssa.adaptivetau(init_new, t, RF, P, t_new)
+    run <- ssa.adaptivetau(init_new, t, RF, P, t_new, tl.params = list(maxtau = 360))
 
     # Offset time by the final time of the past run
     run <- cbind(apply(run[, "time", drop = FALSE], 2, function(x) x +

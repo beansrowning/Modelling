@@ -2,6 +2,10 @@
 # very, very fast. 
 # 5 Jun 2017
 
+# Depends 
+require(data.table)
+
+
 Epi_detect <- function(result, verbose = FALSE) {
   # Calculates the length of time between two periods of zero cases
   # If the length is longer than 365 days, it will return positive
@@ -9,7 +13,7 @@ Epi_detect <- function(result, verbose = FALSE) {
   #
   # Args:
   #   result : A data frame or matrix resulting from a batch run
-  #            must contain time, number of infected, and run number at least
+  #            must contain time, number of infected, and run number
   #   verbose : Logical. if TRUE, returns raw vector of outbreak times
   # Returns:
   #   Printed statement whether an epidemic was detected or not in addition to
@@ -17,20 +21,20 @@ Epi_detect <- function(result, verbose = FALSE) {
   #   Will also return the maximum outbreak length
 
   # Sanitize
-  if (!is.data.table(input)) {
-    input <- as.data.table(input)
+  if (!is.data.table(result)) {
+    result <- as.data.table(result)
   }
   
   # __init__
-  input <- setkey(input, iter)
+  result <- setkey(result, iter)
   count <- 0
   iter_num <- vector()
   outbreaks <- vector()
   
   # The meat of 'er
-  for (i in 1:input$iter[nrow(input)]) {
+  for (i in 1:result$iter[nrow(result)]) {
     
-    mat <- input[J(i)]
+    mat <- result[J(i)]
     mat <- setkey(mat, I)
     mat <- mat[J(0)]
     mat <- mat$time
@@ -55,4 +59,10 @@ Epi_detect <- function(result, verbose = FALSE) {
     print(iter_num)
     print(paste0("Maximum outbreak time ", outbreak_max))
   }
+  if (verbose == TRUE) {
+      assign("outbreaks", outbreaks, envir = .GlobalEnv)
+      print("Outbreak lengths saved as 'outbreaks'")
+  }
+
 }
+# TODO: Drop outbreaks if == 360.0000000000
