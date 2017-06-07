@@ -305,9 +305,13 @@ batch_plot <- function(FUN = "mul_ins", batch = 100,
 #multi-core enabled batch_plot
 batch_plot_mc <- function(batch = 1000, fun_list =
 list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0, i_number = NULL, occ = 2){
+  
+  # Set up PSOCK Cluster 
+  
   core <- detectCores(logical=FALSE)
-  registerDoParallel(cores=core)
-
+  cl <- makePSOCKcluster(core)
+  registerDoParallel(cl)
+  
     if(is.null(grp) == TRUE){
         stop("No infection group specified!")
     }
@@ -373,13 +377,12 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
 
     #batch runs
     plot_dat = data.frame(time = NULL,I = NULL,iter = NULL)
-    foreach(1:batch, .packages='adaptivetau') %dopar% {
+    foreach(i = 1:batch, .packages='adaptivetau') %dopar% {
       mul_ins()
       results <- cbind(results, I = rowSums(results[,c("I1","I2")]))
       results <- cbind(results,iter=i)
       plot_dat <- rbind(plot_dat,results[,c("time","I","iter"),drop=FALSE])
     }
-
 
     #store plot data globally
     assign("plot_dat",plot_dat,envir=.GlobalEnv)
@@ -408,6 +411,8 @@ list(init.values, transitions, RateF, parameters,365), grp = NULL, insertion = 0
     graph = graph + theme_bw()
     plot(graph)
     assign("graph",graph,envir = .GlobalEnv) #for editing or saving
+    
+    stopCluster(cl) # Stop PSOCK cluster
 }
 
 #One-insertion (probably depreciated as the same can be done by mul_ins 3/17)
