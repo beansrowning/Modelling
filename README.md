@@ -6,7 +6,7 @@ By: Sean Browning, LSHTM 2017
   * The project is a stochastic SEIR measles model built on the **adaptivetau**
     library and optimized with a parallel backend through **foreach** and its
     associated packages.
-  * Visualization was originally done with google visualizations using the R *googleVis*
+  * Visualizations were originally done with google visualizations using the R *googleVis*
     package, but this is now accomplished with *ggplot2*.
 
 ## Dependent Libraries
