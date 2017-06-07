@@ -1,18 +1,15 @@
-#WHO EURO 1 population measles model
-#28/2/2017 Sean Browning
-#Kyrgyzstan data (95.6% vac in 1-14, 95.6% in 15-inf)
-#Depends: 'adaptivetau', 'googleVis', modelvis.R
+# Benchmarking some code streamlining in the Multicore
+# batch plot.
 
-if (!require(adaptivetau)){
-  install.packages("adaptivetau")
-}
-suppressPackageStartupMessages(library(adaptivetau))
+#Depends
+require("adaptivetau")
+require("microbenchmark")
+require("ggplot2")
+source("multicore.R")
+source("multicore_2.R")
 
-#Source model visualization
-script.dir <- dirname(sys.frame(1)$ofile)
-source(paste0(script.dir, "/modelvis.R"))
+# Model paramaters 
 
-#Defining input
 init.values <- c(
   S = c(81400, 180700),
   E = c(0, 0),
@@ -83,33 +80,17 @@ RateF <- function(x, p, t) {
            (R2 / 1000) * omega
   ))
  }
+ 
+set.seed(1234)
 
-#runs
-SIR_run <- function(i = init.values, t = transitions, RF = RateF,
-                    P = parameters, t_int, i_num, age = "a", tf = 365) {
-    t_2 <- tf - t_int
-    inf_grp <- ifelse(age == "a", "I2", "I1")
+bench <<- microbenchmark(streamlined = batch_plot_mc2(batch = 10000,
+                                       grp = "a",
+                                       insertion = 10,
+                                       i_number = 20),
+                        base = batch_plot_mc(batch = 10000,
+                                      grp = "a",
+                                      insertion = 10,
+                                      i_number = 20), times = 100)
 
-    run_1 <- ssa.adaptivetau(i, t, RF, P, t_int)
 
-    run_1[nrow(run_1), inf_grp] <- run_1[nrow(run_1), inf_grp] + i_num
-
-    init.2 <- run_1[nrow(run_1), ]
-    init.2 <- init.2[c("S1", "S2", "E1", "E2", "I1", "I2", "R1", "R2", "D"),
-                     drop = FALSE]
-
-    run_2 <- ssa.adaptivetau(init.2, t, RF, P, t_2)
-    run_2 <- cbind(apply(run_2[, "time", drop = FALSE], 2,
-                   function(x) x + run_1[nrow(run_1), "time"]), run_2[,-1])
-    run <<- rbind(run_1, run_2[-1, ])
-    }
-SIR_run(t_int=10, i_num=1) #insert 1 person at time 10
-#Summary Measures
-run <- cbind(run,
-            S = rowSums(run[, c("S1", "S2")]),
-            I = rowSums(run[, c("I1", "I2")]),
-            R = rowSums(run[, c("R1", "R2")])
-)
-#Plot
-#plotting only the compartment that stores those cases introduced
-SIRplot(run, vars = c("time", "I"), parameters = parameters)  #"S", "I", "R"
+autoplot(bench)
