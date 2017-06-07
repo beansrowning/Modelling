@@ -1,6 +1,7 @@
-# Multicore Batch Run
-# 4 Jun 2017
+# Multicore Batch Run function
+# 7 Jun 2017
 
+# depends
 require("adaptivetau")
 require("parallel")
 require("doParallel")
@@ -18,7 +19,7 @@ batch_run_mc <- function(batch = 10000,
   #
   # Args:
   #   batch : Number of desired ssa runs
-  #   fun_list : List of parameters passed to ssa.adaptivetau
+  #   fun_list : List of parameters passed to mul_ins
   #   grp : 'y' or 'a' to indicate which age strata to insert into
   #   insertion : Time point of first insertion (in days)
   #   i_number : Number of infected persons to insert each time
@@ -26,7 +27,7 @@ batch_run_mc <- function(batch = 10000,
   # Returns:
   #   plot_dat : data frame of time and infected counts for each run
 
-  # Throw some errors 
+  # Throw some errors
   if (is.null(grp) == TRUE) {
     stop("No infection group specified!")
   }
@@ -36,20 +37,20 @@ batch_run_mc <- function(batch = 10000,
   if (is.null(insertion) == TRUE || insertion < 0) {
     stop("Something is wrong with your start time, partner.")
   }
-  
+
   # Set up PSOCK Cluster
   core <- detectCores(logical = FALSE)
   cl <- makePSOCKcluster(core)
   registerDoParallel(cl)
-  
+
   # Assign args to globalEnv for mul_ins to acess
-  batch <<- batch 
+  batch <<- batch
   fun_list <<- fun_list
   grp <<- grp
   insertion <<- insertion
   i_number <<- i_number
   occ <<- occ
-  
+
   clusterExport(cl, c("mul_ins", "batch", "fun_list",
                       "grp", "insertion", "i_number", "occ"))
 
@@ -61,23 +62,23 @@ batch_run_mc <- function(batch = 10000,
     results <- results[, c("time", "I", "iter"), drop = FALSE]
     return(results)
   }
-  
+
   # batch runs
   plot_dat <- data.frame(time = NULL, I = NULL, iter = NULL)
-  plot_dat <- foreach(i = 1:batch, .packages = "adaptivetau", 
+  plot_dat <- foreach(i = 1:batch, .packages = "adaptivetau",
                       .combine = rbind) %dopar% {
       par_run()
 
     }
 
-  # Return Plot Data for analysis and plotting 
+  # Return Plot Data for analysis and plotting
   plot_dat <- as.data.frame(plot_dat)
   return(plot_dat)
 
   # Stop PSOCK cluster
-  stopCluster(cl) 
+  stopCluster(cl)
   registerDoSEQ()
-  
+
   # Garbage Collection
   rm(cl)
   rm(batch, envir = .GlobalEnv)
@@ -91,10 +92,12 @@ batch_run_mc <- function(batch = 10000,
 mul_ins <- function() {
   # - batch_run_mc subroutine interfacing with ssa.apaptivetau
   # - Allows for single or multiple insertions of infected persons
-  #   at any time point. 
+  #   at any time point.
   # - If multiple insertions are called, it will space them out equally
-  #   over the specified run length. 
+  #   over the specified run length. No current way of having other spacing.
   # - Appends ssa run matrices together, and adjusts for time offset.
+  # - Max tau leaping set at 360.5 to try and eliminate false positive
+  #   epidemics when running Epi_detect.
   # Args:
   #   None, inherits from batch_run_mc
   # Returns:
@@ -120,10 +123,11 @@ mul_ins <- function() {
   } else {
     t_start <- i_start
   }
-  
-  # First run 
-  results <- ssa.adaptivetau(init, t, RF, P, t_start, tl.params = list(maxtau = 360))
-  
+
+  # First run
+  results <- ssa.adaptivetau(init, t, RF, P, t_start,
+                             tl.params = list(maxtau = 360.5))
+
   # Subsequent runs
   for (i in 1:ins) {
     # Add infected
@@ -140,11 +144,12 @@ mul_ins <- function() {
     t_new <- (tf - i_start) * (i / ins) - (tf - i_start) * ((i - 1) / ins)
 
     # Run with new inits
-    run <- ssa.adaptivetau(init_new, t, RF, P, t_new, tl.params = list(maxtau = 360))
+    run <- ssa.adaptivetau(init_new, t, RF, P, t_new,
+                           tl.params = list(maxtau = 360.5))
 
     # Offset time by the final time of the past run
     run <- cbind(apply(run[, "time", drop = FALSE], 2, function(x) x +
-      results[nrow(results), "time"]), run[, -1])
+                       results[nrow(results), "time"]), run[, -1])
 
     # Drop duplicated first row
     results <- rbind(results, run[-1, ])
