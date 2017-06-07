@@ -10,17 +10,14 @@ By: Sean Browning, LSHTM 2017
     package, but this is now accomplished with *ggplot2*.
 
 ## Dependent Libraries
-<<<<<<< HEAD
 * Adaptivetau (model backend)
 * data.table (for optimized subsetting)
 * foreach (for batch model runs)
 * doParallel (parallel computing backend)
 * ggplot2 (visualizations)
-=======
 * Adaptivetau
 * googleVis (js embedded html visualization)
 * ggplot2
->>>>>>> 794436fce1e252e619f4ca0a10461e65b16da11d
 
 ## Directories
 ### Current
