@@ -15,9 +15,6 @@ By: Sean Browning, LSHTM 2017
 * foreach (for batch model runs)
 * doParallel (parallel computing backend)
 * ggplot2 (visualizations)
-* Adaptivetau
-* googleVis (js embedded html visualization)
-* ggplot2
 
 ## Directories
 ### Current
