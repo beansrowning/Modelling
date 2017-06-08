@@ -1,7 +1,7 @@
 # Multicore Batch Run function
 # 7 Jun 2017
 
-# depends
+# Depends
 require("adaptivetau")
 require("parallel")
 require("doParallel")
@@ -63,7 +63,7 @@ batch_run_mc <- function(batch = 10000,
     return(results)
   }
 
-  # batch runs
+  # Batch runs
   plot_dat <- data.frame(time = NULL, I = NULL, iter = NULL)
   plot_dat <- foreach(i = 1:batch, .packages = "adaptivetau",
                       .combine = rbind) %dopar% {
@@ -103,7 +103,7 @@ mul_ins <- function() {
   # Returns:
   #   results : matrix of conglomerated run data
 
-  # __inherits__
+  # __Inherits__
   init <- fun_list[[1]]
   t <- fun_list[[2]]
   RF <- fun_list[[3]]
@@ -141,7 +141,7 @@ mul_ins <- function() {
                            "I2", "R1", "R2", "D"), drop = FALSE]
 
     # Calculate new run length
-    t_new <- (tf - i_start) * (i / ins) - (tf - i_start) * ((i - 1) / ins)
+    t_new <- (tf - i_start) * (i / ins) - (tf - i_start) * ( (i - 1) / ins)
 
     # Run with new inits
     run <- ssa.adaptivetau(init_new, t, RF, P, t_new,

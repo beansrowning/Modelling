@@ -1,10 +1,10 @@
-# Test data to run functions 
+# Test data to run functions
 # Kyrgyzstan data (95.6% vac in 1-14, 95.6% in 15-inf)
 
 # Depends
 require("adaptivetau")
 
-# Model paramaters 
+# Model paramaters
 
 init.values <- c(
   S = c(81400, 180700),
@@ -23,7 +23,7 @@ transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2"),
   )
 
 # Kyrgyzstan
-parameters <- c( 
+parameters <- c(
   R0 = 16,
   infectious.period = 7, # days
   latent.period = 8,     # days
@@ -42,7 +42,7 @@ RateF <- function(x, p, t) {
   omega <- p["death.rate"] / 365
   v <- ifelse(t > x["D"], p["vacc.pro"], 0)
   age.out <- 1 / (p["young.size"] * 365)
-  
+
   # Local population values
   S1 <- x["S1"]
   E1 <- x["E1"]
@@ -59,7 +59,7 @@ RateF <- function(x, p, t) {
   N1 <- S1 + E1 + I1 + R1
   N2 <- S2 + E2 + I2 + R2
   Nt <- N1 + N2
-  
+
   # Rate Functions
   return(c(S1 * beta[1] * (I / Nt), #young
            E1 * f,

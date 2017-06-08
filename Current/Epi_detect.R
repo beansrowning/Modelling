@@ -49,7 +49,10 @@ Epi_detect <- function(result, verbose = FALSE) {
     }
 
   }
-  outbreaks <- round(outbreaks,3)
+  # Due to some issue with the precision doubles are being stored
+  # at, time has to be rounded to 3 decimal places to subset properly.
+  # I have no idea how to get around that.
+  outbreaks <- round(outbreaks, 3)
   outbreaks <- outbreaks[!outbreaks %in% 360.5]
   outbreak_max <- max(outbreaks)
   if (count == 0) {
