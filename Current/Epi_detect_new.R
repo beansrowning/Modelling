@@ -5,7 +5,7 @@
 require("data.table")
 
 
-Epi_detect <- function(result, verbose = FALSE) {
+Epi_detect2 <- function(result, verbose = FALSE) {
   # - Calculates the length of time between periods of zero cases
   # - If the length is longer than 365 days, it will return positive
   # - Speed improved with data.table subsetting methods
@@ -35,12 +35,12 @@ Epi_detect <- function(result, verbose = FALSE) {
   for (i in 1:result$iter[nrow(result)]) {
 
     mat <- result[J(i)]
-    mat <- setkey(mat, I)
-    mat <- mat[J(0)]
+    mat <- setkey(mat, roots)
+    mat <- mat[J(TRUE)]
     mat <- mat$time
     outbreak_time <- diff(mat)
 
-    outbreaks <- c(outbreak_time, outbreaks)
+    outbreaks <- c(outbreaks, outbreak_time)
     if (any(outbreak_time >= 365)) {
       count <- count + 1
       iter_num <- c(iter_num, i)
@@ -64,7 +64,7 @@ Epi_detect <- function(result, verbose = FALSE) {
     print(paste0("Maximum outbreak time ", outbreak_max))
   }
   if (verbose == TRUE) {
-      assign("outbreaks", outbreaks, envir = .GlobalEnv)
+      assign("outbreaks2", outbreaks, envir = .GlobalEnv)
       print("Outbreak lengths saved as 'outbreaks'")
   }
 

@@ -40,7 +40,7 @@ Epi_detect <- function(result, verbose = FALSE) {
     mat <- mat$time
     outbreak_time <- diff(mat)
 
-    outbreaks <- c(outbreak_time, outbreaks)
+    outbreaks <- c(outbreaks, outbreak_time)
     if (any(outbreak_time >= 365)) {
       count <- count + 1
       iter_num <- c(iter_num, i)
