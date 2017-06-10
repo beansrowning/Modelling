@@ -1,6 +1,6 @@
 # Workspace for smarter Epi_detect function
-# Done, just need to combine into a functional Epi_detect
-# TODO: Combine functions
+# Failed. Only roots function used for base of Epi_detect.
+# Roots function recoded in C++ due to speed issues. 
 
 testtime <- 0:19
 # Case 1: Two peaks, epidemic starts after time 0 and simulation
@@ -73,6 +73,53 @@ endpoints <- function(input) {
     } else {
       stop("Invalid dimensions or input data!")
     }
+  }
+  return(ret)
+}
+
+roots <- function(input) {
+  # Function to find the beginning and end of an epidemic based upon
+  # the criteria mentioned above
+  # Painfully slow due to too much control flow in R, replaced with Croots.
+  # Args:
+  #   input : A numeric vector of the count of infected at each time point.
+  # Returns:
+  #   ret : A logical vector of the start and endpoints for an epidemic.
+  
+  ret <- vector()
+  for (i in 1:length(input)) {
+    if (length(input[i - 1]) == 1) {
+      if (input[i] > 0) {
+        if (input[i - 1] == 0) {
+          ret <- c(ret, TRUE)
+          next
+        } else {
+          ret <- c(ret, FALSE)
+          next
+        }
+      } else if (input[i] == 0) {
+        if (input[i - 1] > 0) {
+          ret <- c(ret, TRUE)
+          next
+        } else {
+          ret <- c(ret, FALSE)
+          next
+        }
+      } else {
+        stop(paste0("Returned negative at: ", i, "!"))
+      }
+    } else if (length(input[i - 1]) < 1) {
+      if (input[i] > 0) {
+        ret <- c(ret, TRUE)
+        next
+      } else {
+        ret <- c(ret, FALSE)
+        next
+      }
+    } else {
+      stop("Something is awry!")
+    }
+    next
   }
   return(ret)
 }

@@ -1,4 +1,5 @@
-# Epidemic endpoint capturing function
+# Epidemic endpoint capturing function (depreciated)
+# Never worked, bad approach.
 # 8 June 2017
 
 endpoints <- function(input) {
