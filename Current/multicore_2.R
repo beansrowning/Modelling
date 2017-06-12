@@ -1,5 +1,6 @@
 # Multicore Batch Run function
-# 7 Jun 2017
+# Attempting to handle arguments a bit better...
+# 11 Jun 2017
 
 # Depends
 require("adaptivetau")
@@ -7,11 +8,7 @@ require("parallel")
 require("doParallel")
 require("foreach")
 
-batch_run_mc <- function(batch = 10000,
-                          fun_list = list(init.values, transitions,
-                          RateF, parameters, 365),
-                          grp = NULL, insertion = 0,
-                          i_number = NULL, occ = 2) {
+batch_run_mc <- function(...) {
   # Runs a specified number of adaptivetau simulations utilizing multithreaded
   # processing by assigning CPU cores to a parallel socket cluster.
   # It will not, therefore, run in a virtual machine. UNIX untested.
@@ -19,7 +16,11 @@ batch_run_mc <- function(batch = 10000,
   #
   # Args:
   #   batch : Number of desired ssa runs
-  #   fun_list : List of parameters passed to mul_ins
+  #   init.values : Initial model values
+  #   transitions : Model transtions
+  #   rfunc : Model rate function
+  #   parameters : Model parameters / variable definitions
+  #   length : Approximate model run length
   #   grp : 'y' or 'a' to indicate which age strata to insert into
   #   insertion : Time point of first insertion (in days)
   #   i_number : Number of infected persons to insert each time
@@ -27,29 +28,45 @@ batch_run_mc <- function(batch = 10000,
   # Returns:
   #   plot_dat : data frame of time and infected counts for each run
 
-  # Throw some errors
-  if (is.null(grp) == TRUE) {
-    stop("No infection group specified!")
+  # Match call (experimental)
+  call <- match.call(expand.dots = TRUE)
+  if (!is.null(call$batch)) {
+    assign("batch", call$batch, envir = .GlobalEnv)
+  } else {
+    assign("batch", 10000, envir = .GlobalEnv);
+    warning("No batch count given, 10000 assumed")
   }
-  if (is.null(occ) == TRUE) {
-    stop("Number of insertions not specified!")
+  if (!is.null(call$insertion) && call$insertion >= 0) {
+    assign("insertion", call$insertion, envir = .GlobalEnv)
+  } else {
+    assign("insertion", 0, envir = .GlobalEnv)
+    warning("No start time given, 0 assumed")
   }
-  if (is.null(insertion) == TRUE || insertion < 0) {
-    stop("Something is wrong with your start time, partner.")
+  if (!is.null(call$i_number)) {
+    assign("i_number", call$i_number, envir = .GlobalEnv)
+  } else {
+    assign("i_number", 0, envir = .GlobalEnv)
+    warning("No infected count given, 0 assumed")
   }
+  if (!is.null(call$occ)) {
+    assign("occ", call$occ, envir = .GlobalEnv)
+  } else {
+    assign("occ", 2, envir = .GlobalEnv)
+    warning("No insertion count given, 2 assumed")
+  }
+  ifelse(!is.null(call$grp), assign("grp", call$grp, envir = .GlobalEnv),
+                stop("No infection group specified!"))
+  init <- ifelse(!is.null(call$init.values), call$init.values, init.values)
+  t <- ifelse(!is.null(call$transitions), call$transitions, transitions)
+  rf <- ifelse(!is.null(call$rfunc), call$rfunc, RateF)
+  p <- ifelse(!is.null(call$parameters), call$parameters, parameters)
+  tf <- ifelse(!is.null(call$length), call$length, 365)
+  fun_list <<- list(init, t, rf, p, tf)
 
   # Set up PSOCK Cluster
   core <- detectCores(logical = FALSE)
   cl <- makePSOCKcluster(core)
   registerDoParallel(cl)
-
-  # Assign args to globalEnv for mul_ins to acess
-  batch <<- batch
-  fun_list <<- fun_list
-  grp <<- grp
-  insertion <<- insertion
-  i_number <<- i_number
-  occ <<- occ
 
   clusterExport(cl, c("mul_ins", "batch", "fun_list",
                       "grp", "insertion", "i_number", "occ"))

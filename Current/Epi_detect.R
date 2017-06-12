@@ -1,11 +1,21 @@
 # Finally, a functional Epidemic Detector
-# 9 June 2017
+# 11 June 2017
 
 # Depends
 require("data.table")
 require("Rcpp")
-# C++ root finder
-sourceCpp("./src/Croots.cpp")
+
+# Root finder (writen in C++)
+# If Rtools is not installed, or admin access not available, load package
+# (move "/Data/Croots" to your R library directory)
+tryCatch(sourceCpp("./src/Croots.cpp"),
+         error = function(e) {
+           print("Croots couldn't load, trying package instead... ")
+           tryCatch(library("Croots"),
+                    error = function(e){
+                      print("Library failed to load. Is it installed?")
+                    })
+         })
 
 # Rules to define the roots of epidemic to satisfy all cases:
 #   epidemic starts at first time with infected individiuals present, and ends
@@ -16,16 +26,20 @@ sourceCpp("./src/Croots.cpp")
 #     - n = 0 AND I_n > 0         // Start at time = 0
 #   This excludes the posibility of infected being left at the end of the
 #   simulation, so always over-run it. It's also possible to throw a warning.
+# Therefore:
+#   Testing at X_n whether X_(n-1) > 0 will ensure that the only length
+#   being caluclated is epidemic length, and not the time between epidemics.
 
 Epi_detect <- function(result, verbose = FALSE) {
-  # Attempted improvement of the diff function for the purpose of
-  # determining the length of epidemics. Calls a C++ function to determine
+  # Improvement of the diff function for the purpose of determining
+  # the length of epidemics. Calls a C++ function to determine
   # the roots of the epidemic before calculating the length.
   #
   # Args:
   #   result : A data frame, data.table, or matrix resulting from a batch run
   #            must contain time, infected counts, iteration number, and roots
-  #   verbose : Logical. if TRUE, returns data frame of outbreak lengths
+  #   verbose : Logical. if TRUE, returns data frame of outbreak lengths and
+  #             affixes results of the Croots function to the input
   # Returns:
   #   - Printed statement whether an epidemic was detected, in addition to the
   #     the number of detected epidemics, and the target iteration
@@ -80,6 +94,14 @@ Epi_detect <- function(result, verbose = FALSE) {
  if (verbose == TRUE) {
      assign("outbreaks", outbreaks, envir = .GlobalEnv)
      print("Outbreak lengths saved as: 'outbreaks'")
+
+     result$roots <<- Croots(result$I)
+     print("Roots saved to input file")
+
+     if (count > 0) {
+       check <- result[result[, "iter"] %in% iter_num, ]
+       assign("check", check, envir = .GlobalEnv)
+     }
  }
 
 }
