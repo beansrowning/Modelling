@@ -1,4 +1,5 @@
-# Modelling load file June 28 2017
+# Modelling load file
+# June 28 2017
 
 # Check and load dependencies
 dep <- list("adaptivetau", "Rcpp", "tidyverse", "parallel", "doParallel",
@@ -17,4 +18,7 @@ files <- c("data.r", "Epi_detect.R", "multicore.R")
 sapply(files, source, .GlobalEnv)
 
 # Done.
+rm(list("dep", "files"))
 print("Done.")
+
+# TODO: S4 classes and methods? Object file definitions?
