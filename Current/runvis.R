@@ -54,6 +54,6 @@ run_vis <- function(results, save = FALSE) {
             scale_x_log10()
   plot(graph)
   if (save == TRUE) {
-    assign("graph", graph, envir = .GlobalEnv)
+    assign("graph", graph, envir = parent.frame())
   }
 }
