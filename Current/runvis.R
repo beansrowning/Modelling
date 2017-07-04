@@ -36,13 +36,17 @@ run_vis <- function(results, save = FALSE) {
   n <- max(results$iter)
   #---Plot data-------------------------------------------
   graph <- ggplot(sum_dat) +
-            # geom_point(aes(x = time, y = mean), alpha = 0) +
+            geom_point(aes(x = time, y = mean), alpha = 0.1) +
             geom_smooth(aes(x = time, y = mean), size = 0.5, method = "glm",
                         formula = y ~ bs(x, 20)) +
-            geom_ribbon(aes(x = time, ymin = low, ymax = high),
-                        alpha = 0.25) +
-            geom_ribbon(aes(x = time, ymin = lower, ymax = higher),
-                        alpha = 0.25) +
+            geom_smooth(aes(x = time, y = low), size = 0.25, alpha = 0.5,
+                        method = "glm", formula = y ~ bs(x, 20))
+            geom_smooth(aes(x = time, y = high), size = 0.25, alpha = 0.5,
+                        method = "glm", formula = y ~ bs(x, 20))
+            # geom_ribbon(aes(x = time, ymin = low, ymax = high),
+            #             alpha = 0.25) +
+            # geom_ribbon(aes(x = time, ymin = lower, ymax = higher),
+            #             alpha = 0.25) +
             ggtitle(paste0("Results of ", n, " stochastic runs")) +
             xlab("Time (days)") +
             ylab("Infected (count)") +
