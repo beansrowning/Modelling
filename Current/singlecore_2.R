@@ -1,18 +1,17 @@
-# Multicore Batch Run function
-# Attempting to handle arguments a bit better...
-# 11 Jun 2017
+# Singlecore Batch Run function
+# Bringing it back up to spec
+# 03 Jul 2017
 
 # Depends
 require("adaptivetau")
-require("parallel")
-require("doParallel")
-require("foreach")
 
-batch_run_mc <- function(...) {
-  # Runs a specified number of adaptivetau simulations utilizing multithreaded
-  # processing by assigning CPU cores to a parallel socket cluster.
-  # It will not, therefore, run in a virtual machine. UNIX untested.
-  # Performance increase over base function is close to sqrt(n)
+batch_run_sc <- function(...) {
+  # Runs a specified number of adaptivetau simulations
+  # - Is not optimized for multithreaded systems
+  # - Performance loss is minimal for small batch sizes / systems
+  #   with few cores or limited resources (my Pentium G3258)
+  # - For large batches or in systems with higher core count,
+  #   the multicore batch run is preferrable.
   #
   # Args:
   #   batch : Number of desired ssa runs
@@ -90,47 +89,17 @@ batch_run_mc <- function(...) {
   fun_list <<- list(init, t, rf, p, tf)
   #---End Match Call / Parameter assignment---------------
 
-  #---Define Parallel Socket CLuster----------------------
-  core <- detectCores(logical = FALSE)
-  cl <- makePSOCKcluster(core)
-  registerDoParallel(cl)
-
-  clusterExport(cl, c("mul_ins", "batch", "fun_list",
-                      "grp", "insertion", "i_number", "occ"))
-
- #---Define per-thread simulation routine-----------------
-  par_run <- function() {
-    results <- mul_ins()
-    results <- cbind(results, I = rowSums(results[, c("I1", "I2")]))
-    results <- cbind(results, iter = i)
-    results <- results[, c("time", "I", "iter"), drop = FALSE]
-    return(results)
-  }
-
-  #---Initiate Parallel Execution------------------------
+  #---Run Simulations-------------------------------------
   sim_dat <- data.frame(time = NULL, I = NULL, iter = NULL)
-  sim_dat <- foreach(i = 1:batch, .packages = "adaptivetau",
-                      .combine = rbind) %dopar% {
-      par_run()
-
+  for (i in 1:batch) {
+      results <- mul_ins()
+      results <- cbind(results, I = rowSums(results[, c("I1", "I2")]), iter = i)
+      sim_dat <- rbind(sim_dat, results[, c("time", "I", "iter"), drop = FALSE])
     }
 
   #---Sanitize and return run data-----------------------
   sim_dat <- as.data.frame(sim_dat)
   return(sim_dat)
-
-  #---Stop PSOCK cluster---------------------------------
-  stopCluster(cl)
-  registerDoSEQ()
-
-  #---Garbage Collection---------------------------------
-  rm(cl)
-  rm(batch, envir = .GlobalEnv)
-  rm(fun_list, envir = .GlobalEnv)
-  rm(grp, envir = .GlobalEnv)
-  rm(insertion, envir = .GlobalEnv)
-  rm(i_number, envir = .GlobalEnv)
-  rm(occ, envir = .GlobalEnv)
 }
 
 mul_ins <- function() {

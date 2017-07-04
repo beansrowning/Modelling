@@ -43,10 +43,10 @@ Files being actively developed, currently:
 - Epi_detect : Analyzes data for epidemics lasting longer than 365 days
 - /Src : Any C++ or FORTRAN functions or subroutines called from R
 
-  ### Scrap
+### Scrap
 
-   Depreciated files for reference and not much else
+Depreciated files for reference and not much else
 
-  ### Data
+### Data
 
-   Run data or data produced from function optimizing
+Run data or data produced from function optimizing

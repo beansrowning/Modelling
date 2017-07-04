@@ -2,8 +2,8 @@
 # June 28 2017
 
 # Check and load dependencies
-dep <- list("adaptivetau", "Rcpp", "tidyverse", "parallel", "doParallel",
-            "foreach", "data.table")
+dep <- list("adaptivetau", "Rcpp", "ggplot2", "splines", "parallel",
+            "doParallel", "foreach", "data.table")
 for (pkg in dep) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dep = TRUE)
@@ -14,11 +14,11 @@ for (pkg in dep) {
 }
 
 # Source data and functions
-files <- c("data.r", "Epi_detect.R", "multicore.R")
+files <- c("data.r", "Epi_detect.R", "multicore.R", "runvis.R")
 sapply(files, source, .GlobalEnv)
 
 # Done.
-rm(list("dep", "files"))
+rm("dep", "files", "pkg")
 print("Done.")
 
 # TODO: S4 classes and methods? Object file definitions?
