@@ -3,7 +3,7 @@
 
 # Check and load dependencies
 dep <- list("adaptivetau", "Rcpp", "ggplot2", "splines", "parallel",
-            "doParallel", "foreach", "data.table")
+            "doParallel", "data.table")
 for (pkg in dep) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dep = TRUE)
@@ -14,7 +14,7 @@ for (pkg in dep) {
 }
 
 # Source data and functions
-files <- c("data.r", "Epi_detect.R", "multicore.R", "runvis.R")
+files <- c("data.r", "Epi_detect.R", "multicore.R", "runvis.R", "handling.R")
 sapply(files, source, .GlobalEnv)
 
 # Done.

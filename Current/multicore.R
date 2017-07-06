@@ -1,92 +1,120 @@
 # Multicore Batch Run function
-# 7 Jun 2017
+# Working with environments
+# 11 Jun 2017
 
 # Depends
 require("adaptivetau")
 require("parallel")
 require("doParallel")
-require("foreach")
 
-batch_run_mc <- function(batch = 10000,
-                          fun_list = list(init.values, transitions,
-                          RateF, parameters, 365),
-                          grp = NULL, insertion = 0,
-                          i_number = NULL, occ = 2) {
+batch_run_mc <- function(envir, ...) {
   # Runs a specified number of adaptivetau simulations utilizing multithreaded
-  # processing by assigning CPU cores to a parallel socket cluster.
-  # It will not, therefore, run in a virtual machine. UNIX untested.
-  # Performance increase over base function is close to sqrt(t) on 4 cores
+  # processing by assigning CPU cores to a processing cluster.
+  # The type of cluster is determined by OS :
+  # Windows uses a Parallel Socket Cluster
+  # Mac/UNIX use a FORK cluster.
+  # Virtualized systems seem to have trouble doing either and are not advisable
+  # Performance increase over base function is close to sqrt(n), however
+  # this is depends heavily on the size of the batch and the number of cores.
   #
   # Args:
+  #   envir : Environment where the model parameters can be found
   #   batch : Number of desired ssa runs
-  #   fun_list : List of parameters passed to mul_ins
+  #   length : Approximate model run length
   #   grp : 'y' or 'a' to indicate which age strata to insert into
   #   insertion : Time point of first insertion (in days)
   #   i_number : Number of infected persons to insert each time
   #   occ : How many total insertion events should occur
   # Returns:
-  #   plot_dat : data frame of time and infected counts for each run
+  #   sim_dat : data frame of time and infected counts for each run
 
-  # Throw some errors
-  if (is.null(grp) == TRUE) {
-    stop("No infection group specified!")
+  #---Begin Match Call / Parameter Assignment---------------
+  call <- match.call(expand.dots = TRUE)
+
+  stopifnot(!is.null(call$grp))
+
+  if (!is.null(call$batch)) {
+    assign("batch", call$batch)
+  } else {
+    assign("batch", 10000);
+    warning("No batch count given, 10000 assumed")
   }
-  if (is.null(occ) == TRUE) {
-    stop("Number of insertions not specified!")
+  if (!is.null(call$insertion) && call$insertion >= 0) {
+    assign("insertion", call$insertion)
+  } else {
+    assign("insertion", 0)
+    warning("No start time given, 0 assumed")
   }
-  if (is.null(insertion) == TRUE || insertion < 0) {
-    stop("Something is wrong with your start time, partner.")
+  if (!is.null(call$i_number)) {
+    assign("i_number", call$i_number)
+  } else {
+    assign("i_number", 0)
+    warning("No infected count given, 0 assumed")
+  }
+  if (!is.null(call$occ)) {
+    assign("occ", call$occ)
+  } else {
+    assign("occ", 2)
+    warning("No insertion count given, 2 assumed")
+  }
+  if (!is.null(call$envir))  {
+    .envir <- envir
+    .vars <- c("init.values", "transitions", "parameters", "RateF")
+    stopifnot(any(.vars %in% ls(.envir)), is.environment(.envir))
+  } else {
+    .envir <- .GlobalEnv
+  }
+  grp <- call$grp
+  init <- get("init.values", envir = .envir)
+  t <- get("transitions", envir = .envir)
+  rf <- get("RateF", envir = .envir)
+  p <- get("parameters", envir = .envir)
+  if (!is.null(call$length)) {
+    assign("tf", call$length)
+  } else {
+    assign("tf", 365)
   }
 
-  # Set up PSOCK Cluster
+  fun_list <- list(init, t, rf, p, tf)
+  #---End Match Call / Parameter assignment---------------
+
+  #---Define Cluster--------------------------------------
   core <- detectCores(logical = FALSE)
-  cl <- makePSOCKcluster(core)
+  gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
+  cl <- makeCluster(core, type = gettype)
   registerDoParallel(cl)
 
-  # Assign args to globalEnv for mul_ins to acess
-  batch <<- batch
-  fun_list <<- fun_list
-  grp <<- grp
-  insertion <<- insertion
-  i_number <<- i_number
-  occ <<- occ
-
   clusterExport(cl, c("mul_ins", "batch", "fun_list",
-                      "grp", "insertion", "i_number", "occ"))
+                      "grp", "insertion", "i_number", "occ"),
+                envir = environment())
 
-
+ #---Define per-thread simulation routine-----------------
   par_run <- function() {
     results <- mul_ins()
-    results <- cbind(results, I = rowSums(results[, c("I1", "I2")]))
-    results <- cbind(results, iter = i)
+    results <- cbind(results, I = rowSums(results[, c("I1", "I2")]), iter = i)
     results <- results[, c("time", "I", "iter"), drop = FALSE]
     return(results)
   }
 
-  # Batch runs
-  plot_dat <- data.frame(time = NULL, I = NULL, iter = NULL)
-  plot_dat <- foreach(i = 1:batch, .packages = "adaptivetau",
+  #---Initiate Parallel Execution------------------------
+  sim_dat <- data.frame(time = NULL, I = NULL, iter = NULL)
+  sim_dat <- foreach(i = 1:batch, .packages = "adaptivetau",
                       .combine = rbind) %dopar% {
       par_run()
 
     }
 
-  # Return Plot Data for analysis and plotting
-  plot_dat <- as.data.frame(plot_dat)
-  return(plot_dat)
+  #---Sanitize and return run data-----------------------
+  sim_dat <- as.data.frame(sim_dat)
+  return(sim_dat)
 
-  # Stop PSOCK cluster
+  #---Stop PSOCK cluster---------------------------------
   stopCluster(cl)
+  closeAllConnections()
   registerDoSEQ()
 
-  # Garbage Collection
-  rm(cl)
-  rm(batch, envir = .GlobalEnv)
-  rm(fun_list, envir = .GlobalEnv)
-  rm(grp, envir = .GlobalEnv)
-  rm(insertion, envir = .GlobalEnv)
-  rm(i_number, envir = .GlobalEnv)
-  rm(occ, envir = .GlobalEnv)
+  #---Garbage Collection---------------------------------
+  rm("cl", "batch", "fun_list", "grp", "insertion", "i_number", "occ")
 }
 
 mul_ins <- function() {
@@ -96,26 +124,28 @@ mul_ins <- function() {
   # - If multiple insertions are called, it will space them out equally
   #   over the specified run length. No current way of having other spacing.
   # - Appends ssa run matrices together, and adjusts for time offset.
-  # - Max tau leaping set at 360.5 to try and eliminate false positive
-  #   epidemics when running Epi_detect.
+  # - Now with improved environment handling
+  #
   # Args:
   #   None, inherits from batch_run_mc
   # Returns:
   #   results : matrix of conglomerated run data
 
   # __Inherits__
-  init <- fun_list[[1]]
-  t <- fun_list[[2]]
-  RF <- fun_list[[3]]
-  P <- fun_list[[4]]
-  ins <- occ
-  i_num <- i_number
-  i_start <- insertion
-  age <- grp
-  tf <- fun_list[[5]]
+  ins <- get("occ", envir = parent.frame())
+  i_num <- get("i_number", envir = parent.frame())
+  i_start <- get("insertion", envir = parent.frame())
+  age <- get("grp", envir = parent.frame())
+  .fun_list <- get("fun_list", envir = parent.frame())
+  init <- .fun_list[[1]]
+  t <- .fun_list[[2]]
+  RF <- .fun_list[[3]]
+  P <- .fun_list[[4]]
+  tf <- .fun_list[[5]]
+
   inf_grp <- ifelse(age == "a", "I2", "I1")
 
-  # Check for first insertion
+  #---Check for first insertion time------------------------
   if (i_start == 0) {
     t_start <- tf * (1 / ins)
     init[inf_grp] <- init[inf_grp] + i_num
@@ -124,10 +154,10 @@ mul_ins <- function() {
     t_start <- i_start
   }
 
-  # First run
+  #---First run----------------------------------------------
   results <- ssa.adaptivetau(init, t, RF, P, t_start)
 
-  # Subsequent runs
+  #---Subsequent runs----------------------------------------
   for (i in 1:ins) {
     # Add infected
     results[nrow(results), inf_grp] <- results[nrow(results), inf_grp] +

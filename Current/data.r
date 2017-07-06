@@ -1,12 +1,9 @@
 # Test data to run functions
 # Kyrgyzstan data (95.6% vac in 1-14, 95.6% in 15-inf)
-
-# Depends
-require("adaptivetau")
-
+Kyrgyz <- new.env()
 # Model paramaters
 
-init.values <- c(
+Kyrgyz$init.values <- c(
   S = c(81400, 180700),
   E = c(0, 0),
   I = c(0, 0),
@@ -14,7 +11,7 @@ init.values <- c(
   D = 0 # Begining of vaccination programme
   )
 
-transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2"),
+Kyrgyz$transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2"),
   rbind(c("S1", "E1", "I1"), -1, c("E1", "I1", "R1"), +1),
   rbind(c("S1", "R1"), +1),
   rbind(c("S1", "E1", "I1", "R1"), -1, c("S2", "E2", "I2", "R2"), +1),
@@ -23,7 +20,7 @@ transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2"),
   )
 
 # Kyrgyzstan
-parameters <- c(
+Kyrgyz$parameters <- c(
   R0 = 16,
   infectious.period = 7, # days
   latent.period = 8,     # days
@@ -33,7 +30,7 @@ parameters <- c(
   death.rate = 5.4       # per 1000, anum
 )
 
-RateF <- function(x, p, t) {
+Kyrgyz$RateF <- function(x, p, t) {
   # Local parameters
   beta <- p["R0"] / (p["infectious.period"])
   f <- 1 / p["latent.period"]
