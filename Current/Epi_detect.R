@@ -58,6 +58,7 @@ Epi_detect <- function(result, verbose = FALSE) {
   outbreaks <- data.frame(Length = NULL, Iteration = NULL)
   outbreak_time <- vector()
 
+  # Call root finder function on the Infection counts
   result$roots <- Croots(result$I)
 
   # The meat of 'er
@@ -92,7 +93,7 @@ Epi_detect <- function(result, verbose = FALSE) {
    print(paste0("Maximum outbreak time: ", outbreak_max))
  }
  if (verbose == TRUE) {
-     assign("outbreaks", outbreaks, envir = .GlobalEnv)
+     assign("outbreaks", outbreaks, envir = parent.frame())
      print("Outbreak lengths saved as: 'outbreaks'")
 
      result$roots <<- Croots(result$I)
@@ -100,7 +101,7 @@ Epi_detect <- function(result, verbose = FALSE) {
 
      if (count > 0) {
        check <- result[result[, "iter"] %in% iter_num, ]
-       assign("check", check, envir = .GlobalEnv)
+       assign("check", check, envir = parent.frame())
      }
  }
 

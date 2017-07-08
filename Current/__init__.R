@@ -2,9 +2,9 @@
 # June 28 2017
 
 # Check and load dependencies
-dep <- list("adaptivetau", "Rcpp", "ggplot2", "splines", "parallel",
+depends <- list("adaptivetau", "Rcpp", "ggplot2", "splines", "parallel",
             "doParallel", "data.table")
-for (pkg in dep) {
+for (pkg in depends) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dep = TRUE)
     require(pkg, character.only = TRUE)
