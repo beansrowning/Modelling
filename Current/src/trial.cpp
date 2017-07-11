@@ -2,17 +2,17 @@
 
 using namespace Rcpp;
 
+// Function to generate new values of i_number and insertion
 double roll(NumericVector set double oldval) {
-    double out, newval;
+    double newval;
     
     if (!oldval)
-        out = R::sample(set, 1);
-        return out;
+        newval = R::sample(set, 1);
+        return newval;
     do {
         newval = R::sample(set, 1);
-    } while (newval <= oldIns)
-    out = newVal;
-    return out;
+    } while (newval <= oldIns);
+    return newval;
 }
 
 // [[Rcpp::export]]
