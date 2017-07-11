@@ -103,18 +103,14 @@ batch_run_mc <- function(envir, ...) {
       par_run()
 
     }
-
-  #---Sanitize and return run data-----------------------
-  sim_dat <- as.data.frame(sim_dat)
-  return(sim_dat)
-
-  #---Stop PSOCK cluster---------------------------------
+  #---Stop cluster---------------------------------
   stopCluster(cl)
   closeAllConnections()
-  registerDoSEQ()
-
   #---Garbage Collection---------------------------------
   rm("cl", "batch", "fun_list", "grp", "insertion", "i_number", "occ")
+
+  #---Return run data-----------------------
+  return(sim_dat)
 }
 
 mul_ins <- function() {

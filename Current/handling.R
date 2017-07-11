@@ -6,7 +6,8 @@ savesimdat <- function(obj) {
   #   obj : Name of the environment to save
   # Returns:
   #   - object saved to the /Data/ directory
-  file <- paste0(obj, ".dat")
+  name <- deparse(substitute(obj))
+  file <- paste0(name, ".dat")
   save(obj, file = paste0("../Data/", file))
   print(paste0("File ", file, " saved in: Data/"))
 }

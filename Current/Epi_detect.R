@@ -45,6 +45,9 @@ Epi_detect <- function(result, verbose = FALSE) {
   #     the number of detected epidemics, and the target iteration
   #   - Will also return maximum outbreak length.
 
+  # Name for assignment if verbose
+  dtname <- deparse(substitute(result))
+
   # Sanitize
   if (!is.data.table(result)) {
     result <- as.data.table(result)
@@ -96,7 +99,7 @@ Epi_detect <- function(result, verbose = FALSE) {
      assign("outbreaks", outbreaks, envir = parent.frame())
      print("Outbreak lengths saved as: 'outbreaks'")
 
-     result$roots <<- Croots(result$I)
+     assign(dtname, result, envir = parent.frame())
      print("Roots saved to input file")
 
      if (count > 0) {

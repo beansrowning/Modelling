@@ -18,7 +18,5 @@ files <- c("data.r", "Epi_detect.R", "multicore.R", "runvis.R", "handling.R")
 sapply(files, source, .GlobalEnv)
 
 # Done.
-rm("dep", "files", "pkg")
+rm("depends", "files")
 print("Done.")
-
-# TODO: S4 classes and methods? Object file definitions?
