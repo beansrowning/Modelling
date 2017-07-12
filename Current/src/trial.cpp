@@ -43,21 +43,20 @@ NumericVector trialrun(Environment env, String age) {
     // Some parameter sets here
     IntegerVector infCount = seq(1,100);
     IntegerVector insertion = seq(0,3000);
-    IntegerVector occ = seq(1,120);
+    double occ = 12;
     double newCount, newIns, newOcc, oldCount, oldIns, oldOcc;
     NumericVector out(2);
     out.names() = CharacterVector::create("Insertion Time",
-                                       "Infected Count",
-                                       "Occurances");
+                                          "Infected Count",
+                                          "Occurances");
 
     bool successone;
-    oldIns = 0, oldCount = 0, oldOcc = 0;
+    oldIns = 0, oldCount = 0;
     do {
         newIns = roll(insertion, oldIns);
         newCount = roll(infCount, oldCount);
-        newOcc = oldOcc++;
         // Rewrite whole thing?
-        DataFrame run = runBatch(_env, newIns, newCount, newOcc, _age, tf);
+        DataFrame run = runBatch(_env, newIns, newCount, occ, _age, tf);
         successone = epiCheck(run);
     } while (!successone);
 
@@ -66,7 +65,7 @@ NumericVector trialrun(Environment env, String age) {
     NumericVector newvect(0);
     out[0] = newIns;
     out[1] = newCount;
-    out[2] = newOcc;
+    out[2] = occ;
     oldCount = out[1];
 
     // Now decrease number of people being inserted to optimize
