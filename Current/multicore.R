@@ -11,7 +11,7 @@ batch_run_mc <- function(envir, ...) {
   # Runs a specified number of adaptivetau simulations utilizing multithreaded
   # processing by assigning CPU cores to a processing cluster.
   # The type of cluster is determined by OS :
-  # Windows uses a Parallel Socket Cluster
+  # Windows uses a Parallel Socket Cluster (PSOCK)
   # Mac/UNIX use a FORK cluster.
   # Virtualized systems seem to have trouble doing either and are not advisable
   # Performance increase over base function is close to sqrt(n), however
@@ -110,7 +110,7 @@ batch_run_mc <- function(envir, ...) {
   rm("cl", "batch", "fun_list", "grp", "insertion", "i_number", "occ")
 
   #---Return run data-----------------------
-  return(sim_dat)
+  return(as.data.frame(sim_dat))
 }
 
 mul_ins <- function() {

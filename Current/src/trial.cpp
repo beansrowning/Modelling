@@ -1,27 +1,28 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
-#include <R.h>
 #include <RcppArmadilloExtensions/sample.h>
 
 using namespace Rcpp;
 
 // Function to generate new values of i_number and insertion
+
 double roll(IntegerVector set, double oldval) {
     double newval;
     NumericVector newvect;
     double _oldval = oldval;
     bool replace = FALSE;
     NumericVector prob = NumericVector::create();
-    IntegerVector _set;
+    IntegerVector _set = set;
+
+    newvect = RcppArmadillo::sample(_set, 1, replace, prob);
+    newval = newvect[0];
 
     if (!_oldval)
-        newvect = RcppArmadillo::sample(_set, 1, replace, prob);
-        newval = newvect(0);
         return newval;
-    do {
+    while (newval <= _oldval) {
         newvect = RcppArmadillo::sample(_set, 1, replace, prob);
-        newval = newvect(0);
-    } while (newval <= _oldval);
+        newval = newvect[0];
+    }
     return newval;
 }
 
@@ -31,21 +32,18 @@ NumericVector trialrun(Environment env, String age) {
     Environment global = Environment::global_env();
     Environment _env = env;
     String _age = age;
-    // NumericVector .inits = env["init.values"];
-    // NumericVector .params = env["parameters"];
-    // NumericVector .transitions = env["transitions"];
-    // Function .RateF = env["RateF"];
+
     double tf = 3650;
-    // TODO: Create both of these functions
+
     Function runBatch = global["brtrial"];
     Function epiCheck = global["edtrial"];
 
     // Some parameter sets here
-    IntegerVector infCount = seq(1,100);
-    IntegerVector insertion = seq(0,3000);
+    IntegerVector infCount = seq_len(100);
+    IntegerVector insertion = seq_len(3000);
     double occ = 12;
-    double newCount, newIns, newOcc, oldCount, oldIns, oldOcc;
-    NumericVector out(2);
+    double newCount, newIns, oldCount, oldIns;
+    NumericVector out(3);
     out.names() = CharacterVector::create("Insertion Time",
                                           "Infected Count",
                                           "Occurances");
@@ -62,19 +60,23 @@ NumericVector trialrun(Environment env, String age) {
 
     // First Sucesss
     bool successtwo = 1;
+    bool replace = FALSE;
     NumericVector newvect(0);
-    out[0] = newIns;
-    out[1] = newCount;
-    out[2] = occ;
-    oldCount = out[1];
+    out["Insertion Time"] = newIns;
+    out["Infected Count"] = newCount;
+    out["Occurances"] = occ;
+    oldCount = out["Infected Count"];
+    IntegerVector range = seq_len(out["Infected Count"]);
 
     // Now decrease number of people being inserted to optimize
     do {
-        newvect = runif(1, 1, out[1]);
-        newCount = newvect(0);
+        newvect = RcppArmadillo::sample(range, 1, replace,
+                                        NumericVector::create());
+        newCount = newvect[0];
         if (newCount >= oldCount)
             continue;
-        DataFrame run = runBatch(env, out[0], newCount, out[2], _age, tf);
+        DataFrame run = runBatch(env, out["Insertion Time"], newCount,
+                                 out["Occurances"], _age, tf);
         successtwo = epiCheck(run);
         if (successtwo)
             oldCount = newCount;

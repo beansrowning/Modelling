@@ -18,5 +18,5 @@ files <- c("data.r", "Epi_detect.R", "multicore.R", "runvis.R", "handling.R")
 sapply(files, source, .GlobalEnv)
 
 # Done.
-rm("depends", "files")
+rm("depends", "files", "pkg")
 print("Done.")

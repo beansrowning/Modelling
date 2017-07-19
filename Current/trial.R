@@ -5,7 +5,7 @@ sourceCpp("./src/trial.cpp")
 source("./trialfunc.R")
 source("./data.r")
 
-trialrun <- function(env, agegp) {
+trial <- function(env, agegp) {
   time <- system.time(out <- trialrun(env, agegp))
   print("Completed.")
   assign("time", time, envir = .GlobalEnv)

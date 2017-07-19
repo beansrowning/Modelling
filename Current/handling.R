@@ -8,7 +8,7 @@ savesimdat <- function(obj) {
   #   - object saved to the /Data/ directory
   name <- deparse(substitute(obj))
   file <- paste0(name, ".dat")
-  save(obj, file = paste0("../Data/", file))
+  save(obj, file = paste0("../Data/", file), compress = "bzip2")
   print(paste0("File ", file, " saved in: Data/"))
 }
 
@@ -18,7 +18,9 @@ loadsimdat <- function(obj) {
   #   obj : Name of the file to load without extension
   # Returns:
   #   - Environment loaded into current R session
-  file <- paste0(obj, ".dat")
+  name <- deparse(substitute(obj))
+  file <- paste0(name, ".dat")
   load(paste0("../Data/", file))
+  assign(name, obj, envir = .GlobalEnv)
   print(paste0(file, " loaded into R sucessfully!"))
 }
