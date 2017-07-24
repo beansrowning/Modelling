@@ -17,7 +17,7 @@ edtrial <- function(result) {
   #   result : A data frame, data.table, or matrix resulting from a batch run
   #            must contain time, infected counts, iteration number, and roots
   # Returns:
-  #   TRUE or FALSE if an epidemic occured
+  #   longest : Maximum epidemic length for determining fitness
 
   # Name for assignment if verbose
   dtname <- deparse(substitute(result))
@@ -56,11 +56,13 @@ edtrial <- function(result) {
     outbreaks <- rbind(outbreaks, cbind(Length = outbreak_time, Iteration = i))
     outbreak_time <- NULL
   }
- if (count == 0) {
-   return(FALSE)
- } else {
-   return(TRUE)
- }
+  longest <- max(outbreaks$Length)
+  return(longest)
+ # if (count == 0) {
+ #   return(FALSE)
+ # } else {
+ #   return(TRUE)
+ # }
 }
 
 brtrial <- function(envir, insertion, i_number, occ, grp, length) {

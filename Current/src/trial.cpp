@@ -4,8 +4,16 @@
 
 using namespace Rcpp;
 
-// Function to generate new values of i_number and insertion
+// Chromosome data storage
+struct chromosome
+{
+  DataFrame runDat;
+  double Ins;
+  double count;
+  unsigned int fitness;
+};
 
+// Function to generate new values of i_number and insertion
 double roll(IntegerVector set, double oldval) {
     double newval;
     NumericVector newvect;
@@ -26,6 +34,17 @@ double roll(IntegerVector set, double oldval) {
     return newval;
 }
 
+// Function to get fitness of model run
+double getFit(DataFrame run) {
+  DataFrame _run;
+  Environment global = Environment::global_env();
+  Function check = global["edtrial"];
+  double fitness;
+
+  fitness = check(_run);
+  return fitness;
+}
+
 // [[Rcpp::export]]
 NumericVector trialrun(Environment env, String age) {
     // Run batch run function and iterate
@@ -33,7 +52,7 @@ NumericVector trialrun(Environment env, String age) {
     Environment _env = env;
     String _age = age;
 
-    double tf = 3650;
+    const int tf = 3650;
 
     Function runBatch = global["brtrial"];
     Function epiCheck = global["edtrial"];
@@ -41,15 +60,14 @@ NumericVector trialrun(Environment env, String age) {
     // Some parameter sets here
     IntegerVector infCount = seq_len(100);
     IntegerVector insertion = seq_len(3000);
-    double occ = 12;
-    double newCount, newIns, oldCount, oldIns;
+    const int occ = 12;
+    double newCount, newIns, oldCount = 0, oldIns = 0;
     NumericVector out(3);
     out.names() = CharacterVector::create("Insertion Time",
                                           "Infected Count",
                                           "Occurances");
 
     bool successone;
-    oldIns = 0, oldCount = 0;
     do {
         newIns = roll(insertion, oldIns);
         newCount = roll(infCount, oldCount);
