@@ -10,7 +10,7 @@ struct chromosome
   DataFrame runDat;
   double Ins;
   double count;
-  unsigned int fitness;
+  double fitness;
 };
 
 // Function to generate new values of i_number and insertion

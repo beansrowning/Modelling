@@ -88,10 +88,10 @@ kyrgyz$RateF <- function(x, p, t) {
 swe <- new.env()
 
 swe$init.values <- c(
-  S = c(86482, 164100),
+  S = c(87805, 176865),
   E = c(0, 0),
   I = c(0, 0),
-  R = c(2088150, 6497688),
+  R = c(2106625, 7392270),
   D = 0 # Begining of vaccination programme
   )
 

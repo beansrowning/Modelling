@@ -7,11 +7,11 @@ require("Rcpp")
 
 # Root finder (writen in C++)
 # If Rtools is not installed, or admin access not available, load package
-# (move "/Data/Croots" to your R library directory)
+# (move "../Data/Croots" to your R library directory)
 tryCatch(sourceCpp("./src/Croots.cpp"),
          error = function(e) {
            print("Croots couldn't load, trying package instead... ")
-           tryCatch(library("Croots"),
+           tryCatch(require("Croots"),
                     error = function(e){
                       print("Library failed to load. Is it installed?")
                     })
@@ -54,7 +54,7 @@ Epi_detect <- function(result, verbose = FALSE) {
   }
 
   # __init__
-  result <- setkey(result, iter)
+  setkey(result, iter) # Should already be sorted, but just a failsafe
   count <- 0
   outbreak_max <- 0
   iter_num <- vector()
@@ -63,14 +63,19 @@ Epi_detect <- function(result, verbose = FALSE) {
 
   # Call root finder function on the Infection counts
   result$roots <- Croots(result$I)
-
   # The meat of 'er
   for (i in 1:result$iter[nrow(result)]) {
-
+    # throw2 <<- "first for loop"
     mat <- result[J(i)]
-    mat <- setkey(mat, roots)
+    if (mat[nrow(mat), "I"] > 0) {
+      warning(paste(strwrap(paste0("Outbreak extended past sim in iteration ", i, "! ",
+                            "Results from this iteration will be excluded."),
+                     width = 50),
+               collapse = "\n"))
+      next
+    }
+    setkey(mat, roots) # Sort by root boolean value for faster subsetting
     mat <- mat[J(TRUE)]
-
     for (j in 2:nrow(mat)) {
       if (mat$I[j - 1] > 0) {
         outbreak_time <- c(outbreak_time, (mat$time[j] - mat$time[j - 1]))
@@ -80,8 +85,10 @@ Epi_detect <- function(result, verbose = FALSE) {
       count <- count + 1
       iter_num <- c(iter_num, i)
     }
+    out <<- outbreaks
     outbreaks <- rbind(outbreaks, cbind(Length = outbreak_time, Iteration = i))
     outbreak_time <- NULL
+    mat <- NULL
   }
 
   # Since the outbreak roots should be accurate, filtering should be uneccessary
