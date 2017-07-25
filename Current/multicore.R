@@ -31,8 +31,6 @@ batch_run_mc <- function(envir, ...) {
   #---Begin Match Call / Parameter Assignment---------------
   call <- match.call(expand.dots = TRUE)
 
-  stopifnot(!is.null(call$grp))
-
   if (!is.null(call$batch)) {
     assign("batch", call$batch)
   } else {
@@ -64,16 +62,18 @@ batch_run_mc <- function(envir, ...) {
   } else {
     .envir <- .GlobalEnv
   }
-  grp <- call$grp
-  init <- get("init.values", envir = .envir)
-  t <- get("transitions", envir = .envir)
-  rf <- get("RateF", envir = .envir)
-  p <- get("parameters", envir = .envir)
   if (!is.null(call$length)) {
     assign("tf", call$length)
   } else {
     assign("tf", 365)
   }
+  stopifnot(insertion < tf, !is.null(call$grp))
+  grp <- call$grp
+  init <- get("init.values", envir = .envir)
+  t <- get("transitions", envir = .envir)
+  rf <- get("RateF", envir = .envir)
+  p <- get("parameters", envir = .envir)
+
 
   fun_list <- list(init, t, rf, p, tf)
   #---End Match Call / Parameter assignment---------------
