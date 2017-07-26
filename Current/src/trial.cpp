@@ -15,11 +15,9 @@ struct chromosome
 
 // Function to generate new values of i_number and insertion
 double roll(IntegerVector set, double oldval) {
-    double newval;
-    NumericVector newvect;
-    double _oldval = oldval;
+    double _oldval = oldval, newval;
+    NumericVector newvect, prob = NumericVector::create();
     bool replace = FALSE;
-    NumericVector prob = NumericVector::create();
     IntegerVector _set = set;
 
     newvect = RcppArmadillo::sample(_set, 1, replace, prob);
@@ -36,13 +34,11 @@ double roll(IntegerVector set, double oldval) {
 
 // Function to get fitness of model run
 double getFit(DataFrame run) {
-  DataFrame _run;
+  DataFrame _run = run;
   Environment global = Environment::global_env();
   Function check = global["edtrial"];
-  double fitness;
-
-  fitness = check(_run);
-  return fitness;
+  // Must force SEXP to double
+  return as<double>(check(_run));
 }
 
 // [[Rcpp::export]]
