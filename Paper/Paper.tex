@@ -1,0 +1,103 @@
+%! DOCTYPE LaTeX %
+%\pdfminorversion = 4
+\documentclass[12pt, a4paper]{article}
+\usepackage{amssymb, latexsym, amsmath, subfiles, tikz, graphicx, hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Tikz                 %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\usetikzlibrary{arrows.meta, positioning}
+\tikzstyle every node=[.append style={align=center}]
+\tikzstyle mystyle=[style={draw, minimum size=2.5cm}]
+
+\graphicspath{{images/}{../images/}}
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Hyperref             %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Stochastic Modelling of Measles in a Disease-Eliminated Setting in Europe},
+    pdfauthor={Sean Browning},
+    bookmarks=true
+}
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Margins              %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\addtolength{\textwidth}{1.0in}
+\addtolength{\textheight}{1.00in}
+\addtolength{\evensidemargin}{-0.75in}
+\addtolength{\oddsidemargin}{-0.75in}
+\addtolength{\topmargin}{-.50in}
+
+\begin{document}
+\title{Stochastic Modelling of Measles in a Disease-Eliminated Setting in Europe}
+\author{Sean Browning}
+\date{10 September, 2017}
+\maketitle
+%%%%%%%%%%%%%%%%
+% Abstract     %
+%%%%%%%%%%%%%%%%
+\begin{abstract}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris semper vel libero
+eget maximus. Sed non nibh ac orci pretium placerat. Cras vulputate dictum libero
+nec vulputate. Suspendisse pharetra eu nibh sit amet rhoncus. Pellentesque lacus
+odio, ultrices aliquam dictum ut, sagittis ac neque. Cras consectetur sem nulla,
+quis consectetur nunc vulputate id. Vestibulum non ullamcorper nisi, eu tincidunt
+dui. Curabitur ut suscipit sapien. Nam at dui rutrum ligula tristique ullamcorper
+id sed tortor. Curabitur nec sem vitae sapien feugiat ultrices eu et eros.
+Duis sit amet facilisis ligula. Donec semper augue magna, ut hendrerit lorem
+maximus eget. Cras quis hendrerit sem.
+\end{abstract}
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of Contents     %
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Background           %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Background}
+\subfile{sections/background}
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Compartmental Model  %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Model Dynamics}
+\subsection{SEIR Compartmental Model}
+\subfile{sections/compartmental_model}
+%%%%%%%%%%%%%%%%%%%%%%%%
+% ODEs                 %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Dynamics as Deterministic ODEs}
+\subfile{sections/modelodes}
+%%%%%%%%%%%%%%%%%%%%%%%%
+% R0                   %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Calculating R0}
+\par
+We can calculate R0 by taking the leading eigenvalue of the Next Generation Matrix
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Model Steady-state   %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Defining Model Steady-State Conditions}
+This section may not need to exist
+
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% As a Stochastic System %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Model as a Stochastic System}
+\subfile{sections/stochastic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography         %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliography{Paper}{}
+\bibliographystyle{abbrv}
+
+\end{document}

@@ -15,7 +15,7 @@ batch_run_mc <- function(envir, ...) {
   # Mac/UNIX use a FORK cluster.
   # Virtualized systems seem to have trouble doing either and are not advisable
   # Performance increase over base function is close to sqrt(n), however
-  # this is depends heavily on the size of the batch and the number of cores.
+  # this depends heavily on the size of the batch and the number of cores.
   #
   # Args:
   #   envir : Environment where the model parameters can be found

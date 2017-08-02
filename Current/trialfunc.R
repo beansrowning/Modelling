@@ -57,7 +57,7 @@ edtrial <- function(result) {
     outbreak_time <- NULL
   }
   longest <- max(outbreaks$Length)
-  return(longest)
+  return(as.double(longest))
  # if (count == 0) {
  #   return(FALSE)
  # } else {

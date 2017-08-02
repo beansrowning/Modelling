@@ -1,0 +1,7 @@
+\BOOKMARK [1][-]{section.1}{Background}{}% 1
+\BOOKMARK [1][-]{section.2}{Model Dynamics}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{SEIR Compartmental Model}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Model Dynamics as Deterministic ODEs}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Calculating R0}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Defining Model Steady-State Conditions}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.5}{The Model as a Stochastic System}{section.2}% 7

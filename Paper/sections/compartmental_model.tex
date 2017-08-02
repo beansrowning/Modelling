@@ -1,0 +1,64 @@
+\documentclass[../Paper.tex]{subfiles}
+
+\begin{document}
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=1cm, auto, >=latex]
+\node [mystyle]              (S1) {$S_{1}$};
+\node [mystyle, right=of S1] (E1) {$E_{1}$};
+\node [mystyle, right=of E1] (I1) {$I_{1}$};
+\node [mystyle, right=of I1] (R1) {$R_{1}$};
+\node [mystyle, below=of S1] (S2) {$S_{2}$};
+\node [mystyle, below=of E1] (E2) {$E_{2}$};
+\node [mystyle, below=of I1] (I2) {$I_{2}$};
+\node [mystyle, below=of R1] (R2) {$R_{2}$};
+\coordinate[above=of S1] (in1);
+\coordinate[above=of R1] (in2);
+\coordinate[below=of S2] (out1);
+\coordinate[below=of E2] (out2);
+\coordinate[below=of I2] (out3);
+\coordinate[below=of R2] (out4);
+\path[->] (S1)   edge node {$\beta I_{1}$}                   (E1) % Young Compartment
+                 edge node {$\theta$}                        (S2)
+          (E1)   edge node {$\phi$}                          (I1)
+                 edge node {$\theta$}                        (E2)
+          (I1)   edge node {$\gamma$}                        (R1)
+                 edge node {$\theta$}                        (I2)
+          (R1)   edge node {$\theta$}                        (R2)
+          (S2)   edge node {$\beta I_{2}$}                   (E2) % Old Compartment
+          (E2)   edge node {$\phi$}                          (I2)
+          (I2)   edge node {$\gamma$}                        (R2)
+          (in1)  edge node {$\alpha\cdot\left(1-\nu\right)$} (S1) % Births
+          (in2)  edge node {$\alpha\cdot\nu$}                (R1)
+          (S2)   edge node {$\Omega$}                        (out1) % Deaths
+          (E2)   edge node {$\Omega$}                        (out2)
+          (I2)   edge node {$\Omega$}                        (out3)
+          (R2)   edge node {$\Omega$}                        (out4);
+\end{tikzpicture}
+\caption{Age stratified SEIR Model with vital dyanmics}
+\label{fig:M1}
+\end{figure}
+Where:
+\par
+ $\beta_{n} = $ Rate of contact between infectious and susceptible persons \par
+ $\phi = $ Rate of onset of infectiousness subsequent to being infected \par
+ $\gamma = $ Rate of recovery from measles from infectious period \par
+ $\alpha = $ Crude birth rate \par
+ $\nu = $ Effective vaccination rate at birth \par
+ $\Omega = $ Crude death rate \par
+ $\theta = $ Rate of aging from young to old compartments \par
+\par
+\raggedright
+To explore the infection dynamics of measles, a SEIR model was selected with two
+age compartments for younger and older populations. This was chosen for a few
+reasons. Firstly, it allows for the modelling of heterogeneous mixing within
+these age groups. Additionally, it allows for the model to more closely
+align with the seroprevalence data given, thereby reducing the number of assumptions
+which would need to be made to fit incoming data. Finally, the selection of two
+compartments over some higher dimension limits the mathematical complexity of both
+modeling the data as well as mapping the parameter space while also allowing
+for some variation in age demographics.
+
+\clearpage
+
+\end{document}

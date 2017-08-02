@@ -85,7 +85,6 @@ Epi_detect <- function(result, verbose = FALSE) {
       count <- count + 1
       iter_num <- c(iter_num, i)
     }
-    out <<- outbreaks
     outbreaks <- rbind(outbreaks, cbind(Length = outbreak_time, Iteration = i))
     outbreak_time <- NULL
     mat <- NULL
