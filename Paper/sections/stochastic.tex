@@ -1,5 +1,6 @@
 \documentclass[../Paper.tex]{subfiles}
 \begin{document}
+\raggedright
 Model stochasticity was accomplished through the R package, adaptivetau\cite{johnson_2016}.
 The deterministic differential equations are supplied as a rate function and evaluated
 by adaptivetau. Transistions are supplied as a vector and their rates defined by
@@ -22,6 +23,7 @@ In making the model stochastic, we can now represent the standard compartmental 
 as a markov chain process. 
 
 \begin{figure}[htbp]
+\centering
 \begin{tikzpicture}
     % Model States
     \node [state]              (S1) {$S_{1}$};
