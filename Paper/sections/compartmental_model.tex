@@ -18,19 +18,24 @@
 \coordinate[below=of E2] (out2);
 \coordinate[below=of I2] (out3);
 \coordinate[below=of R2] (out4);
-\path[->] (S1)   edge node {$\beta I_{1}$}                   (E1) % Young Compartment
+\path[->] 
+          % Young Compartment
+          (S1)   edge node {$\beta I_{1}$}                   (E1) 
                  edge node {$\theta$}                        (S2)
           (E1)   edge node {$\phi$}                          (I1)
                  edge node {$\theta$}                        (E2)
           (I1)   edge node {$\gamma$}                        (R1)
                  edge node {$\theta$}                        (I2)
           (R1)   edge node {$\theta$}                        (R2)
-          (S2)   edge node {$\beta I_{2}$}                   (E2) % Old Compartment
+          % Old Compartment
+          (S2)   edge node {$\beta I_{2}$}                   (E2) 
           (E2)   edge node {$\phi$}                          (I2)
           (I2)   edge node {$\gamma$}                        (R2)
-          (in1)  edge node {$\alpha\cdot\left(1-\nu\right)$} (S1) % Births
+          % Births
+          (in1)  edge node {$\alpha\cdot\left(1-\nu\right)$} (S1) 
           (in2)  edge node {$\alpha\cdot\nu$}                (R1)
-          (S2)   edge node {$\Omega$}                        (out1) % Deaths
+          (S2)   edge node {$\Omega$}                        (out1)
+          % Deaths
           (E2)   edge node {$\Omega$}                        (out2)
           (I2)   edge node {$\Omega$}                        (out3)
           (R2)   edge node {$\Omega$}                        (out4);
