@@ -5,7 +5,7 @@ Model stochasticity was accomplished through the R package, adaptivetau\cite{joh
 The deterministic differential equations are supplied as a rate function and evaluated
 by adaptivetau. Transistions are supplied as a vector and their rates defined by
 a rate function. The model is then stepped using a process called 
-"explicit tau-leaping"\cite{yang_gillespie_petzold_2007}.
+``explicit tau-leaping''\cite{yang_gillespie_petzold_2007}.
 \\
 This process provides an approximation of the output expected from Gillespie algorithm by maximizing
 the time step (called $\tau$) between data points while minimizing the rate of change
@@ -78,12 +78,12 @@ as a markov chain process.
 \end{figure}
 
 This serves to highlight the possible transitions between each state per time 
-step. The "force" of the transitions can stil be described in the same way as the
+step. The ``force'' of the transitions can stil be described in the same way as the
 comparmental SEIR Model in Figure \ref{fig:M1}. 
 However, the probability of any transition per time step is now a function of a 
 poisson-distributed random walk variable defined in the adaptivetau modelling function.
 \begin{equation} \label{eq:tau_leap1}
-P\left ( transition \right )\sim Poisson\left ( R_{trans}\cdot\tau \right )
+P\left ( transition \right )\sim Poisson \left( R_{trans}\cdot\tau \right)
 \end{equation}
  
 As a consequence, for sufficiently large transition rates ($R_{trans}$) or time steps ($\tau$),
