@@ -18,9 +18,9 @@
 \coordinate[below=of E2] (out2);
 \coordinate[below=of I2] (out3);
 \coordinate[below=of R2] (out4);
-\path[->] 
+\path[->]
           % Young Compartment
-          (S1)   edge node {$\beta I_{1}$}                   (E1) 
+          (S1)   edge node {$\beta I_{1}$}                   (E1)
                  edge node {$\theta$}                        (S2)
           (E1)   edge node {$\phi$}                          (I1)
                  edge node {$\theta$}                        (E2)
@@ -28,11 +28,11 @@
                  edge node {$\theta$}                        (I2)
           (R1)   edge node {$\theta$}                        (R2)
           % Old Compartment
-          (S2)   edge node {$\beta I_{2}$}                   (E2) 
+          (S2)   edge node {$\beta I_{2}$}                   (E2)
           (E2)   edge node {$\phi$}                          (I2)
           (I2)   edge node {$\gamma$}                        (R2)
           % Births
-          (in1)  edge node {$\alpha\cdot\left(1-\nu\right)$} (S1) 
+          (in1)  edge node {$\alpha\cdot\left(1-\nu\right)$} (S1)
           (in2)  edge node {$\alpha\cdot\nu$}                (R1)
           (S2)   edge node {$\Omega$}                        (out1)
           % Deaths
@@ -58,10 +58,10 @@ To explore the infection dynamics of measles, a SEIR model was selected with two
 age compartments, subdividing younger and older populations. This was chosen for a few
 reasons. Firstly, it allows for the modelling of heterogeneous mixing within
 these age groups. Additionally, it allows for the model to more closely
-align with the age strata reported in seroprevalence data, thereby reducing the 
-number of assumptions which would need to be made to fit incoming data. 
-Finally, the selection of two compartments over some higher dimension limits 
-the mathematical complexity of both modeling the data as well as mapping the 
+align with the age strata reported in seroprevalence data, thereby reducing the
+number of assumptions which would need to be made to fit incoming data.
+Finally, the selection of two compartments over some higher dimension limits
+the mathematical complexity of both modeling the data as well as mapping the
 parameter space while also allowing for some variation in age demographics.
 
 \clearpage

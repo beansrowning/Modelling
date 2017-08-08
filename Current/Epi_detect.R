@@ -52,30 +52,27 @@ Epi_detect <- function(result, verbose = FALSE) {
   if (!is.data.table(result)) {
     result <- as.data.table(result)
   }
-
-  # __init__
-  setkey(result, iter) # Should already be sorted, but just a failsafe
+  #---init----------------------------------------------------------
   count <- 0
   outbreak_max <- 0
+  tf <- result[nrow(result), "time"]
   iter_num <- vector()
-  outbreaks <- data.frame(Length = NULL, Iteration = NULL)
   outbreak_time <- vector()
-
-  # Call root finder function on the Infection counts
-  result$roots <- Croots(result$I)
-  # The meat of 'er
+  proc <- vector()
+  outbreaks <- data.frame(Length = NULL, Iteration = NULL)
+  #---Error check for outbreaks that ran over simulation time------
+  setkey(result, time)
+  proc <- result[.(tf)][, I]
+  if (any(proc != 0)) {
+    stop("Outbreak ran over simulation at least once!")
+  }
+  setkey(result, iter, time) # re-sort to ensure proper analysis
+  #---Call root finder function on the Infection counts-------------
+  result[, roots := Croots(I)]
+  #---The meat of 'er------------------------------------------------
   for (i in 1:result$iter[nrow(result)]) {
-    # throw2 <<- "first for loop"
-    mat <- result[J(i)]
-    if (mat[nrow(mat), "I"] > 0) {
-      warning(paste(strwrap(paste0("Outbreak extended past sim in iteration ", i, "! ",
-                            "Results from this iteration will be excluded."),
-                     width = 50),
-               collapse = "\n"))
-      next
-    }
-    setkey(mat, roots) # Sort by root boolean value for faster subsetting
-    mat <- mat[J(TRUE)]
+    setkey(result, iter, roots)
+    mat <- result[.(i, TRUE)]
     for (j in 2:nrow(mat)) {
       if (mat$I[j - 1] > 0) {
         outbreak_time <- c(outbreak_time, (mat$time[j] - mat$time[j - 1]))
@@ -89,10 +86,8 @@ Epi_detect <- function(result, verbose = FALSE) {
     outbreak_time <- NULL
     mat <- NULL
   }
-
-  # Since the outbreak roots should be accurate, filtering should be uneccessary
   outbreak_max <- max(outbreaks$Length)
-
+ #---Output-----------------------------------------------------------
  if (count == 0) {
    print("No Epidemics Detected!")
    print(paste0("Maximum outbreak time: ", outbreak_max))
@@ -109,9 +104,9 @@ Epi_detect <- function(result, verbose = FALSE) {
      print("Roots saved to input file")
 
      if (count > 0) {
-       check <- result[result[, "iter"] %in% iter_num, ]
+       setkey(result, iter, time)
+       check <- result[iter %in% iter_num]
        assign("check", check, envir = parent.frame())
      }
  }
-
 }

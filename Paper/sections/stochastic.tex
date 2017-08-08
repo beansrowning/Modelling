@@ -4,7 +4,7 @@
 Model stochasticity was accomplished through the R package, adaptivetau\cite{johnson_2016}.
 The deterministic differential equations are supplied as a rate function and evaluated
 by adaptivetau. Transistions are supplied as a vector and their rates defined by
-a rate function. The model is then stepped using a process called 
+a rate function. The model is then stepped using a process called
 ``explicit tau-leaping''\cite{yang_gillespie_petzold_2007}.
 \\
 This process provides an approximation of the output expected from Gillespie algorithm by maximizing
@@ -18,9 +18,9 @@ of change is low. This serves a dual purpose:
   \item[$\bullet$]{To introduce model stochasticity by using a random walk variable
                    to define transition advancement}
 \end{enumerate}
- 
+
 In making the model stochastic, we can now represent the standard compartmental model
-as a markov chain process. 
+as a markov chain process.
 
 \begin{figure}[htbp]
 \centering
@@ -44,7 +44,7 @@ as a markov chain process.
     % Loop connections
     \draw[every loop]
         % Young Compartment
-        (S1)   edge[bend right] node {}  (E1) 
+        (S1)   edge[bend right] node {}  (E1)
                edge[bend right] node {}  (S2)
         (E1)   edge[bend right] node {}  (I1)
                edge[bend right] node {}  (E2)
@@ -52,11 +52,11 @@ as a markov chain process.
                edge[bend right] node {}  (I2)
         (R1)   edge[bend right] node {}  (R2)
         % Old Compartment
-        (S2)   edge[bend right] node {}  (E2) 
+        (S2)   edge[bend right] node {}  (E2)
         (E2)   edge[bend right] node {}  (I2)
         (I2)   edge[bend right] node {}  (R2)
         % Births
-        (in1)  edge[bend right] node {}  (S1) 
+        (in1)  edge[bend right] node {}  (S1)
         (in2)  edge[bend right] node {}  (R1)
         % Deaths
         (S2)   edge[bend right] node {}  (out1)
@@ -77,20 +77,20 @@ as a markov chain process.
 \label{fig:M2}
 \end{figure}
 
-This serves to highlight the possible transitions between each state per time 
+This serves to highlight the possible transitions between each state per time
 step. The ``force'' of the transitions can stil be described in the same way as the
-comparmental SEIR Model in Figure \ref{fig:M1}. 
-However, the probability of any transition per time step is now a function of a 
+comparmental SEIR Model in Figure \ref{fig:M1}.
+However, the probability of any transition per time step is now a function of a
 poisson-distributed random walk variable defined in the adaptivetau modelling function.
 \begin{equation} \label{eq:tau_leap1}
 P\left ( transition \right )\sim Poisson \left( R_{trans}\cdot\tau \right)
 \end{equation}
- 
+
 As a consequence, for sufficiently large transition rates ($R_{trans}$) or time steps ($\tau$),
-Equation \ref{eq:tau_leap1} can be simplified using the normal distribution: 
+Equation \ref{eq:tau_leap1} can be simplified using the normal distribution:
 
 \begin{equation} \label{eq:tau_leap2}
-P\left( transition \right)\sim N \left( R_{trans}\cdot\tau, \sqrt{R_{trans}\cdot\tau} \right) 
+P\left( transition \right)\sim N \left( R_{trans}\cdot\tau, \sqrt{R_{trans}\cdot\tau} \right)
 \end{equation}
 
 \clearpage
