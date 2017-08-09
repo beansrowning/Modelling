@@ -1,0 +1,31 @@
+\documentclass[../Paper.tex]{subfiles}
+\begin{document}
+  In order to determine the smallest inputs into the model which would result in
+  an epidemic, it is necessary to visualize the hyperparameter space via grid search.
+  \\
+  Let our two parameter inputs be defined as:
+  \begin{equation}
+    x \in \{1, 2, \cdots, n \}
+  \end{equation}
+  and,
+  \begin{equation}
+    y \in \{1, 2, \cdots, n \}
+  \end{equation}
+  where: $x =$ number of new cases of measles being added to the model, and
+  $y =$ number of ``insertion events'' which occur during one model simulation.\\
+  \\
+  The cost function, $f(x, y)$, provides scalar output of the maximum outbreak length
+  when the model is evaluated with $x$ and $y$ as inputs.\\
+  \\
+  The three dimensional surface of the hyperparameter space can be found by evaluating $f(x,y)$
+  with all reasonable combinations of $x$ and $y$. The three values can then be
+  expressed as cartesian coordinates and plotted. Importantly, this will help to reveal
+  local maxima, minimizing for the input values. A random search or
+  genetic algorithm methods could also have been used to this end, but due to the
+  suspected spread of local maxima and minima, a whole grid search of the
+  hyperparameter space provides more robust results, depite the time penalty.
+  \\
+  % Subfile for plot is not necessary, but it makes the file look better
+  \subfile{sections/paramspacegraph}
+  \clearpage
+\end{document}

@@ -1,7 +1,12 @@
-\BOOKMARK [1][-]{section.1}{Background}{}% 1
-\BOOKMARK [1][-]{section.2}{Model Dynamics}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{SEIR Compartmental Model}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Model Dynamics as Deterministic ODEs}{section.2}% 4
-\BOOKMARK [2][-]{subsection.2.3}{Calculating R0}{section.2}% 5
-\BOOKMARK [2][-]{subsection.2.4}{Defining Model Steady-State Conditions}{section.2}% 6
-\BOOKMARK [2][-]{subsection.2.5}{The Model as a Stochastic System}{section.2}% 7
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Aims\040and\040Objectives}{}% 2
+\BOOKMARK [1][-]{section.3}{Materials\040and\040Methods}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Coding}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{SEIR\040Compartmental\040Model}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Model\040Dynamics\040as\040Deterministic\040ODEs}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.4}{The\040Model\040as\040a\040Stochastic\040System}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.5}{Calculating\040R0}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.6}{Defining\040Model\040Steady-State\040Conditions}{section.3}% 9
+\BOOKMARK [2][-]{subsection.3.7}{Visualizing\040Parameter\040Space}{section.3}% 10
+\BOOKMARK [1][-]{section.4}{Results}{}% 11
+\BOOKMARK [1][-]{section.5}{Recommendations}{}% 12

@@ -1,15 +1,19 @@
 %! DOCTYPE LaTeX %
 %\pdfminorversion = 4
 \documentclass[11pt, a4paper]{article}
-\usepackage{amssymb, latexsym, amsmath, subfiles, tikz, graphicx, hyperref}
+\usepackage{amssymb, latexsym, metalogo, amsmath, subfiles, tikz, graphicx,
+            hyperref}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-% Tikz                 %
+% Tikz & pgfplots      %
 %%%%%%%%%%%%%%%%%%%%%%%%
 \usetikzlibrary{automata, arrows.meta, positioning}
 \tikzstyle every node=[.append style={align=center}]
 \tikzstyle mystyle=[style={draw, minimum size=2.5cm}]
-
+\usepackage{pgfplots}
+\usepgfplotslibrary{external}
+\tikzexternalize[prefix=./figures/] % Render Tikz and pgfplots seprately
+\pgfplotsset{width = 7cm, compat = 1.7}
 \graphicspath{{images/}{../images/}}
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Hyperref             %
@@ -20,7 +24,7 @@
     filecolor=magenta,
     urlcolor=cyan,
     pdftitle={Stochastic Modelling of Measles in a Disease-Eliminated Setting in Europe},
-    pdfauthor={Sean Browning},
+    pdfauthor={Student},
     bookmarks=true
 }
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,17 +32,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
 \usepackage{setspace}
-% \addtolength{\textwidth}{1.0in}
-% \addtolength{\textheight}{1.00in}
-% \addtolength{\evensidemargin}{-1.0in}
-% \addtolength{\oddsidemargin}{-1.0in}
-% \addtolength{\topmargin}{-.50in}
 
 \begin{document}
 \title{Stochastic Modelling of Measles in a Disease-Eliminated Setting in Europe}
-\author{Sean Browning}
+\author{Student}
 \date{10 September, 2017}
 \maketitle
+%%%%%%%%%%%%%%%%%%%
+% 1.5 Line Spacing%
+%%%%%%%%%%%%%%%%%%%
 \onehalfspace
 %%%%%%%%%%%%%%%%
 % Abstract     %
@@ -61,46 +63,71 @@ maximus eget. Cras quis hendrerit sem.
 \tableofcontents
 \clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%
-% Background           %
+% Introduction         %
 %%%%%%%%%%%%%%%%%%%%%%%%
-\section{Background}
+\section{Introduction}
 \subfile{sections/background}
 %%%%%%%%%%%%%%%%%%%%%%%%
-% Compartmental Model  %
+% Aims & Objectives    %
 %%%%%%%%%%%%%%%%%%%%%%%%
-\section{Model Dynamics}
-\subsection{SEIR Compartmental Model}
-\subfile{sections/compartmental_model}
+\section{Aims and Objectives}
+\subfile{sections/aims}
 %%%%%%%%%%%%%%%%%%%%%%%%
-% ODEs                 %
+% Materials and Methods%
 %%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Model Dynamics as Deterministic ODEs}
-\subfile{sections/modelodes}
+\section{Materials and Methods}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Coding Backend         %
+  %%%%%%%%%%%%%%%%%%%%%%%%%%
+  \subsection{Coding}
+  \subfile{sections/coding}
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  % Compartmental Model  %
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  \subsection{SEIR Compartmental Model}
+  \subfile{sections/compartmental_model}
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  % ODEs                 %
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  \subsection{Model Dynamics as Deterministic ODEs}
+  \subfile{sections/modelodes}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%
+  % As a Stochastic System %
+  %%%%%%%%%%%%%%%%%%%%%%%%%%
+  \subsection{The Model as a Stochastic System}
+  \subfile{sections/stochastic}
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  % R0                   %
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  \subsection{Calculating R0}
+  We can calculate R0 by taking the leading eigenvalue of the Next Generation Matrix.
+  Probably not important
+  \clearpage
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  % Model Steady-state   %
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  \subsection{Defining Model Steady-State Conditions}
+  This section may not need to exist
+  \clearpage
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Visualizing Parameter Space%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \subsection{Visualizing Parameter Space}
+  \subfile{sections/paramspace}
 %%%%%%%%%%%%%%%%%%%%%%%%
-% R0                   %
+% Results              %
 %%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Calculating R0}
-\par
-We can calculate R0 by taking the leading eigenvalue of the Next Generation Matrix
-\clearpage
+\section{Results}
+\subfile{sections/results}
 %%%%%%%%%%%%%%%%%%%%%%%%
-% Model Steady-state   %
+% Recommendations      %
 %%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Defining Model Steady-State Conditions}
-This section may not need to exist
-
-
-\clearpage
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-% As a Stochastic System %
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The Model as a Stochastic System}
-\subfile{sections/stochastic}
-
+\section{Recommendations}
+\subfile{sections/recommendations}
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography         %
 %%%%%%%%%%%%%%%%%%%%%%%%
 \bibliography{Paper}{}
-\bibliographystyle{abbrv}
+\bibliographystyle{unsrt}
 
 \end{document}

@@ -1,6 +1,15 @@
+
+# R Studio
 *.Rproj
 **/.Rproj.user
 *.Rhistory
+# LSHTM environment
 *.bat
-.Rproj.user
+# Zed
 *.zedstate
+# LaTeX
+/Paper/figures/*
+/Paper/*.gz
+/Paper/*.log
+/Paper/*auxlock
+/Paper/*.bst

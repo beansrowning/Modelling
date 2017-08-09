@@ -1,0 +1,26 @@
+\documentclass[../Paper.tex]{subfiles}
+\begin{document}
+All model functions were coded in R\cite{R} with {C++} suplement.
+The utilized packages were as follows:
+\begin{enumerate}
+  \item[$\bullet$]{adaptivetau\cite{johnson_2016}}
+  \item[$\bullet$]{ggplot2\cite{Wickham_2009}}
+  \item[$\bullet$]{data.table\cite{data.table}}
+  \item[$\bullet$]{Rcpp\cite{Rcpp}}
+  \item[$\bullet$]{Foreach\cite{foreach}}
+  \item[$\bullet$]{microbenchmark\cite{microbenchmark}}
+  \item[$\bullet$]{profvis\cite{profvis}}
+\end{enumerate}
+To increase modelling performance, the Foreach package parallelized the modelling
+function to utilize all availible processor threads. The data.table package provided
+the ``data.table'' R object that is capable of much faster data sorting and
+subsetting methods than the standard packages. Rcpp served as a linker package
+between R and {C++}, allowing for computationally intensive portions of the R code
+to be offloaded to {C++} and called within the R environment.
+Finally, the microbenchmark and profvis packages were essential for code
+optimization and profiling.
+\\
+In addition to the model functional code, this document was created in \LaTeX\
+and compiled to PDF using the \XeLaTeX\  compiler.
+\clearpage
+\end{document}
