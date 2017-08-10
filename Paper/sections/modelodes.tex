@@ -1,33 +1,20 @@
 \documentclass[../Paper.tex]{subfiles}
 
 \begin{document}
-The dynamics which describe the compartmental model can be written deterministically
-as ordinary differential equations : \\
-\\
-\begin{equation} \label{eq:s1}
-  \frac{\mathrm{d} S_{1}}{\mathrm{d} t} = N\alpha\left(1 - \nu \right) - S_{1}\left(\beta I_{1} + \theta \right)
-\end{equation}
-\begin{equation}
-  \frac{\mathrm{d} E_{1}}{\mathrm{d} t} = S_{1}\beta I_{1} - E_{1}\left( \phi + \theta \right)
-\end{equation}
-\begin{equation}
-  \frac{\mathrm{d} I_{1}}{\mathrm{d} t} = E_{1}\phi - I_{1}\left(\gamma + \theta \right)
-\end{equation}
-\begin{equation}
-  \frac{\mathrm{d} R_{1}}{\mathrm{d} t} = N\alpha\nu + I_{1}\gamma - R_{1}\theta
-\end{equation}
-\begin{equation} \label{eq:s2}
-  \frac{\mathrm{d} S_{2}}{\mathrm{d} t} = S_{1}\theta - S_{2}\left(\beta I_{2} + \Omega \right)
-\end{equation}
-\begin{equation}
-  \frac{\mathrm{d} E_{2}}{\mathrm{d} t} = E_{1}\theta + S_{2}\beta I_{2} - E_{2}\left( \phi + \Omega \right)
-\end{equation}
-\begin{equation}
-  \frac{\mathrm{d} I_{2}}{\mathrm{d} t} = I_{1}\theta + E_{2}\phi - I_{2}\left(\gamma + \Omega \right)
-\end{equation}
-\begin{equation}
-  \frac{\mathrm{d} R_{2}}{\mathrm{d} t} = R_{1}\theta + I_{2}\gamma - R_{2}\Omega
-\end{equation}
-\raggedright
-\clearpage
+  The dynamics which describe the compartmental model can be written deterministically
+  as ordinary differential equations : 
+
+  \begin{align}
+    &\frac{\mathrm{d} S_{1}}{\mathrm{d} t} = N\alpha\left(1 - \nu \right) - S_{1}\left(\beta I_{1} + \theta \right)\\[12pt]
+    &\frac{\mathrm{d} E_{1}}{\mathrm{d} t} = S_{1}\beta I_{1} - E_{1}\left( \phi + \theta \right)\\[12pt]
+    &\frac{\mathrm{d} I_{1}}{\mathrm{d} t} = E_{1}\phi - I_{1}\left(\gamma + \theta \right)\\[12pt]
+    &\frac{\mathrm{d} R_{1}}{\mathrm{d} t} = N\alpha\nu + I_{1}\gamma - R_{1}\theta\\[12pt]
+    &\frac{\mathrm{d} S_{2}}{\mathrm{d} t} = S_{1}\theta - S_{2}\left(\beta I_{2} + \Omega \right)\\[12pt]
+    &\frac{\mathrm{d} E_{2}}{\mathrm{d} t} = E_{1}\theta + S_{2}\beta I_{2} - E_{2}\left( \phi + \Omega \right)\\[12pt]
+    &\frac{\mathrm{d} I_{2}}{\mathrm{d} t} = I_{1}\theta + E_{2}\phi - I_{2}\left(\gamma + \Omega \right)\\[12pt]
+    &\frac{\mathrm{d} R_{2}}{\mathrm{d} t} = R_{1}\theta + I_{2}\gamma - R_{2}\Omega
+  \end{align}
+
+  \justifying
+  \clearpage
 \end{document}

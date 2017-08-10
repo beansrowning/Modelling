@@ -1,24 +1,26 @@
 \documentclass[../Paper.tex]{subfiles}
 \begin{document}
+\justifying
 Population demographic data for the project was acquired from the United Nations
 Department of Economic and Social Affairs, Population Division (UN DESA). Measles
 seroprevalence data was made available by findings from ESEN2 presented to the World
-Health Organization.\\
-\\
+Health Organization.
+
 As previously mentioned, the model will have two age compartments in an effort to
-reduce the number of overall dimensions. However, seroprevalence data provided from
-the WHO report is given in several age categories, and the appropriate proportion
-of measles seronegativity in each age group must be extrapolated. Additionally, the
-data collected in the seroepidemiology report were not all done in the same year.
-Many countries have not submitted updated data in over 20 years, therefore some
-liberty was taken in best estimating these population values. Where possible, 
-sensitivity analyses were undertaken to quantify the impact on model results.\\
-\\
-To extrapolate values to be used in the model, direct standardization was
-done using the most recent population age demographics for each country. Two
-summary measures were created by summating the weighted rates for each age range
-contained in the model compartments. This can be described using the following
-equation:\\
+reduce the number of dimensions. However, the WHO report provides seroprevalence data
+in several age categories, and the appropriate proportion of measles seronegativity
+in each age group must be extrapolated. Additionally, the data in the
+seroepidemiology report were not all collected in the same year.
+Several countries, such as Sweden, have not submitted updated data in over 20 years,
+therefore some liberty was taken in best estimating these population values.
+Where possible, sensitivity analyses of the parameters were conducted to
+quantify the impact on model results.
+
+To extrapolate values for in the model, seroprevalence values were direct standardized
+using the most recent population age demographics for each country. Two summary
+measures were created by summating the weighted rates for each age range
+contained in the model compartments. This is described here by the following
+equation:
   \begin{equation}
     P_{[i,n]} =\sum_{i}^{n}W_{i}\cdot \widehat{p_{i}}
   \end{equation}
@@ -26,7 +28,8 @@ equation:\\
   $P_{[i,n]} =$ measles seroprevalence from ages $i$ to $n$, \\
   $W_{i} =$ weight of age group $i$, calculated as the quotient of the population
   of age group $i$ divided by the population in groups $i$ to $n$, and \\
-  $\widehat{p_{i}} =$ measles seroprevalence in group $i$ \\
+  $\widehat{p_{i}} =$ measles seroprevalence in group $i$
+
 The resulting seroprevalence values are then multiplied by their respective
 populations to generate the proportion susceptible and immune in the two age
 compartments.

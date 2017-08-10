@@ -1,8 +1,8 @@
 %! DOCTYPE LaTeX %
 %\pdfminorversion = 4
 \documentclass[11pt, a4paper]{article}
-\usepackage{amssymb, latexsym, metalogo, amsmath, subfiles, tikz, graphicx,
-            hyperref}
+\usepackage{amssymb, latexsym, metalogo, amsmath, subfiles, tikz, ragged2e,
+            graphicx, hyperref}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Tikz & pgfplots      %
@@ -11,9 +11,11 @@
 \tikzstyle every node=[.append style={align=center}]
 \tikzstyle mystyle=[style={draw, minimum size=2.5cm}]
 \usepackage{pgfplots}
+% Render Tikz and pgfplots seprately to avoid memory issues
 \usepgfplotslibrary{external}
-\tikzexternalize[prefix=./figures/] % Render Tikz and pgfplots seprately
+\tikzexternalize[prefix=./figures/]
 \pgfplotsset{width = 7cm, compat = 1.7}
+% Refrencing images in subfiles will point to the correct directory
 \graphicspath{{images/}{../images/}}
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Hyperref             %
@@ -28,24 +30,27 @@
     bookmarks=true
 }
 %%%%%%%%%%%%%%%%%%%%%%%%
-% Margins              %
+% Formatting           %
 %%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
-\usepackage{setspace}
-
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % 1in margins
+\setlength{\parskip}{12pt} % 12pt paragraph spacing
+\linespread{1.3} % 1.5 line spacing
+\setlength{\JustifyingParindent}{0cm} % No paragraph indent
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Title                %
+%%%%%%%%%%%%%%%%%%%%%%%%
+% TODO: append provided cover sheet as Title page
 \begin{document}
 \title{Stochastic Modelling of Measles in a Disease-Eliminated Setting in Europe}
 \author{Student}
 \date{10 September, 2017}
 \maketitle
-%%%%%%%%%%%%%%%%%%%
-% 1.5 Line Spacing%
-%%%%%%%%%%%%%%%%%%%
-\onehalfspace
+
 %%%%%%%%%%%%%%%%
 % Abstract     %
 %%%%%%%%%%%%%%%%
 \begin{abstract}
+\noindent
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris semper vel libero
 eget maximus. Sed non nibh ac orci pretium placerat. Cras vulputate dictum libero
 nec vulputate. Suspendisse pharetra eu nibh sit amet rhoncus. Pellentesque lacus
@@ -62,6 +67,11 @@ maximus eget. Cras quis hendrerit sem.
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \tableofcontents
 \clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Acknowledgements     %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Acknoledgements}
+\subfile{sections/acknowledgements}
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Introduction         %
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,6 +134,11 @@ maximus eget. Cras quis hendrerit sem.
 %%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
 \subfile{sections/results}
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Discussion           %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+\subfile{sections/discussion}
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Recommendations      %
 %%%%%%%%%%%%%%%%%%%%%%%%
