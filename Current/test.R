@@ -1,7 +1,7 @@
 # Hyperparameter space mapping
 # Functions: soluntionSpace()
 # Subroutines: mod_sub(), mod_thread(), ed_sub()
-
+# Consider using Bytecode or JIT compiling
 require("adaptivetau")
 require("parallel")
 require("foreach")
@@ -15,7 +15,7 @@ if (!"Croots" %in% ls()) {
            })
 }
 
-solutionSpace <- function(envir, count, insbound, occbound) {
+solutionSpace <- function(envir, count, insbound, occbound, length) {
   # A function to perform a whole grid search on the hyperparmeters
   # ins and occ, with the domain of the cartesian space defined by insbound
   # and occbound respectively.
@@ -28,6 +28,7 @@ solutionSpace <- function(envir, count, insbound, occbound) {
   #      count : (int) the number of simulations to run for each point
   #   insbound : (numeric vector) domain of "ins" to search
   #   occbound : (numeric vector) domain of "occ" to search
+  #   length   : (int) length of each model run in days
   # Returns :
   #     output : (data.table) three column data.table containing the maximum
   #              outbreak observed given each value of "ins" and "occ" as inputs
@@ -37,14 +38,18 @@ solutionSpace <- function(envir, count, insbound, occbound) {
   stopifnot(any(.vars %in% ls(envir)), is.environment(envir))
   # Check user input
   stopifnot(length(count) == 1, count > 0, is.vector(insbound),
-            is.vector(occbound))
+            is.vector(occbound), !is.NULL(length))
   #---Initialize parameters-------------------------------------------
   # TODO : Easier to forego intermediary variables?
-  init <- get("init.values", envir = envir)
-  t <- get("transitions", envir = envir)
-  rf <- get("RateF", envir = envir)
-  p <- get("parameters", envir = envir)
-  fun_list <- list(init, t, rf, p, tf)
+  # init <- get("init.values", envir = envir)
+  # t <- get("transitions", envir = envir)
+  # rf <- get("RateF", envir = envir)
+  # p <- get("parameters", envir = envir)
+  fun_list <- list(init = get("init.values", envir = envir),
+                   t = get("transitions", envir = envir),
+                   rf = get("RateF", envir = envir),
+                   p = get("parameters", envir = envir),
+                   tf)
   output <- data.table(ins = NULL, occ = NULL, max = NULL)
   mod_run <- data.table(time = NULL, I = NULL, iter = NULL)
   max <- NULL
@@ -52,13 +57,14 @@ solutionSpace <- function(envir, count, insbound, occbound) {
   gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
   cl <- makeCluster(detectCores(logical = FALSE), type = gettype)
   # Stop cluster on exit
+  on.exit(stopCluster())
   on.exit(closeAllConnections())
   # Export parameters to cluster environment
   ########################################################################
   # TODO: This may not be the correct place to export, consider export at#
   #       foreach function call.                                         #
   ########################################################################
-  clusterExport(cl, c("fun_list"), envir = environment())
+  # clusterExport(cl, c("fun_list"), envir = environment())
 
   #---Cartesian whole grid search-------------------------------------
   for (i in 1:length(insbound)) {
@@ -74,6 +80,18 @@ solutionSpace <- function(envir, count, insbound, occbound) {
       max <- NULL
     }
   }
+  
+  # # Alternative syntax using nested foreach loops :
+  # # Needs profiling
+  # foreach(i = insbound, .combine ='data.frame') %:%
+  #   foreach(j = occbound, .combine='c') %do% {
+  #     mod_sub()
+  #     ed_sub()
+  #     c(i, j, max) # May not be the proper return
+  #     mod_run <- NULL
+  #     max <- NULL
+  #   }
+  
   # Return results
   return(output)
 }
@@ -115,18 +133,22 @@ mod_sub <- function() {
     # Returns :
     #   out : (data.frame) model output for a single iteration
     #         "time", "I", and "iter" columns
+    
+    #---Initialize variables--------------------------------
+    times <- vector()
+    out <- matrix()
+    
+    times <- c(coords[2])
+    
 
-    ###########################################
-    # TODO: Write per-thread modelling routine#
-    ###########################################
-
-    return(out)
+    return(as.data.frame(out))
   }
 
   #---Model in parallel--------------------------------------
   mod_run <- foreach(i = 1:count,
                      .packages = "adaptivetau",
-                     .combine = data.frame) %dopar% {
+                     .combine = data.frame,
+                     .export = "fun_list" ) %dopar% {
               # Run several iteration of the model and append into data.frame
               mod_thread()
             }
@@ -175,6 +197,7 @@ ed_sub <- function() {
   mat <- mod_run[J(TRUE)] # Take only roots
   for (i in 2:nrow(mat)) {
       # Determine if current observation is an endpoint
+      # by checking that the previous observation was a start point (I > 0)
       if (mat$I[i - 1] > 0) {
         # Take the length between the preious observation (start) and this one
         outbreaks <- c(outbreaks, (mat$time[i] - mat$time[i - 1]))

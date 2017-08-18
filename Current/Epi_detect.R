@@ -96,7 +96,7 @@ Epi_detect <- function(result, verbose = FALSE) {
    print(iter_num)
    print(paste0("Maximum outbreak time: ", outbreak_max))
  }
- if (verbose == TRUE) {
+ if (verbose) {
      assign("outbreaks", outbreaks, envir = parent.frame())
      print("Outbreak lengths saved as: 'outbreaks'")
 
