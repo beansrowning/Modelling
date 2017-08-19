@@ -1,4 +1,6 @@
-# Rank and sort model output
+# Rank sort, and plot model data
+# functions: run_vis2()
+# subroutines: run_rank()
 
 require(data.table)
 require(ggplot2)
@@ -27,6 +29,7 @@ run_vis2 <- function(results, save = FALSE) {
   plot(graph)
   if (save) {
     graph <<- graph
+    print("Saved.")
   }
 }
 
@@ -38,8 +41,8 @@ run_rank <- function() {
   # Returns:
   #   results : (data.table) with the maximum times appended
   
-  #---Sanitize input-----------------------------------------------
-  results <- get("results", envir = parent.frame())
+  #---Ensure input exists-----------------------------------------------
+  stopifnot("results" %in% ls())
   #---Initialize variables-----------------------------------------
   n <- 0
   m <- results[order(iter, time)][.N, iter]
@@ -78,6 +81,10 @@ run_rank <- function() {
   results[, max := maxes]
   setorder(results, -max, time)
   #---Rank------------------------------------------------------------
+  ############################################################################
+  # BUG : Somehow largest values of max are ordered last when put in the loop#
+  #       Nothing seems to solve this, so the rank will alway be reversed.   #
+  ############################################################################
   lvls <- unique(results[order(-max, time)][, iter])
   rank <- foreach(i = seq_along(lvls), .combine = 'c') %do% {
     num <- results[iter == lvls[i]][, .N]
@@ -87,6 +94,5 @@ run_rank <- function() {
   setorder(results, -max, time)
   setkey(results, max, time)
   results[, rank := rank]
-  results <<- results
   n <<- m
 }
