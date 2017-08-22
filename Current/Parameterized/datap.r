@@ -97,7 +97,7 @@ swe$init.values <- c(
 
 swe$transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2"),
   rbind(c("S1", "E1", "I1"), -1, c("E1", "I1", "R1"), +1),
-  rbind(c("S1", "R1"), +1),
+  rbind(c("S1", "R1", "I1", "I2"), +1),
   rbind(c("S1", "E1", "I1", "R1"), -1, c("S2", "E2", "I2", "R2"), +1),
   rbind(c("S2", "E2", "I2"), -1, c("E2", "I2", "R2"), +1),
   rbind(c("S2", "E2", "I2", "R2"), -1)
@@ -105,12 +105,17 @@ swe$transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2
 
 swe$parameters <- c(
   R0 = 16,
+  introduction.rate = 0, # (time to new case introduction)^-1
   infectious.period = 7, # days
   latent.period = 8,     # days
   vacc.pro = 0.94,       # proportion vacc at birth
   young.size = 19,       # years in the young compartment
   birth.rate = 10.8,     # per 1000, anum
-  death.rate = 10.5       # per 1000, anum
+  death.rate = 10.5,       # per 1000, anum
+  # To be set by a wrapper function
+  end.time = numeric(),
+  grp.yng = 0,
+  grp.old = 0
 )
 
 swe$RateF <- function(x, p, t) {
@@ -122,7 +127,7 @@ swe$RateF <- function(x, p, t) {
   omega <- p["death.rate"] / 365
   v <- ifelse(t > x["D"], p["vacc.pro"], 0)
   age.out <- 1 / (p["young.size"] * 365)
-
+  int.rate <- ifelse(t < p["end.time"], p["introduction.rate"], 0)
   # Local population values
   S1 <- x["S1"]
   E1 <- x["E1"]
@@ -146,11 +151,15 @@ swe$RateF <- function(x, p, t) {
            I1 * gamma,
            (Nt / 1000) * alpha * (1 - v),
            (Nt / 1000) * alpha * v,
+           # TODO : These rates should be different
+           p["grp.yng"] * int.rate, # Young
+           p["grp.old"] * int.rate, # Old
            S1 * age.out,
            E1 * age.out,
            I1 * age.out,
            R1 * age.out,
-           S2 * beta * (I / Nt), #old
+           # Old
+           S2 * beta * (I / Nt),
            E2 * f,
            I2 * gamma,
            (S2 / 1000) * omega,

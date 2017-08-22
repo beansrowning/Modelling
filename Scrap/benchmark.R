@@ -8,7 +8,7 @@ require("ggplot2")
 source("multicore.R")
 source("multicore_2.R")
 
-# Model paramaters 
+# Model parameters 
 
 init.values <- c(
   S = c(81400, 180700),
