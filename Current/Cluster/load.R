@@ -3,7 +3,7 @@
 
 # Check and load dependencies
 depends <- list("adaptivetau", "Rcpp", "parallel",
-            "doParallel", "data.table", "Rmpi", "snow")
+            "doParallel", "data.table", "Rmpi")
 for (pkg in depends) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dep = TRUE)
