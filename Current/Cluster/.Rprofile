@@ -30,7 +30,7 @@ library(doParallel)
 library(foreach)
 library(iterators)
 library(data.table)
-
+cl <- makeCluster(mpi.universe.size() - 1, type = "MPI")
 #Change to TRUE if you don't want any slave host info
 quiet=FALSE
 
