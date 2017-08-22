@@ -1,5 +1,5 @@
-# This R profile can be used when a cluster does not allow spawning or a job 
-# scheduler is required to launch any parallel jobs. Saving this file as 
+# This R profile can be used when a cluster does not allow spawning or a job
+# scheduler is required to launch any parallel jobs. Saving this file as
 # .Rprofile in the working directory or root directory. For unix platform, run
 # mpirun -n [cpu numbers] R --no-save -q
 
@@ -7,15 +7,15 @@
 # R_HOME_DIR
 # R_PROFILE=${R_HOME_DIR}/library/Rmpi/Rprofile; export R_PROFILE
 
-# For windows platform with mpich2, use mpiexec wrapper and specify a working 
+# For windows platform with mpich2, use mpiexec wrapper and specify a working
 # directory where .Rprofile is inside.
 
 # Cannot be used as Rprofile.site because it will not work
 
-# If no CPU consumptions of slaves while waiting are desirable, change 
+# If no CPU consumptions of slaves while waiting are desirable, change
 # nonblocak=FALSE to nonblock=TRUE and change sleep time accordingly
 
-# Following system libraries are not loaded automatically. So manual loads are 
+# Following system libraries are not loaded automatically. So manual loads are
 # needed.
 library(utils)
 library(stats)
@@ -23,6 +23,13 @@ library(datasets)
 library(grDevices)
 library(graphics)
 library(methods)
+library(Rcpp)
+library(adaptivetau)
+library(parallel)
+library(doParallel)
+library(foreach)
+library(iterators)
+library(data.table)
 
 #Change to TRUE if you don't want any slave host info
 quiet=FALSE
@@ -42,14 +49,14 @@ if (mpi.comm.rank(0) >0){
     options(echo=FALSE)
     .comm <- 1
     mpi.barrier(0)
-    repeat 
+    repeat
 		try(eval(mpi.bcast.cmd(rank=0,comm=.comm, nonblock=FALSE, sleep=0.1)),TRUE)
-	if (is.loaded("mpi_comm_disconnect")) 
+	if (is.loaded("mpi_comm_disconnect"))
         mpi.comm.disconnect(.comm)
     else mpi.comm.free(.comm)
     mpi.quit()
 }
-    
+
 if (mpi.comm.rank(0)==0) {
     #options(echo=TRUE)
     mpi.barrier(0)
