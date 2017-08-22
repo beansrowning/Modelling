@@ -22,7 +22,8 @@ if (!"lenFind" %in% ls()) {
 }
 
 solutionSpace <- function(envir, count = 10000, insbound,
-                          vaccbound = c(0.94), len, grp = c(1, 1)) {
+                          vaccbound = c(0.94),
+                          len, grp = c(1, 1), offset = 600) {
   # A function to perform a whole grid search on the hyperparmeters
   # ins and vacc, with the domain of the cartesian space defined by insbound
   # and vaccbound respectively.
@@ -41,6 +42,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #                  c(0,1) = Only "old" cases will be introduced
   #                  c(1,1) = both "young" and "old" cases will be introduced
   #                  c(n,m) = both will be introduced with some weights n and m
+  #   offset    : (int) length to append to the end of `len` to overrun the simulation
+  #               can also be used to determine endemic spread.
   # Returns :
   #     output : (data.table) three column data.table containing the maximum
   #              outbreak observed given each value of "ins" and "vacc" as inputs
@@ -62,7 +65,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Set the end time for the case introductions to be the given length-
   fun_list$p["end.time"] <- len
   #---Overrun the time period specified to avoid infected persons left at end
-  len <- len + 600
+  len <- len + offset
   #---Fix to avoid FP issues-----------------------------------------------
   output <- data.table(ins = integer(), vacc = integer(), max = integer())
   mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
