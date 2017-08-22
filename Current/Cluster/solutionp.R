@@ -76,8 +76,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
     fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
+  cl <- get("cl", parent.frame())
   registerDoParallel(cl)
-  opt <- list(chunkSize = mpi.universe.size() - 1)
+  opt <- list(chunkSize = 10000/15)
   #---Stop cluster on exit--------------------------------------------
   on.exit(stopCluster())
   on.exit(closeAllConnections())
