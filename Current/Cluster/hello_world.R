@@ -1,5 +1,6 @@
 # Spawn 14 slaves (change this number appropriately)
 mpi.spawn.Rslaves(nslaves=15)
+print(mpi.universe.size())
 #
 # In case R exits unexpectedly, have it automatically clean up
 # resources taken up by Rmpi (slaves, memory, etc...)
