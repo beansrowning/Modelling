@@ -25,7 +25,7 @@ tryCatch(sourceCpp("../src/lenfind.cpp"),
                     error = function(e) {
                       stop(e)
                       })
-         }
+
 # Source data and functions
 files <- c("datap.r", "solutionp.R")
 sapply(files, source, .GlobalEnv)

@@ -13,6 +13,9 @@
 /Paper/*.log
 /Paper/*auxlock
 /Paper/*.bst
+/Paper/*.fdb_latexmk
+/Paper/*.fls
+/Paper/*.xdv
 # Plotly
 *.plotly
 # VIM
