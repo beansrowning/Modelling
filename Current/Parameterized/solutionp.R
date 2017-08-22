@@ -42,8 +42,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #                  c(0,1) = Only "old" cases will be introduced
   #                  c(1,1) = both "young" and "old" cases will be introduced
   #                  c(n,m) = both will be introduced with some weights n and m
-  #   offset    : (int) length to append to the end of `len` to overrun the simulation
-  #               can also be used to determine endemic spread.
+  #   offset    : (int) length to append to the end of `len` to overrun the
+  #               simulation can also be used to determine endemic spread.
   # Returns :
   #     output : (data.table) three column data.table containing the maximum
   #              outbreak observed given each value of "ins" and "vacc" as inputs

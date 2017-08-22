@@ -3,7 +3,7 @@ print("Creating New Environment")
 set.seed(1000)
 
 solutions <- new.env()
-print(paste0("Starting Run 1", date()))
+print(paste0("Starting Run 1 - ", date()))
 # Run 1
 # Sweden model
 # ------------
@@ -37,7 +37,7 @@ print(paste0("Starting Run 2 - ", date()))
                                   vaccbound = c(0.90, 0.91, 0.92, 0.93,
                                                 0.94, 0.95, 0.96, 0.97, 0.98),
                                   len = 365,
-                                  grp = c(1,0.5)))
+                                  grp = c(1, 0.5)))
 print("Run 2 finished")
 print(solutions$t2)
 print(paste0("Starting Run 3 - ", date()))
@@ -56,7 +56,7 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(swe,
                                  vaccbound = c(0.90, 0.91, 0.92, 0.93,
                                                0.94, 0.95, 0.96, 0.97, 0.98),
                                  len = 365,
-                                 grp = c(0.5,1)))
+                                 grp = c(0.5, 1)))
  print("Run 3 finished")
  print(solutions$t3)
  print(paste0("Starting Run 4 - ", date()))
@@ -75,7 +75,7 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(swe,
                                   vaccbound = c(0.90, 0.91, 0.92, 0.93,
                                                 0.94, 0.95, 0.96, 0.97, 0.98),
                                   len = 365,
-                                  grp = c(1,0)))
+                                  grp = c(1, 0)))
 print("Run 4 finished")
 print(solutions$t4)
 print(paste0("Starting Run 5 - ", date()))
@@ -95,7 +95,7 @@ solutions$t5 <- system.time(solutions$run_5 <- solutionSpace(swe,
                                  vaccbound = c(0.90, 0.91, 0.92, 0.93,
                                                0.94, 0.95, 0.96, 0.97, 0.98),
                                  len = 365,
-                                 grp = c(0,1)))
+                                 grp = c(0, 1)))
 print("Run 5 finished")
 print(solutions$t5)
 print(paste0("Saving - ", date()))
