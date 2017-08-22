@@ -30,7 +30,7 @@ library(doParallel)
 library(foreach)
 library(iterators)
 library(data.table)
-cl <- makeCluster(mpi.universe.size() - 1, type = "MPI")
+
 #Change to TRUE if you don't want any slave host info
 quiet=FALSE
 
@@ -71,6 +71,7 @@ if (mpi.comm.rank(0)==0) {
             mpi.close.Rslaves(comm=1)
     	}
     }
+cl<-getcluster()
     #print("Please use mpi.quit() to quit R")
 	if (is.loaded("mpi_initialize"))
        .Call("mpi_finalize",PACKAGE = "Rmpi")
