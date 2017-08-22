@@ -30,10 +30,10 @@ library(doParallel)
 library(foreach)
 library(iterators)
 library(data.table)
-
+library(snow)
 #Change to TRUE if you don't want any slave host info
 quiet=FALSE
-
+print(mpi.universe.size())
 if (!invisible(library(Rmpi,logical.return = TRUE))){
     warning("Rmpi cannot be loaded")
     q(save = "no")
@@ -71,7 +71,6 @@ if (mpi.comm.rank(0)==0) {
             mpi.close.Rslaves(comm=1)
     	}
     }
-cl<-getcluster()
     #print("Please use mpi.quit() to quit R")
 	if (is.loaded("mpi_initialize"))
        .Call("mpi_finalize",PACKAGE = "Rmpi")
