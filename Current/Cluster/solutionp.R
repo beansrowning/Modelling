@@ -76,12 +76,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
     fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
-  cl <- get("cl", parent.frame())
-  registerDoParallel(cl)
-  opt <- list(chunkSize = 10000/15)
   #---Stop cluster on exit--------------------------------------------
-  on.exit(stopCluster())
-  on.exit(closeAllConnections())
+  # on.exit(stopCluster())
+  # on.exit(closeAllConnections())
   #---Define function subroutines-------------------------------------
   mod_sub <- function() {
     # Batch model run subroutine
@@ -101,7 +98,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     mod_run <- foreach(i = 1:count,
                        .packages = "adaptivetau",
                        .combine = "rbind",
-                       .options.mpi = opt,
+                       .options.mpi = list(chunkSize = 10000/15),
                        .export = "len") %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,
