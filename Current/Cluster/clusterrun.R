@@ -1,6 +1,6 @@
 print("Creating New Environment")
 mpi.spawn.Rslaves(nslaves=15)
-cl <- makeMPIcluster(15)
+cl <- getMPIcluster()
 set.seed(1000)
 solutions <- new.env()
 print(paste0("Starting Run 1", date()))
