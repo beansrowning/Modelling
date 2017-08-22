@@ -76,7 +76,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
-  cl <- makeCluster(mpi.universe.size() - 1, type = "MPI")
+  cl <- getMPIcluster()
   registerDoParallel(cl)
   opt <- list(chunkSize = mpi.universe.size() - 1)
   #---Stop cluster on exit--------------------------------------------
