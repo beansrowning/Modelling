@@ -33,7 +33,7 @@ library(data.table)
 library(snow)
 #Change to TRUE if you don't want any slave host info
 quiet=FALSE
-print(mpi.universe.size())
+
 if (!invisible(library(Rmpi,logical.return = TRUE))){
     warning("Rmpi cannot be loaded")
     q(save = "no")

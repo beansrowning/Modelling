@@ -1,5 +1,7 @@
 source("load.R")
 print("Creating New Environment")
+print(mpi.universe.size())
+print(getMPIcluster())
 set.seed(1000)
 solutions <- new.env()
 print(paste0("Starting Run 1", date()))
