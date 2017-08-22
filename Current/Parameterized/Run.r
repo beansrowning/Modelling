@@ -21,9 +21,3 @@ solutions$run_2 <- solutionSpace(swe, insbound = seq(0.01, 0.08, 0.01),
 print("Second run done")
 print(date())
 print("Done.")
-mod_run <- batch_run_mc(swe, i_number = 1, insertion = 10,
-                       occ = 1, grp = "y", length = 1000,
-                        batch = 10000)
-mod_run <- as.data.table(mod_run)
-ed_sub_r()
-ed_sub_c()
