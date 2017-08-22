@@ -13,8 +13,11 @@ solutions$plot_dat_1 <- list(x = unique(solutions$run_1[, ins]),
 solutions$plot_dat_2 <- list(x = unique(solutions$run_2[, ins]),
                              y = unique(solutions$run_2[, vacc]),
                              z = rbind(solutions$run_2[vacc == 0.93][, max],
-                                       solutions$run_2[vacc == 0.94][, max],
-                                       solutions$run_2[vacc == 0.95][, max],
+                                        # BUG: FP handling error when using seq(),
+                                        # either do not use seq(), or do not use
+                                        # `=` with FP values
+                                       solutions$run_2[vacc == solutions$run_2[9, vacc]][, max],
+                                       solutions$run_2[vacc == solutions$run_2[17, vacc]][, max],
                                        solutions$run_2[vacc == 0.96][, max]))
 font <- list(family = "Courier New, Monospace",
              size = 14,
@@ -34,11 +37,11 @@ solutions$p2 <- plot_ly(x = solutions$plot_dat_2$x,
               z = solutions$plot_dat_2$z) %>% add_surface() %>%
               layout(title = "Hyperparameter Space Run 2",
                      scene = list(xaxis = list(title = "Introduction Rate",
-                                               titlefont = font,
-                                               nticks = 8,
-                                               range = c(0.01, 0.08)),
-                                  yaxis = list(title = "Vaccine Coverage (%)"),
-                                  zaxis = list(title = "Maximum Outbreak Length (days)")))
+                                               titlefont = font),
+                                  yaxis = list(title = "Vaccine Coverage (%)",
+                                               titlefont = font),
+                                  zaxis = list(title = "Maximum Outbreak Length (days)",
+                                               titlefont = font)))
 #---Push to Plotly and save locally---------
 api_create(solutions$p1, filename = "Run_1")
 api_create(solutions$p2, filename = "Run_2")

@@ -63,7 +63,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
   fun_list$p["end.time"] <- len
   #---Overrun the time period specified to avoid infected persons left at end
   len <- len + 600
-  output <- data.table(ins = numeric(), vacc = numeric(), max = numeric())
+  #---Fix to avoid FP issues-----------------------------------------------
+  output <- data.table(ins = integer(), vacc = integer(), max = integer())
   mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
   # Assign what group gets introductions
   # TODO : Does this make sense

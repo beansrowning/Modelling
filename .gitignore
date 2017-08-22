@@ -13,3 +13,7 @@
 /Paper/*.log
 /Paper/*auxlock
 /Paper/*.bst
+# Plotly
+*.plotly
+# VIM
+.viminfo
