@@ -4,4 +4,4 @@
 #$ -q parallel.q
 #$ -pe openmpi 2
 #$ -R y
-mpirun -np 2 R --no-save -q clusterrun.R
+mpirun -np 2 R --no-save -q -f clusterrun.R
