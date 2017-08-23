@@ -30,9 +30,11 @@ cl <- startMPIcluster(verbose=TRUE,
                       defaultopts = list(chunkSize = 10000/(mpi.comm.size(0) - 1)))
 registerDoMPI(cl)
 print(cl)
-test <- foreach(i=1:10000,
+
+mpi.remote.exec(paste(Sys.info()[['nodename']], Sys.getpid(), mpi.comm.rank(), "of", mpi.comm.size())) 
+test <- foreach(i=1:10,
                 .combine = "c") %dopar% {
-  i^2*10
+  paste(Sys.info()[['nodename']], Sys.getpid(), mpi.comm.rank(), "of", mpi.comm.size()) 
 }
 print(head(test))
 stopifnot(length(test) == 10000)
