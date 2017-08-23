@@ -85,7 +85,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
-  tryCatch(cl <- makeForkCluster(detectCores(logical = FALSE)),
+  tryCatch(cl <- makeCluster(detectCores(logical = FALSE), type = "PSOCK"),
            error = function(e) {
              stop(paste0("Error making cluster - ", e))
            })
@@ -198,19 +198,11 @@ set.seed(1000)
 
 solutions <- new.env()
 print(paste0("Starting Run 1 - ", date()))
-# Run 1
-# Sweden model
-# ------------
-# Old and young equally likely to be introduced
-# length = 365 days
-# end lag = 600 days
-# Introduction rates : 0.01-0.1
-# Vaccination rates  : 0.90-0.98
-# Parameter space area : 9x10 = 90
+# Standard System openMP benchmark
 solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(swe,
-                                 insbound = c(0.08, 0.09, 0.1),
-                                 vaccbound = c(0.90),
-                                 len = 365))
+                              insbound = c(0.01, 0.02),
+                              vaccbound = c(0.90, 0.91),
+                              len = 365))
 print(solutions$t1)
 print(done)
 
