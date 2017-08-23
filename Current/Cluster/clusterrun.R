@@ -26,14 +26,13 @@ source("datap.r")
 source("solutionp.R")
 print("All dependencies loaded.")
 
-cl <- startMPIcluster()
+cl <- startMPIcluster(verbose=TRUE, 
+                      defaultopts = list(chunkSize = 10000/(mpi.comm.size(0) - 1))
 registerDoMPI(cl)
 print(cl)
-cs <- 10000/cl$workerCount
 test <- foreach(i=1:10000,
-                .combine = "c",
-                .options.mpi = list(chunkSize = cs)) %dopar% {
-  rnorm(1, i, 2)
+                .combine = "c") %dopar% {
+  i^2*10
 }
 print(head(test))
 stopifnot(legnth(test) == 10000)
