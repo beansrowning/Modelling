@@ -29,7 +29,10 @@ print("All dependencies loaded.")
 cl <- startMPIcluster()
 registerDoMPI(cl)
 print(cl)
-test <- foreach(i=1:10000, .combine = "c") %dopar% {
+cs <- 10000/cl$workerCount
+test <- foreach(i=1:10000,
+                .combine = "c",
+                .options.mpi = list(chunkSize = cs)) %dopar% {
   rnorm(1, i, 2)
 }
 print(head(test))
