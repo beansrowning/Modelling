@@ -1,5 +1,32 @@
 print("Creating New Environment")
 # mpi.spawn.Rslaves(nslaves=15)
+require(Rcpp)
+require(adaptivetau)
+require(parallel)
+require(doParallel)
+require(foreach)
+require(iterators)
+require(data.table)
+require(doMPI)
+tryCatch(sourceCpp("./Croots.cpp"),
+         warning = function(w) {
+           print("Croots couldn't load, trying package instead... ")
+           tryCatch(system("cd ../../Data/; R CMD INSTALL Croots"),
+                    error = function(e){
+                      print("Library failed to load. Is it installed?")
+                      print(paste(e, w, sep = " "))
+                    })
+         })
+tryCatch(sourceCpp("./lenfind.cpp"),
+                    error = function(e) {
+                      stop(e)
+                      })
+
+# Source data and functions
+source("datap.r")
+source("solutionp.R")
+print("All dependencies loaded.")
+
 cl <- startMPIcluster()
 registerDoMPI(cl)
 set.seed(1000)
