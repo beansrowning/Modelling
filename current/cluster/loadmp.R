@@ -1,5 +1,4 @@
 # Modelling load file for OpenMP
-# Aug 21 2017
 
 # Check and load dependencies
 depends <- list("adaptivetau", "Rcpp", "parallel",
@@ -33,4 +32,3 @@ sapply(files, source, .GlobalEnv)
 # Done.
 rm("depends", "files", "pkg")
 print("All dependencies loaded.")
-
