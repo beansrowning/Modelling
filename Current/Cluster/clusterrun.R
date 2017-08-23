@@ -10,7 +10,7 @@ require(doMPI)
 tryCatch(sourceCpp("./Croots.cpp"),
          error = function(w) {
            print("Croots couldn't load, trying package instead... ")
-           tryCatch(system("cd ../../Data/; R CMD INSTALL Croots");require(Croots),
+           tryCatch(system("cd ../../Data/; R CMD INSTALL Croots"),
                     error = function(e){
                       print("Library failed to load. Is it installed?")
                       print(paste(e, w, sep = " "))
