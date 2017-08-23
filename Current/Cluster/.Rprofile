@@ -49,8 +49,8 @@ tryCatch(sourceCpp("./lenfind.cpp"),
                       })
 
 # Source data and functions
-files <- c("datap.r", "solutionp.R")
-sapply(files, source)
+source("datap.r")
+source("solutionp.R")
 print("All dependencies loaded.")
 
 if (!invisible(library(Rmpi,logical.return = TRUE))){
