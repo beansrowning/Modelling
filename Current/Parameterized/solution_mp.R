@@ -76,7 +76,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
   gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
-  cl <- makeCluster(detectCores(logical = FALSE), type = gettype)
+  cl <- makeCluster(detectCores(logical = TRUE), type = gettype)
   registerDoParallel(cl)
   #---Stop cluster on exit--------------------------------------------
   on.exit(stopCluster())
