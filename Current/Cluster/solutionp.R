@@ -98,7 +98,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     mod_run <- foreach(i = 1:count,
                        .packages = "adaptivetau",
                        .combine = "rbind",
-                       .options.mpi = list(chunkSize = 10000/15),
+                       .options.mpi = list(chunkSize = 10000/31),
                        .export = "len") %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,

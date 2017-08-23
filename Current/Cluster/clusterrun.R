@@ -1,10 +1,10 @@
 print("Creating New Environment")
 # mpi.spawn.Rslaves(nslaves=15)
-cl <- startMPIcluster(count=15)
+cl <- startMPIcluster(count=31)
 registerDoMPI(cl)
 set.seed(1000)
 solutions <- new.env()
-print(paste0("Starting Run 1", date()))
+print(paste0("Starting Run 1 - ", date()))
 # Run 1
 # Sweden model
 # ------------
