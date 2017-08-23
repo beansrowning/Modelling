@@ -26,10 +26,10 @@ source("datap.r")
 source("solutionp.R")
 print("All dependencies loaded.")
 
-cl <- getMPIcluster()
+cl <- makeMPIcluster()
 registerDoMPI(cl)
 print(cl)
-cs <- list(chunkSize = 10000/(mpi.comm.size(0) - 1)
+cs <- list(chunkSize = 10000/(mpi.comm.size(0) - 1))
 set.seed(1000)
 test <- foreach(i = 1:10) %dopar% {
   paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
