@@ -50,7 +50,7 @@ tryCatch(sourceCpp("./lenfind.cpp"),
 
 # Source data and functions
 files <- c("datap.r", "solutionp.R")
-sapply(files, source, .GlobalEnv)
+sapply(files, source)
 print("All dependencies loaded.")
 
 if (!invisible(library(Rmpi,logical.return = TRUE))){

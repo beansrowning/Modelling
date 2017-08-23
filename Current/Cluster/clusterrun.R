@@ -1,6 +1,6 @@
 print("Creating New Environment")
 # mpi.spawn.Rslaves(nslaves=15)
-cl <- startMPIcluster(count=20)
+cl <- startMPIcluster()
 registerDoMPI(cl)
 set.seed(1000)
 solutions <- new.env()
