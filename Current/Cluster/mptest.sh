@@ -4,5 +4,5 @@
 #$ -q parallel.q
 #$ -pe smp 8
 #$ -R y
-export OMP_NUM_THREADS=8
+export MC_CORES=8
 R --vanilla -f mprun.R

@@ -3,15 +3,14 @@ print("Creating New Environment")
 require(Rcpp)
 require(adaptivetau)
 require(parallel)
-require(doParallel)
 require(foreach)
 require(iterators)
 require(data.table)
 require(doMPI)
 tryCatch(sourceCpp("./Croots.cpp"),
-         warning = function(w) {
+         error = function(w) {
            print("Croots couldn't load, trying package instead... ")
-           tryCatch(system("cd ../../Data/; R CMD INSTALL Croots"),
+           tryCatch(system("cd ../../Data/; R CMD INSTALL Croots");require(Croots),
                     error = function(e){
                       print("Library failed to load. Is it installed?")
                       print(paste(e, w, sep = " "))
@@ -29,6 +28,12 @@ print("All dependencies loaded.")
 
 cl <- startMPIcluster()
 registerDoMPI(cl)
+print(cl)
+test <- foreach(i=1:10000, .combine = "c") %dopar% {
+  rnorm(1, i, 2)
+}
+print(head(test))
+stopifnot(legnth(test) == 10000)
 set.seed(1000)
 solutions <- new.env()
 # Is this thing on?
