@@ -7,29 +7,19 @@ require(foreach)
 require(iterators)
 require(data.table)
 require(doMPI)
-tryCatch(sourceCpp("./Croots.cpp"),
-         error = function(w) {
-           print("Croots couldn't load, trying package instead... ")
-           tryCatch(system("cd ../../Data/; R CMD INSTALL Croots"),
-                    error = function(e){
-                      print("Library failed to load. Is it installed?")
-                      print(paste(e, w, sep = " "))
-                    })
-         })
-tryCatch(sourceCpp("./lenfind.cpp"),
-                    error = function(e) {
-                      stop(e)
-                      })
-
+# Make Cluster
+cl <- makeMPIcluster()
+registerDoMPI(cl)
+print(cl)
+cs <- list(chunkSize = 10000/(mpi.comm.size(0) - 1))
+sourceCpp("./Croots.cpp")
+sourceCpp("./lenfind.cpp")
 # Source data and functions
 source("datap.r")
 source("solutionp.R")
 print("All dependencies loaded.")
 
-cl <- makeMPIcluster()
-registerDoMPI(cl)
-print(cl)
-cs <- list(chunkSize = 10000/(mpi.comm.size(0) - 1))
+
 set.seed(1000)
 test <- foreach(i = 1:10) %dopar% {
   paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
