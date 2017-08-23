@@ -14,9 +14,9 @@ require(foreach)
 require(iterators)
 require(data.table)
 
-cs <- list(chunkSize = 10000/(mpi.comm.size(0) - 1))
-sourceCpp("./Croots.cpp")
-sourceCpp("./lenfind.cpp")
+cs <- list(chunkSize = ceiling(10000/(clusterSize(cl) - 1)))
+sourceCpp("../src/Croots.cpp")
+sourceCpp("../src/lenfind.cpp")
 # Source data and functions
 source("datap.r")
 source("solutionp.R")

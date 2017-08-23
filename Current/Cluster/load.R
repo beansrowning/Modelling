@@ -12,22 +12,11 @@ for (pkg in depends) {
     require(pkg, character.only = TRUE)
   }
 }
-tryCatch(sourceCpp("./Croots.cpp"),
-         warning = function(w) {
-           print("Croots couldn't load, trying package instead... ")
-           tryCatch(system("cd ../../Data/; R CMD INSTALL Croots"),
-                    error = function(e){
-                      print("Library failed to load. Is it installed?")
-                      print(paste(e, w, sep = " "))
-                    })
-         })
-tryCatch(sourceCpp("./lenfind.cpp"),
-                    error = function(e) {
-                      stop(e)
-                      })
+sourceCpp("../src/Croots.cpp")
+sourceCpp("../src/lenfind.cpp")
 
 # Source data and functions
-files <- c("datap.r", "solutionp.R")
+files <- c("datap.r", "solution_mpi.R")
 sapply(files, source, .GlobalEnv)
 
 # Done.

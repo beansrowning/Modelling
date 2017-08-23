@@ -1,6 +1,6 @@
-# Modelling load file
-# Aug 21 2017
-
+# # Modelling load file
+# # Aug 21 2017
+#
 # Check and load dependencies
 depends <- list("adaptivetau", "Rcpp", "parallel",
             "doParallel", "data.table")
@@ -12,185 +12,185 @@ for (pkg in depends) {
     require(pkg, character.only = TRUE)
   }
 }
-tryCatch(sourceCpp("../src/Croots.cpp"),
-         warning = function(w) {
-           print("Croots couldn't load, trying package instead... ")
-           tryCatch(system("cd ../../Data/; R CMD INSTALL Croots"),
-                    error = function(e){
-                      print("Library failed to load. Is it installed?")
-                      print(paste(e, w, sep = " "))
-                    })
-         })
-tryCatch(sourceCpp("../src/lenfind.cpp"),
-                    error = function(e) {
-                      stop(e)
-                      })
-
-# Source data and functions
-source("datap.r")
-# Done.
-rm("depends", "files", "pkg")
-
-solutionSpace <- function(envir, count = 10000, insbound,
-                          vaccbound = c(0.94),
-                          len, grp = c(1, 1), offset = 600) {
-  # A function to perform a whole grid search on the hyperparmeters
-  # ins and vacc, with the domain of the cartesian space defined by insbound
-  # and vaccbound respectively.
-  # The modelling subroutine is parallelized through
-  # foreach and doParallel and will scalwith thread count of the host machine.
-  # Due to limitations with the doParallel package, virtualized systems may
-  # fail to create a cluster.
-  # Args :
-  #   envir     : (env)ironment where the model parameters can be found
-  #   count     : (int) the number of simulations to run for each point
-  #   insbound  : (numeric vector) domain of "ins" to search
-  #   vaccbound : (numeric vector) domain of "vacc" to search
-  #   len       : (int) length of each model run in days
-  #   grp       : (numeric vector) signifying what group will get introductions
-  #              ex. c(1,0) = Only "young" cases will be introduced
-  #                  c(0,1) = Only "old" cases will be introduced
-  #                  c(1,1) = both "young" and "old" cases will be introduced
-  #                  c(n,m) = both will be introduced with some weights n and m
-  #   offset    : (int) length to append to the end of `len` to overrun the
-  #               simulation can also be used to determine endemic spread.
-  # Returns :
-  #     output : (data.table) three column data.table containing the maximum
-  #              outbreak observed given each value of "ins" and "vacc" as inputs
-  #---Check parameters-----------------------------------------------
-  # Check provided Args
-  .vars <- c("init.values", "transitions", "parameters", "RateF")
-  stopifnot(any(.vars %in% ls(envir)), is.environment(envir),
-            (length(count) == 1 && count > 0), is.vector(insbound),
-            is.vector(vaccbound), !is.null(len),
-            (is.vector(grp) && length(grp) == 2 && !any(grp < 0)),
-            !any(insbound < 0), !any(vaccbound < 0))
-
-  #---Initialize parameters-------------------------------------------
-  # TODO : Is this the best way to deal with parameters?
-  fun_list <- list(init = get("init.values", envir = envir),
-                   t = get("transitions", envir = envir),
-                   rf = get("RateF", envir = envir),
-                   p = get("parameters", envir = envir))
-  #---Set the end time for the case introductions to be the given length-
-  fun_list$p["end.time"] <- len
-  #---Overrun the time period specified to avoid infected persons left at end
-  len <- len + offset
-  #---Fix to avoid FP issues-----------------------------------------------
-  output <- data.table(ins = integer(), vacc = integer(), max = integer())
-  mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
-  # Assign what group gets introductions
-  # TODO : Does this make sense
-    fun_list$p["grp.yng"] <- grp[1]
-    fun_list$p["grp.old"] <- grp[2]
-  maxl <- integer()
-  #---Initialize parallel backend-------------------------------------
-  tryCatch(cl <- makeCluster(detectCores(logical = FALSE), type = "PSOCK"),
-           error = function(e) {
-             stop(paste0("Error making cluster - ", e))
-           })
-  tryCatch(registerDoParallel(cl), error = function(e) {
-    stop(paste0("Error registering cluster - ", e))
-  })
-  #---Stop cluster on exit--------------------------------------------
-  on.exit(stopCluster())
-  on.exit(closeAllConnections())
-  #---Define function subroutines-------------------------------------
-  mod_sub <- function() {
-    # Batch model run subroutine
-    # Takes in the parameters provided in the parent environment and runs several
-    # simulations with ssa.adpativetau in parallel using the foreach package
-    # Args :
-    #   None
-    # Input :
-    #   cl : (cluster) created with the makeCluster() function in the parent
-    #        environment
-    # Returns :
-    #   mod_run : (data.table) containing model data from all iterations
-    #---Assign parameters being checked------------------------
-    fun_list$p["introduction.rate"] <- coord[1]
-    fun_list$p["vacc.pro"] <- coord[2]
-    #---Model in parallel--------------------------------------
-    mod_run <- foreach(i = 1:count,
-                       .packages = "adaptivetau",
-                       .combine = "rbind",
-                       .export = "len") %dopar% {
-                # Run several iteration of the model and append into data.frame
-                out <- ssa.adaptivetau(fun_list$init,
-                                           fun_list$t,
-                                           fun_list$rf,
-                                           fun_list$p,
-                                           len)
-                out <- cbind(out, I = rowSums(out[, c("I1", "I2")]), iter = i)
-                out <- out[, c("time", "I", "iter"), drop = FALSE]
-                out
-              }
-    #---Return as data.table to parent environment-------------
-    mod_run <<- as.data.table(mod_run)
-  }
-
-  ed_sub <- function() {
-    # Outbreak length subroutine
-    # analyzes the model output from the calling enviroment to determine the maximum
-    # outbreak length out of the simulations
-    # It does this by running a C++ routine to return the "roots" of an outbreak,
-    # and calculating the distance between those points.
-    # For systems with a large thread count, a parallel implementation with
-    # the foreach package may have some benefit.
-    # Args :
-    #   None
-    # Input :
-    #   mod_run : (data.table) the output from mod_sub in the parent environment
-    # Returns :
-    #   maxl : (int) maximum outbreak time out of the model data provided, stored
-    #         in the parent enviroment
-    #   mod_run : (data.table) appended with a "roots" column
-
-    #---init----------------------------------------------------------
-    # mod_run <- get("mod_run", parent.frame())
-    tf <- mod_run[nrow(mod_run), "time"]
-    iter_num <- vector()
-    proc <- vector()
-    outbreaks <- vector()
-    #---Error check for outbreaks that ran over simulation time------
-    # This would cause errors in the analysis
-    setkey(mod_run, time)
-    proc <- mod_run[.(tf)][, I]
-    if (any(proc != 0)) {
-      stop("Outbreak ran over simulation at least once, check sim length!")
-    }
-    # re-sort to ensure Croots will work correctly
-    setkey(mod_run, iter, time)
-    #---Call root finder function on the Infection counts-------------
-    mod_run[, roots := Croots(I)]
-    #---The meat of 'er------------------------------------------------
-    setkey(mod_run, roots)
-    mat <- mod_run[J(TRUE)] # Take only root
-    #---Pass time and I columns as vectors for the C++ function to process
-    outbreaks <- lenFind(mat[, time], mat[, I])
-    maxl <<- max(outbreaks)
-  }
-  #---Cartesian whole grid search-------------------------------------
-  for (i in 1:length(vaccbound)) {
-    for (j in 1:length(insbound)){
-      #---Store value of ins and vacc to be evaluated------------------
-      coord <- c(insbound[j], vaccbound[i])
-      mod_sub()
-      ed_sub()
-      #---Append coord to output space--------------------------------
-      # Using the data.table function rbindlist to populate the data.table
-      output <- rbindlist(list(output, data.frame(ins = insbound[j],
-                                                  vacc = vaccbound[i],
-                                                  max = maxl)),
-                          fill = TRUE)
-      #---Clear vars for next iteration-------------------------------
-      mod_run <- NULL
-      maxl <- NULL
-    }
-  }
-  #---Return results----------------------------------------------------
-  return(output)
-}
+# tryCatch(sourceCpp("../src/Croots.cpp"),
+#          warning = function(w) {
+#            print("Croots couldn't load, trying package instead... ")
+#            tryCatch(system("cd ../../Data/; R CMD INSTALL Croots"),
+#                     error = function(e){
+#                       print("Library failed to load. Is it installed?")
+#                       print(paste(e, w, sep = " "))
+#                     })
+#          })
+# tryCatch(sourceCpp("../src/lenfind.cpp"),
+#                     error = function(e) {
+#                       stop(e)
+#                       })
+#
+# # Source data and functions
+# source("datap.r")
+# # Done.
+# rm("depends", "files", "pkg")
+#
+# solutionSpace <- function(envir, count = 10000, insbound,
+#                           vaccbound = c(0.94),
+#                           len, grp = c(1, 1), offset = 600) {
+#   # A function to perform a whole grid search on the hyperparmeters
+#   # ins and vacc, with the domain of the cartesian space defined by insbound
+#   # and vaccbound respectively.
+#   # The modelling subroutine is parallelized through
+#   # foreach and doParallel and will scalwith thread count of the host machine.
+#   # Due to limitations with the doParallel package, virtualized systems may
+#   # fail to create a cluster.
+#   # Args :
+#   #   envir     : (env)ironment where the model parameters can be found
+#   #   count     : (int) the number of simulations to run for each point
+#   #   insbound  : (numeric vector) domain of "ins" to search
+#   #   vaccbound : (numeric vector) domain of "vacc" to search
+#   #   len       : (int) length of each model run in days
+#   #   grp       : (numeric vector) signifying what group will get introductions
+#   #              ex. c(1,0) = Only "young" cases will be introduced
+#   #                  c(0,1) = Only "old" cases will be introduced
+#   #                  c(1,1) = both "young" and "old" cases will be introduced
+#   #                  c(n,m) = both will be introduced with some weights n and m
+#   #   offset    : (int) length to append to the end of `len` to overrun the
+#   #               simulation can also be used to determine endemic spread.
+#   # Returns :
+#   #     output : (data.table) three column data.table containing the maximum
+#   #              outbreak observed given each value of "ins" and "vacc" as inputs
+#   #---Check parameters-----------------------------------------------
+#   # Check provided Args
+#   .vars <- c("init.values", "transitions", "parameters", "RateF")
+#   stopifnot(any(.vars %in% ls(envir)), is.environment(envir),
+#             (length(count) == 1 && count > 0), is.vector(insbound),
+#             is.vector(vaccbound), !is.null(len),
+#             (is.vector(grp) && length(grp) == 2 && !any(grp < 0)),
+#             !any(insbound < 0), !any(vaccbound < 0))
+#
+#   #---Initialize parameters-------------------------------------------
+#   # TODO : Is this the best way to deal with parameters?
+#   fun_list <- list(init = get("init.values", envir = envir),
+#                    t = get("transitions", envir = envir),
+#                    rf = get("RateF", envir = envir),
+#                    p = get("parameters", envir = envir))
+#   #---Set the end time for the case introductions to be the given length-
+#   fun_list$p["end.time"] <- len
+#   #---Overrun the time period specified to avoid infected persons left at end
+#   len <- len + offset
+#   #---Fix to avoid FP issues-----------------------------------------------
+#   output <- data.table(ins = integer(), vacc = integer(), max = integer())
+#   mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
+#   # Assign what group gets introductions
+#   # TODO : Does this make sense
+#     fun_list$p["grp.yng"] <- grp[1]
+#     fun_list$p["grp.old"] <- grp[2]
+#   maxl <- integer()
+#   #---Initialize parallel backend-------------------------------------
+#   tryCatch(cl <- makeCluster(detectCores(logical = FALSE), type = "PSOCK"),
+#            error = function(e) {
+#              stop(paste0("Error making cluster - ", e))
+#            })
+#   tryCatch(registerDoParallel(cl), error = function(e) {
+#     stop(paste0("Error registering cluster - ", e))
+#   })
+#   #---Stop cluster on exit--------------------------------------------
+#   on.exit(stopCluster())
+#   on.exit(closeAllConnections())
+#   #---Define function subroutines-------------------------------------
+#   mod_sub <- function() {
+#     # Batch model run subroutine
+#     # Takes in the parameters provided in the parent environment and runs several
+#     # simulations with ssa.adpativetau in parallel using the foreach package
+#     # Args :
+#     #   None
+#     # Input :
+#     #   cl : (cluster) created with the makeCluster() function in the parent
+#     #        environment
+#     # Returns :
+#     #   mod_run : (data.table) containing model data from all iterations
+#     #---Assign parameters being checked------------------------
+#     fun_list$p["introduction.rate"] <- coord[1]
+#     fun_list$p["vacc.pro"] <- coord[2]
+#     #---Model in parallel--------------------------------------
+#     mod_run <- foreach(i = 1:count,
+#                        .packages = "adaptivetau",
+#                        .combine = "rbind",
+#                        .export = "len") %dopar% {
+#                 # Run several iteration of the model and append into data.frame
+#                 out <- ssa.adaptivetau(fun_list$init,
+#                                            fun_list$t,
+#                                            fun_list$rf,
+#                                            fun_list$p,
+#                                            len)
+#                 out <- cbind(out, I = rowSums(out[, c("I1", "I2")]), iter = i)
+#                 out <- out[, c("time", "I", "iter"), drop = FALSE]
+#                 out
+#               }
+#     #---Return as data.table to parent environment-------------
+#     mod_run <<- as.data.table(mod_run)
+#   }
+#
+#   ed_sub <- function() {
+#     # Outbreak length subroutine
+#     # analyzes the model output from the calling enviroment to determine the maximum
+#     # outbreak length out of the simulations
+#     # It does this by running a C++ routine to return the "roots" of an outbreak,
+#     # and calculating the distance between those points.
+#     # For systems with a large thread count, a parallel implementation with
+#     # the foreach package may have some benefit.
+#     # Args :
+#     #   None
+#     # Input :
+#     #   mod_run : (data.table) the output from mod_sub in the parent environment
+#     # Returns :
+#     #   maxl : (int) maximum outbreak time out of the model data provided, stored
+#     #         in the parent enviroment
+#     #   mod_run : (data.table) appended with a "roots" column
+#
+#     #---init----------------------------------------------------------
+#     # mod_run <- get("mod_run", parent.frame())
+#     tf <- mod_run[nrow(mod_run), "time"]
+#     iter_num <- vector()
+#     proc <- vector()
+#     outbreaks <- vector()
+#     #---Error check for outbreaks that ran over simulation time------
+#     # This would cause errors in the analysis
+#     setkey(mod_run, time)
+#     proc <- mod_run[.(tf)][, I]
+#     if (any(proc != 0)) {
+#       stop("Outbreak ran over simulation at least once, check sim length!")
+#     }
+#     # re-sort to ensure Croots will work correctly
+#     setkey(mod_run, iter, time)
+#     #---Call root finder function on the Infection counts-------------
+#     mod_run[, roots := Croots(I)]
+#     #---The meat of 'er------------------------------------------------
+#     setkey(mod_run, roots)
+#     mat <- mod_run[J(TRUE)] # Take only root
+#     #---Pass time and I columns as vectors for the C++ function to process
+#     outbreaks <- lenFind(mat[, time], mat[, I])
+#     maxl <<- max(outbreaks)
+#   }
+#   #---Cartesian whole grid search-------------------------------------
+#   for (i in 1:length(vaccbound)) {
+#     for (j in 1:length(insbound)){
+#       #---Store value of ins and vacc to be evaluated------------------
+#       coord <- c(insbound[j], vaccbound[i])
+#       mod_sub()
+#       ed_sub()
+#       #---Append coord to output space--------------------------------
+#       # Using the data.table function rbindlist to populate the data.table
+#       output <- rbindlist(list(output, data.frame(ins = insbound[j],
+#                                                   vacc = vaccbound[i],
+#                                                   max = maxl)),
+#                           fill = TRUE)
+#       #---Clear vars for next iteration-------------------------------
+#       mod_run <- NULL
+#       maxl <- NULL
+#     }
+#   }
+#   #---Return results----------------------------------------------------
+#   return(output)
+# }
 
 print("All dependencies loaded.")
 print("Creating New Environment")
@@ -198,11 +198,20 @@ set.seed(1000)
 
 solutions <- new.env()
 print(paste0("Starting Run 1 - ", date()))
-# Standard System openMP benchmark
-solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(swe,
-                              insbound = c(0.01, 0.02),
-                              vaccbound = c(0.90, 0.91),
-                              len = 365))
+# Run 1
+# Sweden model
+# ------------
+# Old and young equally likely to be introduced
+# length = 365 days
+# end lag = 600 days
+# Introduction rates : 0.01-0.1
+# Vaccination rates  : 0.90-0.98
+# Parameter space area : 9x10 = 90
+solutions$t1 <- system.time(solutions$run_1 <- sS(swe,
+                                insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
+                                              0.06, 0.07, 0.08, 0.09, 0.1),
+                                vaccbound = c(0.90, 0.91, 0.92, 0.93,
+                                              0.94, 0.95, 0.96, 0.97, 0.98),
+                                len = 365))
+print("Run 1 finished")
 print(solutions$t1)
-print(done)
-

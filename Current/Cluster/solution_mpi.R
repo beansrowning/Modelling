@@ -10,16 +10,10 @@ require("Rcpp")
 require("Rmpi")
 
 if (!"Croots" %in% ls()) {
-  tryCatch(sourceCpp("../src/Croots.cpp"),
-           error = function(e) {
-             stop(e)
-           })
+  sourceCpp("../src/Croots.cpp")
 }
 if (!"lenFind" %in% ls()) {
-  tryCatch(sourceCpp("../src/lenfind.cpp"),
-           error = function(e) {
-             stop(e)
-             })
+  sourceCpp("../src/lenfind.cpp")
 }
 
 solutionSpace <- function(envir, count = 10000, insbound,
