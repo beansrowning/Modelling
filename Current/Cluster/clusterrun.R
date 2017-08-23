@@ -26,12 +26,16 @@ source("datap.r")
 source("solutionp.R")
 print("All dependencies loaded.")
 
-cl <- startMPIcluster(verbose=TRUE, 
-                      defaultopts = list(chunkSize = 10000/(mpi.comm.size(0) - 1)))
+cl <- getMPIcluster()
 registerDoMPI(cl)
 print(cl)
-
+cs <- list(chunkSize = 10000/(mpi.comm.size(0) - 1)
 set.seed(1000)
+test <- foreach(i = 1:10) %dopar% {
+  paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
+        "of", mpi.comm.size())
+}
+
 solutions <- new.env()
 # Is this thing on?
 # Let's just check that MPI and foreach are playing nicely at all

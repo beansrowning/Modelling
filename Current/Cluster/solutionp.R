@@ -76,6 +76,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
+  chunk <- get("cs", parent.frame())
   #---Stop cluster on exit--------------------------------------------
   # on.exit(stopCluster())
   # on.exit(closeAllConnections())
@@ -98,7 +99,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     mod_run <- foreach(i = 1:count,
                        .packages = "adaptivetau",
                        .combine = "rbind",
-                       .options.mpi = list(chunkSize = 10000/20),
+                       .options.mpi = chunk,
                        .export = "len") %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,
