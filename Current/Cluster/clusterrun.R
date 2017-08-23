@@ -31,13 +31,6 @@ cl <- startMPIcluster(verbose=TRUE,
 registerDoMPI(cl)
 print(cl)
 
-mpi.remote.exec(paste(Sys.info()[['nodename']], Sys.getpid(), mpi.comm.rank(), "of", mpi.comm.size())) 
-test <- foreach(i=1:10,
-                .combine = "c") %dopar% {
-  paste(Sys.info()[['nodename']], Sys.getpid(), mpi.comm.rank(), "of", mpi.comm.size()) 
-}
-print(head(test))
-stopifnot(length(test) == 10000)
 set.seed(1000)
 solutions <- new.env()
 # Is this thing on?
