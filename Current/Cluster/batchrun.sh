@@ -4,4 +4,4 @@
 #$ -q parallel.q
 #$ -pe openmpi 16
 #$ -R y
-mpirun -np 16 bash RMPISNOW --no-save -q -f clusterrun.R
+mpirun -np 16 R --no-save -q -f clusterrun.R
