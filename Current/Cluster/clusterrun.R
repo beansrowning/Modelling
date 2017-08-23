@@ -27,7 +27,7 @@ source("solutionp.R")
 print("All dependencies loaded.")
 
 cl <- startMPIcluster(verbose=TRUE, 
-                      defaultopts = list(chunkSize = 10000/(mpi.comm.size(0) - 1))
+                      defaultopts = list(chunkSize = 10000/(mpi.comm.size(0) - 1)))
 registerDoMPI(cl)
 print(cl)
 test <- foreach(i=1:10000,
@@ -35,7 +35,7 @@ test <- foreach(i=1:10000,
   i^2*10
 }
 print(head(test))
-stopifnot(legnth(test) == 10000)
+stopifnot(length(test) == 10000)
 set.seed(1000)
 solutions <- new.env()
 # Is this thing on?
