@@ -62,7 +62,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Overrun the time period specified to avoid infected persons left at end
   len <- len + offset
   #---Fix to avoid FP issues-----------------------------------------------
-  output <- data.table(ins = integer(), vacc = integer(), max = integer())
+  output <- data.table(ins = integer(), vacc = integer(), max = integer(),
+                       median = integer())
   mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
   fun_list$p["grp.yng"] <- grp[1]
   fun_list$p["grp.old"] <- grp[2]
@@ -167,6 +168,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     #---Pass time and I columns as vectors for the C++ function to process
     outbreaks <- lenFind(mat[, time], mat[, I])
     maxl <<- max(outbreaks)
+    modl <<- median(outbreaks)
   }
   #---Cartesian whole grid search-------------------------------------
   for (i in 1:length(vaccbound)) {
@@ -180,11 +182,13 @@ solutionSpace <- function(envir, count = 10000, insbound,
       # Using the data.table function rbindlist to populate the data.table
       output <- rbindlist(list(output, data.frame(ins = insbound[j],
                                                   vacc = vaccbound[i],
-                                                  max = maxl)),
+                                                  max = maxl,
+                                                  median = modl)),
                           fill = TRUE)
       #---Clear vars for next iteration-------------------------------
       mod_run <- NULL
       maxl <- NULL
+      modl <- NULL
     }
   }
   #---Return results----------------------------------------------------
