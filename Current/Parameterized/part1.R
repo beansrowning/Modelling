@@ -390,6 +390,10 @@ measles_land$t3 <- system.time(measles_land$run_3 <- solutionSpace(measles_land,
                                     sero.p = c(0.96, 0.96)))
 print(paste0("Run 3 done - ", measles_land$t3))
 
+# let's save our progress and be done
+print(paste0("All Done! - ", date()))
+save(measles_land, file="../../Data/gridsearch_part1.dat")
+
 # This is actually looking more reasoable...
 # Now there's a greater question : is the max of the 10000 runs the correct value?
 # or is an average / mode a better estimate? 
@@ -407,8 +411,15 @@ print(paste0("Run 3 done - ", measles_land$t3))
 # Pending the results of those searches, I can narrow in on an appropriate population size
 # ...cluster run failed at 800 offset, increasing to 1200...
 
+# Data from the first grid search is in, and we can see some very large
+# large differences between maximum and median outbreak times. 
+# how do we then define how likely a country is to experience an outbreak ?
 
-# let's save our progress and be done for the night (or the morning as it were)
-print(paste0("All Done! - ", date()))
-save(measles_land, file="../../Data/gridsearch_part1.dat")
+# Maybe by counting the number of iterations that went above whatever threshold?
+# Then again, the question posed was "will not experience and outbreak"
+
+# So let's compromise and say that we accept the maximum in 10,000. But we might
+# need to have some measure of the probability that this occurs (p value, etc).
+
+
 
