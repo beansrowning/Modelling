@@ -400,6 +400,12 @@ print(paste0("Run 3 done - ", measles_land$t3))
 # idea of what to expect looking forward. It certainly seems like there is
 # potential for ~12 mo outbreaks given these parameters around the 330,000 area
 
+# I currently have two grid searches running : 
+# 1. A repeat of the last one which will also append the median (LG30)
+# 2. The same gridspace at 95% seroprevalence instead (in the cluster)
+
+# Pending the results of those searches, I can narrow in on an appropriate population size
+# ...cluster run failed at 800 offset, increasing to 1200...
 
 
 # let's save our progress and be done for the night (or the morning as it were)

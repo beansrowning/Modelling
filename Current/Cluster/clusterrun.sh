@@ -6,4 +6,4 @@
 #$ -R y
 # 1 + number of slaves
 # Run in Spawn mode
-mpirun -np 1 R --no-save -q -f clusterrun.R
+mpirun -np 1 R --vanilla --no-save -q -f clusterrun.R

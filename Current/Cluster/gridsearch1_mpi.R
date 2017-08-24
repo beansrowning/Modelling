@@ -154,6 +154,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
       save(mod_run, file = paste0("fail", i, j, ".dat"), compress = "bzip2")
       cat(date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
           "Outbreak ran over simulation at least once, check sim length!", "\n")
+      #---Remember to assign some values here or it will halt----------
+      maxl <- NA
+      modl <- NA
       return()
       }
     }

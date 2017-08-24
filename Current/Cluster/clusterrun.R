@@ -1,4 +1,4 @@
-require("Rmpi")
+# require(Rmpi)
 require(doMPI)
 # Make Cluster
 cl <- startMPIcluster(16, comm = 1)
@@ -23,7 +23,7 @@ print("All dependencies loaded.")
 
 
 set.seed(1000)
-test <- foreach(i = 1:mpi.comm.size()) %dopar% {
+foreach(i = 1:mpi.comm.size()) %dopar% {
   paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
         "of", mpi.comm.size())
 }
@@ -46,8 +46,8 @@ measles_land$t3 <- system.time(measles_land$run_3 <- solutionSpace(measles_land,
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
-                                    # let's try 800 again
-                                    offset = 800,
+                                    # no dice
+                                    offset = 1200,
                                     sero.p = c(0.95, 0.95)))
 print(paste0("Run 3 done - ", measles_land$t3))
 
