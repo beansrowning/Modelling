@@ -22,7 +22,7 @@ kyrgyz$transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", 
 
 # Kyrgyzstan
 kyrgyz$parameters <- c(
-  R0 = 16, # TODO : Don't use R0
+  R0 = 16,
   infectious.period = 7, # days
   latent.period = 8,     # days
   vacc.pro = 0.95,       # proportion vacc at birth
