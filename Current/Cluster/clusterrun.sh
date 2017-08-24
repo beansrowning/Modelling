@@ -5,4 +5,5 @@
 #$ -pe openmpi 17
 #$ -R y
 # 1 + number of slaves
-mpirun -np 17 R --no-save -q -f clusterrun.R
+# Run in Spawn mode
+mpirun -np 1 R --no-save -q -f clusterrun.R
