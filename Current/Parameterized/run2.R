@@ -127,8 +127,8 @@ threedPlot(measles_land,
            title = "Grid Search Run 1 : 90% Seroprevalence")
 measles_land$p1 <- measles_land$plot
 measles_land$p_d1 <- measles_land$plot_dat
-rm(plot_dat, enivr = measles_land)
-rm(plot, enivr = measles_land)
+rm(plot_dat, envir = measles_land)
+rm(plot, envir = measles_land)
 # let's save our progress and be done
 print(paste0("All Done! - ", date()))
 save(measles_land, file="../../Data/gridsearch1_part2.dat")
