@@ -221,7 +221,8 @@ rm(trial_run)
 # Now to the question at hand : What is the smallest population size which can
 # sustain no measles transmission following case importation at 12 mo, 24 mo, 36 mo.
 
-# Let's start at 12.
+# Let's start at 12. 
+# (we can actually look at all of them by running the model longer)
 # -------------------
 
 # Now we will want to consider a grid space comprising different population sizes
@@ -273,7 +274,7 @@ get_popvalues <- function(vec, young = 0.16, sero.p = c(0.9,0.9)) {
   # compartments of both populations for each value i the vector
   # Args :
   #   vec   : (Numeric Vector) of total population values being searched for
-  #   young : (int) of the percentage comprising the young compartments of the model
+  #   young : (int) the percentage comprising the young compartments of the model
   #   sero.p: (Numeric Vector) of the seroprevalence in the young and old compartments
   # Returns :
   #   out : (list) containg all values of S and R to be assigned in the search
@@ -300,7 +301,7 @@ print(popvalues)
 print(popvalues[[1]])
 print(popvalues[[1]]$S2)
 #Sys.sleep(10)
-# Wow. I can't believe I got that working the first go.
+# Wow. I can't believe I got that working on the first go.
 rm(popvalues)
 # I took the liberty of fixing up the gridsearch function to work with this routine
 # and now we can load that up and begin.
@@ -329,43 +330,38 @@ measles_land$t1 <- system.time(measles_land$run_1 <- solutionSpace(measles_land,
                                     offset = 1200))
 print(paste0("Run 1 done - ", measles_land$t1))
 
+# as It's now going on the 9th hour waiting for this to finish, and I had
+# issues with outbreaks overrunning the sim with the offset at 800, I think the
+# other two models upping the introduction rate are overkill.
+
+# What is probably better is to up the seoprevalence estimate in both groups
+# by some small amount to see how that affects the output. Hopefully it will not
+# take nearly as long
+
+# I also had to update the gridsearch function to pass more arguments to the
+# get_popvalues() function internally. That way we can change things like
+# baseline seroprevalence from one call.
+
 # Run 2
 #-------
 # Testing initial population size and effective vaccination rate on outbreak length
 # Population sizes : 300,000 - 500,000 by 10,000
 # Vaccination rates : 0.90 - 1 by 0.01
-# Case introduction rate : 0.05 (approximately 1 per 20 days)
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
 # Equal introduction likelihood in either group
 # Total grid area: 21 x 11 = 231
 print(paste0("Begining Run 2 - ", date()))
-measles_land$parameters["introduction.rate"] <- 0.05
+measles_land$parameters["introduction.rate"] <- 0.01
 measles_land$t2 <- system.time(measles_land$run_2 <- solutionSpace(measles_land,
                                     insbound = seq(300000, 500000, 10000),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
-                                    # And just to be on the /really/ safe side...
-                                    offset = 1200))
+                                    # let's try 800 again
+                                    offset = 800,
+                                    sero.p = c(0.92, 0.92))
 print(paste0("Run 2 done - ", measles_land$t2))
-
-# Run 3
-#-------
-# Testing initial population size and effective vaccination rate on outbreak length
-# Population sizes : 300,000 - 500,000 by 10,000
-# Vaccination rates : 0.90 - 1 by 0.01
-# Case introduction rate : 0.1 (approximately 1 per 10 days)
-# Equal introduction likelihood in either group
-# Total grid area: 21 x 11 = 231
-print(paste0("Begining Run 3 - ", date()))
-measles_land$parameters["introduction.rate"] <- 0.1
-measles_land$t3 <- system.time(measles_land$run_3 <- solutionSpace(measles_land,
-                                    insbound = seq(300000, 500000, 10000),
-                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
-                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
-                                    len = 365,
-                                    # And just to be on the /really/ safe side...
-                                    offset = 1200))
-print(paste0("Run 3 done - ", measles_land$t3))
 
 # let's save our progress and be done for the night (or the morning as it were)
 print(paste0("All Done! - ", date()))

@@ -17,7 +17,7 @@ sourceCpp("../src/lenfind.cpp")
 
 solutionSpace <- function(envir, count = 10000, insbound,
                           vaccbound = c(0.94),
-                          len, grp = c(1, 1), offset = 600) {
+                          len, grp = c(1, 1), offset = 600, ...) {
   # A function to perform a whole grid search on the hyperparmeters
   # ins and vacc, with the domain of the cartesian space defined by insbound
   # and vaccbound respectively.
@@ -38,6 +38,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #                  c(n,m) = both will be introduced with some weights n and m
   #   offset    : (int) length to append to the end of `len` to overrun the
   #               simulation can also be used to determine endemic spread.
+  #   ...       : Additional arguments to pass to get_popvalues()
   # Returns :
   #     output : (data.table) three column data.table containing the maximum
   #              outbreak observed given each value of "ins" and "vacc" as inputs
@@ -67,7 +68,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
   #---Get population values for part 1--------------------------------
-  popvalues <- get_popvalues(insbound)
+  popvalues <- get_popvalues(insbound, ...)
   #---Initialize parallel backend-------------------------------------
   gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
   cl <- makeCluster(detectCores(logical = TRUE), type = gettype)
@@ -93,6 +94,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     fun_list$init["R1"] <- as.integer(popvalues[[j]]$R1)
     fun_list$init["R2"] <- as.integer(popvalues[[j]]$R2)
     fun_list$p["vacc.pro"] <- coord[2]
+    cat(" ...Modelling")
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
                        .packages = "adaptivetau",
@@ -135,17 +137,25 @@ solutionSpace <- function(envir, count = 10000, insbound,
     iter_num <- vector()
     proc <- vector()
     outbreaks <- vector()
+    cat(" Analyzing", "\n")
     #---Error check for outbreaks that ran over simulation time------
     # This would cause errors in the analysis
     setkey(mod_run, time)
     proc <- mod_run[.(tf)][, I]
     if (any(proc != 0)) {
-      #---Push whatever progress we have at this point-------------------------
+      #---Let's try to up the length by just 100 before giving up------
+      len <- len + 100
+      mod_sub()
+      setkey(mod_run, time)
+      proc <- mod_run[.(tf)][, I]
+      if (any(proc != 0)) {
+      #---Better to just dump what we have and move on-----------------
       save(output, file = paste0("bailout", i, j, ".dat"))
       save(mod_run, file = paste0("fail", i, j, ".dat"))
-      warning(paste0("In ", vaccbound[i]," - ", insbound[j],
-                  " Outbreak ran over simulation at least once, check sim length!"))
+      cat(date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
+          "Outbreak ran over simulation at least once, check sim length!", "\n")
       break
+      }
     }
     # re-sort to ensure Croots will work correctly
     setkey(mod_run, iter, time)
@@ -163,6 +173,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     for (j in 1:length(insbound)){
       #---Store value of ins and vacc to be evaluated------------------
       coord <- c(insbound[j], vaccbound[i])
+      cat(date(), ": Running :",vaccbound[i], "-", insbound[j])
       mod_sub()
       ed_sub()
       #---Append coord to output space--------------------------------
