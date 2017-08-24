@@ -104,7 +104,7 @@ set.seed(1000)
 # Equal introduction likelihood in either group
 # Total grid area: 21 x 11 = 231
 # Trying reduced depth : 5000 (simulations way too long to start at 10K)
-print(paste0("Begining Run 3 - ", date()))
+print(paste0("Begining Run 1 - ", date()))
 measles_land$parameters["introduction.rate"] <- 0.01
 measles_land$parameters["start.time"] <- 0
 measles_land$parameters["end.time"] <- 365
