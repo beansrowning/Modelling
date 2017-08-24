@@ -110,6 +110,7 @@ measles_land$parameters["introduction.rate"] <- 0.01
 measles_land$parameters["start.time"] <- 0
 measles_land$parameters["end.time"] <- 365
 measles_land$t94 <- system.time(measles_land$run_94 <- solutionSpace(measles_land,
+                                    count = 2000,
                                     insbound = seq(300000, 500000, 10000),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
