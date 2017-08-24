@@ -149,11 +149,11 @@ solutionSpace <- function(envir, count = 10000, insbound,
       proc <- mod_run[.(tf)][, I]
       if (any(proc != 0)) {
       #---Better to just dump what we have and move on-----------------
-      save(output, file = paste0("bailout", i, j, ".dat"))
-      save(mod_run, file = paste0("fail", i, j, ".dat"))
+      save(output, file = paste0("bailout", i, j, ".dat"), compress = "bzip2")
+      save(mod_run, file = paste0("fail", i, j, ".dat"), compress = "bzip2")
       cat(date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
           "Outbreak ran over simulation at least once, check sim length!", "\n")
-      break
+      return()
       }
     }
     # re-sort to ensure Croots will work correctly

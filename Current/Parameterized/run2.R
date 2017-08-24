@@ -113,7 +113,7 @@ measles_land$t2 <- system.time(measles_land$run_2 <- solutionSpace(measles_land,
                                     len = 365,
                                     # let's try 800 again
                                     offset = 800,
-                                    sero.p = c(0.92, 0.92))
+                                    sero.p = c(0.92, 0.92)))
 print(paste0("Run 2 done - ", measles_land$t2))
 
 # let's save our progress and be done
