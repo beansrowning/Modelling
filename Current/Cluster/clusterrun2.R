@@ -39,10 +39,11 @@ set.seed(1000)
 # Case introduction rate : 0.01 (approximately 1 per 100 days)
 # Equal introduction likelihood in either group
 # Total grid area: 21 x 11 = 231
-# Will adjust depth accordingly
+# Trying 2000
 print(paste0("Begining Run 3 - ", date()))
 measles_land$parameters["introduction.rate"] <- 0.01
 measles_land$t4 <- system.time(measles_land$run_4 <- solutionSpace(measles_land,
+				    count = 1000,
                                     insbound = seq(300000, 500000, 10000),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
