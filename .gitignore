@@ -2,6 +2,7 @@
 # R Studio
 *.Rproj
 **/.Rproj.user
+*.Rprofile
 *.Rhistory
 # LSHTM environment
 *.bat

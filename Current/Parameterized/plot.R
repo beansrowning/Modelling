@@ -1,7 +1,7 @@
 require(plotly)
 require(data.table)
 
-3dPlot <- function(envir, data, variables, xlab = "x",
+threedPlot <- function(envir, data, variables, cutoff = 365, xlab = "x",
                    ylab = "y", zlab = "z", title = "") {
   # A function to generate 3D plots in plotly from gridsearch runs
   # Uses makeplotdat function and plot_ly to produce both graph data
@@ -9,7 +9,7 @@ require(data.table)
   # Args :
   #   TODO : This
   # Returns :
-  
+
   stopifnot(is.data.table(data),
             is.vector(variables) && length(variables) > 0 && is.character(variables),
             is.environment(envir))
@@ -26,7 +26,7 @@ require(data.table)
     #     x = (numeric vector) values of ins
     #     y = (numeric vector) values of vacc
     #     z = (numeric matrix) x*y values of variable specified
-  
+
     #---Cast data wide and store as a matrix----------
     z <- dcast(dat, vacc ~ ins, value.var = zedd)
     z <- z[, vacc := NULL]
@@ -37,11 +37,12 @@ require(data.table)
                 z = z))
   }
   #---Initialize-----------------------------------------------------
-  plot_dat <- makeplotdat(data,variables[1])
+  plot_dat <- makeplotdat(data, variables[1])
   newz <- matrix()
+  mask <- matrix(cutoff, nrow = nrow(plot_dat$z), ncol = ncol(plot_dat$z))
   #---And Plot-------------------------------------------------------
   plot <- plot_ly(x = plot_dat$x, y = plot_dat$y) %>%
-                  add_surface(z =plot_dat$z) %>%
+                  add_surface(z = plot_dat$z) %>%
                   layout(title = title,
                          scene = list(xaxis = list(title = xlab),
                                       yaxis = list(title = ylab),
@@ -50,10 +51,12 @@ require(data.table)
   if (length(variables) > 1) {
     for (i in 2:length(variables)) {
       newz <- makeplotdat(data, variables[i])$z
-      assign(paste0("plot_dat$z",i), newz)
+      assign(paste0("plot_dat$z", i), newz)
       plot <- plot %>% add_surface(z = newz)
     }
   }
+  #---Add a cutoff to show roughly what values are relevant-----------
+  plot <- plot %>% add_surface(z = mask, showscale = FALSE)
   #---Return data-----------------------------------------------------
   assign("plot", plot, envir)
   assign("plot_dat", plot_dat, envir)
