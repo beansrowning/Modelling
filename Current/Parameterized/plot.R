@@ -39,7 +39,6 @@ threedPlot <- function(envir, data, variables, cutoff = 365, xlab = "x",
   #---Initialize-----------------------------------------------------
   plot_dat <- makeplotdat(data, variables[1])
   newz <- matrix()
-  mask <- matrix(cutoff, nrow = nrow(plot_dat$z), ncol = ncol(plot_dat$z))
   #---And Plot-------------------------------------------------------
   plot <- plot_ly(x = plot_dat$x, y = plot_dat$y) %>%
                   add_surface(z = plot_dat$z) %>%
@@ -56,7 +55,11 @@ threedPlot <- function(envir, data, variables, cutoff = 365, xlab = "x",
     }
   }
   #---Add a cutoff to show roughly what values are relevant-----------
-  plot <- plot %>% add_surface(z = mask, showscale = FALSE)
+  if (!is.null(cutoff)) {
+    mask <- matrix(cutoff, nrow = nrow(plot_dat$z), ncol = ncol(plot_dat$z))
+    plot <- plot %>% add_surface(z = mask, showscale = FALSE)
+  }
+
   #---Return data-----------------------------------------------------
   assign("plot", plot, envir)
   assign("plot_dat", plot_dat, envir)
