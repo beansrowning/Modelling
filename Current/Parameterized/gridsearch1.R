@@ -63,12 +63,11 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Fix to avoid FP issues-----------------------------------------------
   output <- data.table(ins = integer(), vacc = integer(), max = integer())
   mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
-  popvalues <- list()
   fun_list$p["grp.yng"] <- grp[1]
   fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
   #---Get population values for part 1--------------------------------
-  get_popvalues(insbound)
+  popvalues <- get_popvalues(insbound)
   #---Initialize parallel backend-------------------------------------
   gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
   cl <- makeCluster(detectCores(logical = TRUE), type = gettype)
@@ -89,10 +88,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
     # Returns :
     #   mod_run : (data.table) containing model data from all iterations
     #---Assign parameters being checked------------------------
-    fun_list$init["S1"] <- popvalues[[j]]$S1
-    fun_list$init["S2"] <- popvalues[[j]]$S2
-    fun_list$init["R1"] <- popvalues[[j]]$R1
-    fun_list$init["R2"] <- popvalues[[j]]$R2
+    fun_list$init["S1"] <- as.integer(popvalues[[j]]$S1)
+    fun_list$init["S2"] <- as.integer(popvalues[[j]]$S2)
+    fun_list$init["R1"] <- as.integer(popvalues[[j]]$R1)
+    fun_list$init["R2"] <- as.integer(popvalues[[j]]$R2)
     fun_list$p["vacc.pro"] <- coord[2]
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
@@ -141,7 +140,12 @@ solutionSpace <- function(envir, count = 10000, insbound,
     setkey(mod_run, time)
     proc <- mod_run[.(tf)][, I]
     if (any(proc != 0)) {
-      stop("Outbreak ran over simulation at least once, check sim length!")
+      #---Push whatever progress we have at this point-------------------------
+      save(output, file = paste0("bailout", i, j, ".dat"))
+      save(mod_run, file = paste0("fail", i, j, ".dat"))
+      warning(paste0("In ", vaccbound[i]," - ", insbound[j],
+                  " Outbreak ran over simulation at least once, check sim length!"))
+      break
     }
     # re-sort to ensure Croots will work correctly
     setkey(mod_run, iter, time)

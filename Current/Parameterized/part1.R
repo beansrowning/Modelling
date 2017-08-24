@@ -183,7 +183,7 @@ trial_run <- ssa.adaptivetau(measles_land$init.values, measles_land$transitions,
 str(trial_run)
 head(trial_run)
 tail(trial_run)
-Sys.sleep(10)
+#Sys.sleep(10)
 # with new case introduction :
 # both age groups, starting at time 0, ending at 365, overrunning until 1000
 # all of these assignments will be done by a function, but we can always do it
@@ -198,7 +198,7 @@ measles_land$RateF, measles_land$parameters, 1000)
 str(trial_run)
 head(trial_run)
 tail(trial_run)
-Sys.sleep(10)
+#Sys.sleep(10)
 # Now just with case introduction in the old compartment, waiting one year before
 # new case introduction, and still going until 1000 :
 measles_land$parameters["grp.yng"] <- 0
@@ -209,7 +209,7 @@ measles_land$RateF, measles_land$parameters, 1000)
 str(trial_run)
 head(trial_run)
 tail(trial_run)
-Sys.sleep(10)
+#Sys.sleep(10)
 # If all that went well, let's delete that data and reset those values :
 measles_land$parameters["introduction.rate"] <- 0
 measles_land$parameters["start.time"] <- 0
@@ -217,7 +217,7 @@ measles_land$parameters["end.time"] <- 0
 measles_land$parameters["grp.yng"] <- 0
 measles_land$parameters["grp.old"] <- 0
 rm(trial_run)
-Sys.sleep(10)
+#Sys.sleep(10)
 # Now to the question at hand : What is the smallest population size which can
 # sustain no measles transmission following case importation at 12 mo, 24 mo, 36 mo.
 
@@ -269,14 +269,14 @@ Sys.sleep(10)
 get_popvalues <- function(vec, young = 0.16, sero.p = c(0.9,0.9)) {
   # This routine creates the inital values for our SEIR model
   # by taking in the raw population number in vector format
-  # and outputting a vector containing the values of the S and R
+  # and outputting a list containing the values of the S and R
   # compartments of both populations for each value i the vector
   # Args :
   #   vec   : (Numeric Vector) of total population values being searched for
   #   young : (int) of the percentage comprising the young compartments of the model
   #   sero.p: (Numeric Vector) of the seroprevalence in the young and old compartments
   # Returns :
-  #   popvalues : (Numeric Vector) containg all values of S and R to be assigned in the search
+  #   out : (list) containg all values of S and R to be assigned in the search
 
   #---Skipping some of the checks, don't break it-----------------
   stopifnot(is.vector(vec), length(young) == 1,
@@ -291,15 +291,15 @@ get_popvalues <- function(vec, young = 0.16, sero.p = c(0.9,0.9)) {
                      R2 = vec[i] * (1 - young) * sero.p[2])
   }
   #---Return to parent frame for access in a function-------------
-  popvalues <<- out
+  return(out)
 }
 
 # with that, we should be good to go. Doesn't hurt to test it at least once though.
-get_popvalues(c(300000, 310000, 320000, 330000))
+popvalues <- get_popvalues(c(300000, 310000, 320000, 330000))
 print(popvalues)
 print(popvalues[[1]])
 print(popvalues[[1]]$S2)
-Sys.sleep(10)
+#Sys.sleep(10)
 # Wow. I can't believe I got that working the first go.
 rm(popvalues)
 # I took the liberty of fixing up the gridsearch function to work with this routine
@@ -318,7 +318,7 @@ measles_land$parameters["start.time"] <- 0
 # Case introduction rate : 0.01 (approximately 1 per 100 days)
 # Equal introduction likelihood in either group
 # Total grid area: 21 x 11 = 231
-print(paste0("Beinging Run 1 - ", date()))
+print(paste0("Begining Run 1 - ", date()))
 measles_land$parameters["introduction.rate"] <- 0.01
 measles_land$t1 <- system.time(measles_land$run_1 <- solutionSpace(measles_land,
                                     insbound = seq(300000, 500000, 10000),
@@ -326,7 +326,7 @@ measles_land$t1 <- system.time(measles_land$run_1 <- solutionSpace(measles_land,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     # And just to be on the /really/ safe side...
-                                    offset = 800))
+                                    offset = 1200))
 print(paste0("Run 1 done - ", measles_land$t1))
 
 # Run 2
@@ -337,7 +337,7 @@ print(paste0("Run 1 done - ", measles_land$t1))
 # Case introduction rate : 0.05 (approximately 1 per 20 days)
 # Equal introduction likelihood in either group
 # Total grid area: 21 x 11 = 231
-print(paste0("Beinging Run 2 - ", date()))
+print(paste0("Begining Run 2 - ", date()))
 measles_land$parameters["introduction.rate"] <- 0.05
 measles_land$t2 <- system.time(measles_land$run_2 <- solutionSpace(measles_land,
                                     insbound = seq(300000, 500000, 10000),
@@ -345,7 +345,7 @@ measles_land$t2 <- system.time(measles_land$run_2 <- solutionSpace(measles_land,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     # And just to be on the /really/ safe side...
-                                    offset = 800))
+                                    offset = 1200))
 print(paste0("Run 2 done - ", measles_land$t2))
 
 # Run 3
@@ -356,7 +356,7 @@ print(paste0("Run 2 done - ", measles_land$t2))
 # Case introduction rate : 0.1 (approximately 1 per 10 days)
 # Equal introduction likelihood in either group
 # Total grid area: 21 x 11 = 231
-print(paste0("Beinging Run 3 - ", date()))
+print(paste0("Begining Run 3 - ", date()))
 measles_land$parameters["introduction.rate"] <- 0.1
 measles_land$t3 <- system.time(measles_land$run_3 <- solutionSpace(measles_land,
                                     insbound = seq(300000, 500000, 10000),
@@ -364,7 +364,7 @@ measles_land$t3 <- system.time(measles_land$run_3 <- solutionSpace(measles_land,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     # And just to be on the /really/ safe side...
-                                    offset = 800))
+                                    offset = 1200))
 print(paste0("Run 3 done - ", measles_land$t3))
 
 # let's save our progress and be done for the night (or the morning as it were)
