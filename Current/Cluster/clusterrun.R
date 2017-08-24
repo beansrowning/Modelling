@@ -51,7 +51,7 @@ measles_land$t3 <- system.time(measles_land$run_3 <- solutionSpace(measles_land,
                                     sero.p = c(0.95, 0.95)))
 print(paste0("Run 3 done - ", measles_land$t3))
 
-save(measle_land, file = "../../Data/hpc_3_95.dat")
+save(measles_land, file = "../../Data/hpc_3_95.dat")
 print(paste0("Done. - ", date()))
 closeCluster(cl)
 mpi.quit()
