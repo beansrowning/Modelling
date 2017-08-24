@@ -1,4 +1,4 @@
-require(Rmpi)
+require("Rmpi")
 require(doMPI)
 # Make Cluster
 cl <- startMPIcluster(16, comm = 1)
