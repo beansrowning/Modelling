@@ -9,16 +9,10 @@ require("data.table")
 require("Rcpp")
 
 if (!"Croots" %in% ls()) {
-  tryCatch(sourceCpp("../src/Croots.cpp"),
-           error = function(e) {
-             stop(e)
-           })
+sourceCpp("../src/Croots.cpp")
 }
 if (!"lenFind" %in% ls()) {
-  tryCatch(sourceCpp("../src/lenfind.cpp"),
-           error = function(e) {
-             stop(e)
-             })
+sourceCpp("../src/lenfind.cpp")
 }
 
 solutionSpace <- function(envir, count = 10000, insbound,
@@ -74,7 +68,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
   #---Get population values for part 1--------------------------------
-  get_popvalues(insbound) 
+  get_popvalues(insbound)
   #---Initialize parallel backend-------------------------------------
   gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
   cl <- makeCluster(detectCores(logical = TRUE), type = gettype)
@@ -95,10 +89,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
     # Returns :
     #   mod_run : (data.table) containing model data from all iterations
     #---Assign parameters being checked------------------------
-    fun_list$init["S1"] <- popvalues[j]$S1
-    fun_list$init["S2"] <- popvalues[j]$S2
-    fun_list$init["R1"] <- popvalues[j]$R1
-    fun_list$init["R2"] <- popvalues[j]$R2
+    fun_list$init["S1"] <- popvalues[[j]]$S1
+    fun_list$init["S2"] <- popvalues[[j]]$S2
+    fun_list$init["R1"] <- popvalues[[j]]$R1
+    fun_list$init["R2"] <- popvalues[[j]]$R2
     fun_list$p["vacc.pro"] <- coord[2]
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
