@@ -115,7 +115,7 @@ measles_land$t2 <- system.time(measles_land$run_2 <- solutionSpace(measles_land,
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
-                                    offset = 1200,
+                                    offset = 2000,
                                     sero.p = c(0.92, 0.92)))
 print(paste0("Run 2 done - ", measles_land$t2))
 threedPlot(measles_land,
