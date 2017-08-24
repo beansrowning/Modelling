@@ -1,9 +1,7 @@
-print("Creating New Environment")
-# mpi.spawn.Rslaves(nslaves=15)
 require(Rmpi)
 require(doMPI)
 # Make Cluster
-cl <- getMPIcluster()
+cl <- startMPIcluster()
 registerDoMPI(cl)
 clusterSize(cl)
 print(cl)
@@ -18,14 +16,14 @@ cs <- list(chunkSize = ceiling(10000/(clusterSize(cl) - 1)))
 sourceCpp("../src/Croots.cpp")
 sourceCpp("../src/lenfind.cpp")
 # Source data and functions
-source("datap.r")
+source("data.r")
 source("gridsearch1_mpi.R")
 source("../Parameterized/get_popvalues.R")
 print("All dependencies loaded.")
 
 
 set.seed(1000)
-test <- foreach(i = 1:10) %dopar% {
+test <- foreach(i = 1:mpi.comm.size()) %dopar% {
   paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
         "of", mpi.comm.size())
 }
@@ -50,7 +48,7 @@ measles_land$t2 <- system.time(measles_land$run_2 <- solutionSpace(measles_land,
                                     len = 365,
                                     # let's try 800 again
                                     offset = 800,
-                                    sero.p = c(0.92, 0.92))
+                                    sero.p = c(0.92, 0.92)))
 print(paste0("Run 2 done - ", measles_land$t2))
 
 save(solutions, file = "hpcrun228.dat")
