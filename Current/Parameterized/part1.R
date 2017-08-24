@@ -390,6 +390,18 @@ measles_land$t3 <- system.time(measles_land$run_3 <- solutionSpace(measles_land,
                                     sero.p = c(0.96, 0.96)))
 print(paste0("Run 3 done - ", measles_land$t3))
 
+# This is actually looking more reasoable...
+# Now there's a greater question : is the max of the 10000 runs the correct value?
+# or is an average / mode a better estimate? 
+# perhaps we can just alter the `ed_sub()` function to append both. This shouldn't
+# add too much computation time
+
+# Re-run in progress. Then we can overlay both of the results and get a rough
+# idea of what to expect looking forward. It certainly seems like there is
+# potential for ~12 mo outbreaks given these parameters around the 330,000 area
+
+
+
 # let's save our progress and be done for the night (or the morning as it were)
 print(paste0("All Done! - ", date()))
 save(measles_land, file="../../Data/gridsearch_part1.dat")

@@ -1,7 +1,7 @@
 require(Rmpi)
 require(doMPI)
 # Make Cluster
-cl <- startMPIcluster()
+cl <- startMPIcluster(16, comm = 1)
 registerDoMPI(cl)
 clusterSize(cl)
 print(cl)
@@ -35,7 +35,7 @@ set.seed(1000)
 # Testing initial population size and effective vaccination rate on outbreak length
 # Population sizes : 300,000 - 500,000 by 10,000
 # Vaccination rates : 0.90 - 1 by 0.01
-# Baseline Seroprevalence : 96%
+# Baseline Seroprevalence : 95%
 # Case introduction rate : 0.01 (approximately 1 per 100 days)
 # Equal introduction likelihood in either group
 # Total grid area: 21 x 11 = 231
@@ -48,10 +48,10 @@ measles_land$t3 <- system.time(measles_land$run_3 <- solutionSpace(measles_land,
                                     len = 365,
                                     # let's try 800 again
                                     offset = 800,
-                                    sero.p = c(0.96, 0.96)))
+                                    sero.p = c(0.95, 0.95)))
 print(paste0("Run 3 done - ", measles_land$t3))
 
-save(measle_land, file = "hpcrun228.dat", compress = "gzip")
+save(measle_land, file = "../../Data/hpc_3_95.dat")
 print(paste0("Done. - ", date()))
 closeCluster(cl)
 mpi.quit()
