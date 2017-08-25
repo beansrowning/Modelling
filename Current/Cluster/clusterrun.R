@@ -11,7 +11,7 @@ if (mpi.comm.rank(0) > 0) {
   # Create and register an MPI cluster
   cl <- startMPIcluster()
   registerDoMPI(cl)
-
+}
 clusterSize(cl)
 print(cl)
 require(Rcpp)
