@@ -424,11 +424,11 @@ save(measles_land, file="../../Data/gridsearch_part1.dat")
 
 # By the end of the night, I should have a dat file with the measles_land environment
 # along with the following models :
-# 1. Run 1 - 0.90% seroprevalence - In progress (LG30 PC1) (2000 sims)
-# 2. Run 2 - 0.92% seroprevalence - In progress (HP PC) (2000 sims)
-# 3. Run 3 - 0.94% seroprevalence - In progress (HP PC) (2000 sims)
-# 3. Run 3 - 0.95% seroprevalence - In progress (cluster 1)
-# 4. Run 4 - 0.96% seroprevalence - Done (run 3)
+# 1. Run 1 - 0.90% seroprevalence - Crashed. Will re-run
+# 2. Run 2 - 0.92% seroprevalence - In progress (HP PC) (2000 sims) ETA 12h
+# 3. Run 3 - 0.94% seroprevalence - In progress (HP PC) (2000 sims) ETA 24h
+# 4. Run 4 - 0.95% seroprevalence - Done (In dat file)
+# 5. Run 5 - 0.96% seroprevalence - Done (In dat file)
 
 
 
