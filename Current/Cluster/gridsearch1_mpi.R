@@ -22,7 +22,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   # ins and vacc, with the domain of the cartesian space defined by insbound
   # and vaccbound respectively.
   # The modelling subroutine is parallelized through
-  # foreach and doParallel and will scalewith thread count of the host machine.
+  # foreach and doParallel and will scale with thread count of the host machine.
   # Due to limitations with the doParallel package, virtualized systems may
   # fail to create a cluster.
   # Args :
@@ -155,8 +155,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
       cat(date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
           "Outbreak ran over simulation at least once, check sim length!", "\n")
       #---Remember to assign some values here or it will halt----------
-      maxl <- NA
-      modl <- NA
+      maxl <<- NA
+      modl <<- NA
       return()
       }
     }
