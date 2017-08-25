@@ -4,7 +4,13 @@
 # 10-19 : 4.7%
 # 20-39 : 5.9%
 # 40+ : 0.5%
-
+# When weighted to 2015 population averages:
+#   4.00% 0-19
+#   2.34% 20+
+# Current birth / death values reflect 2000-2005 estimates
+# Consider 2010-2015 birth/death estimates:
+# 9.5 CDR
+# 12 CBR
 swe <- new.env()
 
 swe$init.values <- c(
@@ -24,7 +30,7 @@ swe$transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2
 
 swe$parameters <- c(
   R0 = 16,
-  introduction.rate = 0, # (time to new case introduction)^-1
+  introduction.rate = 0, # (time to new case introduction)
   infectious.period = 7, # days
   latent.period = 8,     # days
   vacc.pro = 0.94,       # proportion vacc at birth
@@ -95,11 +101,11 @@ swe$RateF <- function(x, p, t) {
                       (R2 / 1000) * omega
              ))
 }
-             
-             
-            
- 
- # Measles Land 
+
+
+
+
+ # Measles Land
  # 90% Seroprevalence
  # 300K population
  measles_land <- new.env()
@@ -108,7 +114,7 @@ swe$RateF <- function(x, p, t) {
              E = c(0, 0),
              I = c(0, 0),
              R = c(43200, 226800))
- 
+
  measles_land$transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2"),
  rbind(c("S1", "E1", "I1"), -1, c("E1", "I1", "R1"), +1),
  rbind(c("S1", "R1", "I1", "I2"), +1),
@@ -116,7 +122,7 @@ swe$RateF <- function(x, p, t) {
  rbind(c("S2", "E2", "I2"), -1, c("E2", "I2", "R2"), +1),
  rbind(c("S2", "E2", "I2", "R2"), -1)
  )
- 
+
  measles_land$parameters <- c(
    R0 = 16,
    infectious.period = 7, # days
@@ -163,7 +169,7 @@ swe$RateF <- function(x, p, t) {
               N1 <- S1 + E1 + I1 + R1
               N2 <- S2 + E2 + I2 + R2
               Nt <- N1 + N2
- 
+
               return(c(S1 * beta * (I / Nt), # Young values
                        E1 * f,
                        I1 * gamma,

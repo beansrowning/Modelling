@@ -1,7 +1,7 @@
 require(plotly)
 require(data.table)
 
-threedPlot <- function(data, envir = .GlobalEnv, variables, cutoff = 365, xlab = "x",
+threedPlot <- function(data, envir = .GlobalEnv, variables, cutoff = c(365), xlab = "x",
                    ylab = "y", zlab = "z", title = "") {
   # A function to generate 3D plots in plotly from gridsearch runs
   # Uses makeplotdat function and plot_ly to produce both graph data
@@ -56,8 +56,11 @@ threedPlot <- function(data, envir = .GlobalEnv, variables, cutoff = 365, xlab =
   }
   #---Add a cutoff to show roughly what values are relevant-----------
   if (!is.null(cutoff)) {
-    mask <- matrix(cutoff, nrow = nrow(plot_dat$z), ncol = ncol(plot_dat$z))
-    plot <- plot %>% add_surface(z = mask, opacity = 0.5, showscale = FALSE)
+    for (i in 1:length(cutoff)) {
+      mask <- matrix(cutoff[i], nrow = nrow(plot_dat$z), ncol = ncol(plot_dat$z))
+      plot <- plot %>% add_surface(z = mask, opacity = 0.5, showscale = FALSE)
+    }
+
   }
 
   #---Return data-----------------------------------------------------
