@@ -1,7 +1,17 @@
+# require(Rmpi)
 require(doMPI)
 # Make Cluster
-cl <- startMPIcluster(16, comm = 1)
-registerDoMPI(cl)
+# cl <- startMPIcluster(16, comm = 1)
+# registerDoMPI(cl)
+if (mpi.comm.rank(0) > 0) {
+  # This is a cluster worker
+  cl <- openMPIcluster()
+  dompiWorkerLoop(cl)
+} else {
+  # Create and register an MPI cluster
+  cl <- startMPIcluster()
+  registerDoMPI(cl)
+}
 clusterSize(cl)
 print(cl)
 require(Rcpp)
@@ -11,13 +21,12 @@ require(foreach)
 require(iterators)
 require(data.table)
 
-cs <- list(chunkSize = ceiling(10000/(clusterSize(cl) - 1)))
+cs <- list(chunkSize = ceiling(10000/(getDoParWorkers())))
 sourceCpp("../src/Croots.cpp")
 sourceCpp("../src/lenfind.cpp")
 # Source data and functions
-source("data.r")
-source("gridsearch1_mpi.R")
-source("../Parameterized/get_popvalues.R")
+source("../../Data/model_global.R")
+source("gridsearch2_mpi.R")
 print("All dependencies loaded.")
 
 
@@ -28,32 +37,69 @@ foreach(i = 1:mpi.comm.size()) %dopar% {
         "of", mpi.comm.size())
 }
 
-measles_land$parameters["start.time"] <- 0
 set.seed(1000)
-# Run 4
-#-------
-# Testing initial population size and effective vaccination rate on outbreak length
-# Population sizes : 300,000 - 500,000 by 10,000
-# Vaccination rates : 0.90 - 1 by 0.01
-# Baseline Seroprevalence : 94%
-# Case introduction rate : 0.01 (approximately 1 per 100 days)
-# Equal introduction likelihood in either group
-# Total grid area: 21 x 11 = 231
-# Trying 2000
-print(paste0("Begining Run 3 - ", date()))
-measles_land$parameters["introduction.rate"] <- 0.01
-measles_land$t4 <- system.time(measles_land$run_4 <- solutionSpace(measles_land,
-				    count = 1000,
-                                    insbound = seq(300000, 500000, 10000),
+# Run 1
+# Insertion rates :   0.01-0.1 
+# vaccinations rates: 0.9-1
+# Total grid size : 10 * 11 = 110
+# Search depth : 10,000 runs
+# All other population values fixed
+# Case introduction over the course of 1 year
+# Offest by 2000 days beyond
+solutions <- new.env()
+print(paste0("Begining Run 1 - ", date()))
+solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(swe,
+                                    insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
+                                                 0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
-                                    # no dice
-                                    offset = 1200,
-                                    sero.p = c(0.94, 0.94)))
-print(paste0("Run 4 done - ", measles_land$t4))
+                                    offset = 2000))
+print(paste0("Run 1 done - ", solutions$t1[3]))
+save(solutions, file = "../../Data/gridsearch2.dat")
 
-save(measles_land, file = "../../Data/hpc_3_94.dat")
+# Run 2
+# Insertion rates :   0.01-0.1 
+# vaccinations rates: 0.9-1
+# Total grid size : 10 * 11 = 110
+# Search depth : 10,000 runs
+# All other population values fixed
+# Old persons twice as likely to be introduced
+# Case introduction over the course of 1 year
+# Offest by 2000 days beyond
+print(paste0("Begining Run 2 - ", date()))
+solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(swe,
+                                    insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
+                                                 0.06, 0.07, 0.08, 0.09, 0.1),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    grp = c(0.5, 1),
+                                    offset = 2000))
+print(paste0("Run 2 done - "), solutions$t2[3]))
+save(solutions, file = "../../Data/gridsearch2.dat")
+
+# Run 3
+# Insertion rates :   0.01-0.1 
+# vaccinations rates: 0.9-1
+# Total grid size : 10 * 11 = 110
+# Search depth : 10,000 runs
+# All other population values fixed
+# young persons twice as likely to be introduced
+# Case introduction over the course of 1 year
+# Offest by 2000 days beyond
+print(paste0("Begining Run 3 - ", date()))
+solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(swe,
+                                    insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
+                                                 0.06, 0.07, 0.08, 0.09, 0.1),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    grp = c(1, 05),
+                                    offset = 2000))
+print(paste0("Run 2 done - "), solutions$t2[3]))
+save(solutions, file = "../../Data/gridsearch2.dat")
+
 print(paste0("Done. - ", date()))
 closeCluster(cl)
 mpi.quit()

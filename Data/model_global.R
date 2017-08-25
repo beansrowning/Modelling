@@ -187,6 +187,4 @@ swe$RateF <- function(x, p, t) {
                        (I2 / 1000) * omega,
                        (R2 / 1000) * omega
               ))
- }
- 
- 
+}
