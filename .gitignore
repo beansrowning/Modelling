@@ -21,3 +21,5 @@
 *.plotly
 # VIM
 .viminfo
+# SSH
+/.ssh

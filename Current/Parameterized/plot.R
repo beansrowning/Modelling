@@ -1,7 +1,7 @@
 require(plotly)
 require(data.table)
 
-threedPlot <- function(envir, data, variables, cutoff = 365, xlab = "x",
+threedPlot <- function(data, envir = .GlobalEnv, variables, cutoff = 365, xlab = "x",
                    ylab = "y", zlab = "z", title = "") {
   # A function to generate 3D plots in plotly from gridsearch runs
   # Uses makeplotdat function and plot_ly to produce both graph data
