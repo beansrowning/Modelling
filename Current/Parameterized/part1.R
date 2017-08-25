@@ -426,7 +426,7 @@ save(measles_land, file="../../Data/gridsearch_part1.dat")
 # along with the following models :
 # 1. Run 1 - 0.90% seroprevalence - In progress (LG30 PC1) (2000 sims)
 # 2. Run 2 - 0.92% seroprevalence - In progress (LG30 PC2) (2000 sims)
-# 3. Run 3 - 0.94% seroprevalence - In progress (cluster 2)
+# 3. Run 3 - 0.94% seroprevalence - In progress (LG30 PC3) (2000 sims)
 # 3. Run 3 - 0.95% seroprevalence - In progress (cluster 1)
 # 4. Run 4 - 0.96% seroprevalence - Done (run 3)
 
