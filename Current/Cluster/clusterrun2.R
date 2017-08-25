@@ -1,17 +1,17 @@
 # require(Rmpi)
 require(doMPI)
 # Make Cluster
-# cl <- startMPIcluster(16, comm = 1)
-# registerDoMPI(cl)
-if (mpi.comm.rank(0) > 0) {
-  # This is a cluster worker
-  cl <- openMPIcluster()
-  dompiWorkerLoop(cl)
-} else {
-  # Create and register an MPI cluster
-  cl <- startMPIcluster()
-  registerDoMPI(cl)
-}
+cl <- startMPIcluster(16, comm = 1)
+registerDoMPI(cl)
+# if (mpi.comm.rank(0) > 0) {
+#  # This is a cluster worker
+#  cl <- openMPIcluster()
+#  dompiWorkerLoop(cl)
+#} else {
+#  # Create and register an MPI cluster
+#  cl <- startMPIcluster()
+#  registerDoMPI(cl)
+#}
 clusterSize(cl)
 print(cl)
 require(Rcpp)
@@ -76,7 +76,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(swe,
                                     len = 365,
                                     grp = c(0.5, 1),
                                     offset = 2000))
-print(paste0("Run 2 done - "), solutions$t2[3]))
+print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/gridsearch2.dat")
 
 # Run 3
@@ -97,7 +97,7 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(swe,
                                     len = 365,
                                     grp = c(1, 05),
                                     offset = 2000))
-print(paste0("Run 2 done - "), solutions$t2[3]))
+print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/gridsearch2.dat")
 
 print(paste0("Done. - ", date()))
