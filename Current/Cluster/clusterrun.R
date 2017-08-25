@@ -1,8 +1,17 @@
 # require(Rmpi)
 require(doMPI)
 # Make Cluster
-cl <- startMPIcluster(16, comm = 1)
-registerDoMPI(cl)
+# cl <- startMPIcluster(16, comm = 1)
+# registerDoMPI(cl)
+if (mpi.comm.rank(0) > 0) {
+  # This is a cluster worker
+  cl <- openMPIcluster()
+  dompiWorkerLoop(cl)
+} else {
+  # Create and register an MPI cluster
+  cl <- startMPIcluster()
+  registerDoMPI(cl)
+
 clusterSize(cl)
 print(cl)
 require(Rcpp)
@@ -11,8 +20,12 @@ require(parallel)
 require(foreach)
 require(iterators)
 require(data.table)
-
-cs <- list(chunkSize = ceiling(10000/(clusterSize(cl) - 1)))
+initEnvir <- function() {
+  library(adaptivetau)
+  len <- get("len", parent.frame())
+}
+opts <- list(chunkSize = ceiling(10000/(getDoParWorkers())), 
+              initEnvir = initEnvir)
 sourceCpp("../src/Croots.cpp")
 sourceCpp("../src/lenfind.cpp")
 # Source data and functions
@@ -22,8 +35,9 @@ source("../Parameterized/get_popvalues.R")
 print("All dependencies loaded.")
 
 
+
 set.seed(1000)
-foreach(i = 1:mpi.comm.size()) %dopar% {
+foreach(i = 1:(getDoParWorkers()) %dopar% {
   paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
         "of", mpi.comm.size())
 }

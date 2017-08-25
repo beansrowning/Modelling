@@ -71,7 +71,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Get population values for part 1--------------------------------
   popvalues <- get_popvalues(insbound, ...)
   #---Initialize parallel backend-------------------------------------
-  chunk <- get("cs", parent.frame())
+  opts <- get("opts", parent.frame())
   #---Stop cluster on exit--------------------------------------------
   on.exit(stopCluster())
   on.exit(closeAllConnections())
@@ -99,7 +99,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
                        .packages = "adaptivetau",
                        .combine = "rbind",
                        .export = "len",
-                       .options.mpi = chunk) %dopar% {
+                       .options.mpi = opts) %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,
                                            fun_list$t,
