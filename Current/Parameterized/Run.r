@@ -1,23 +1,36 @@
-source("load.R")
+require(adaptivetau)
+require(data.table)
+require(Rcpp)
+require(parallel)
+require(doParallel)
+require(foreach)
 
-solutions <- new.env()
+source("gridsearch1.R")
+source("get_popvalues.R")
+source("../../Data/model_global.R")
+set.seed(1000)
+# Run 1
+#-------
+# Testing initial population size and effective vaccination rate on outbreak length
+# Population sizes : 300,000 - 500,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 90%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 21 x 11 = 231
+# Trying reduced depth : 2000 (simulations way too long to start at 10K)
+print(paste0("Begining Run 1 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$parameters["start.time"] <- 0
+measles_land$parameters["end.time"] <- 365
+measles_land$t90 <- system.time(measles_land$run_90 <- solutionSpace(measles_land,
+                                    count = 2000,
+                                    insbound = seq(300000, 500000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    sero.p = c(0.94, 0.94)))
+print(paste0("Run 1 done - ", measles_land$t90[3]))
 
-#---First Run-------------------------------------
-# vaccine protection : 94, 95%
-# Rate of introduction : 0.01-0.05
-print(date())
-print("Starting first run")
-solutions$run_1 <- solutionSpace(swe, insbound = seq(0.01, 0.05, 0.01),
-                                 vaccbound = c(0.94, 0.95),
-                                 len = 365)
-print("First run done")
-print(date())
-#---Second Run-------------------------------------
-# vaccine protection : 93-96%
-# Rate of introduction : 0.01-0.08
-solutions$run_2 <- solutionSpace(swe, insbound = seq(0.01, 0.08, 0.01),
-                                 vaccbound = seq(0.93, 0.96, 0.01),
-                                 len = 365)
-print("Second run done")
-print(date())
-print("Done.")
+save(measles_land, file="../../Data/run90.dat")
