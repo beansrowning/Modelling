@@ -21,7 +21,12 @@ require(foreach)
 require(iterators)
 require(data.table)
 
-cs <- list(chunkSize = ceiling(10000/(getDoParWorkers())))
+initEnvir <- function() {
+  library(adaptivetau)
+  len <- get("len", parent.frame())
+}
+opts <- list(chunkSize = ceiling(10000/(getDoParWorkers())),
+             initEnvir = initEnvir)
 sourceCpp("../src/Croots.cpp")
 sourceCpp("../src/lenfind.cpp")
 # Source data and functions
