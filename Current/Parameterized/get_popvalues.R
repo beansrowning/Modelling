@@ -2,7 +2,7 @@ get_popvalues <- function(vec, young = 0.16, sero.p = c(0.9,0.9)) {
   # This routine creates the inital values for our SEIR model
   # by taking in the raw population number in vector format
   # and outputting a list containing the values of the S and R
-  # compartments of both populations for each value i the vector
+  # compartments of both populations for each value i in the vector
   # Args :
   #   vec   : (Numeric Vector) of total population values being searched for
   #   young : (int) the percentage comprising the young compartments of the model

@@ -81,7 +81,7 @@ measles_land$t2_31 <- system.time(measles_land$run_2_31 <- solutionSpace(measles
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     offset = 2000,
-                                    grp = c(1, 1)
+                                    grp = c(1, 1),
                                     sero.p = c(0.92, 0.94)))
 print(paste0("Run 3 done - ", measles_land$t2_31[3]))
 save(measles_land, file="../../Data/worker1.dat")
@@ -105,7 +105,7 @@ measles_land$t2_41 <- system.time(measles_land$run_2_41 <- solutionSpace(measles
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     offset = 2000,
-                                    grp = c(1, 1)
+                                    grp = c(1, 1),
                                     sero.p = c(0.94, 0.92)))
 print(paste0("Run 4 done - ", measles_land$t2_41[3]))
 save(measles_land, file="../../Data/worker1.dat")
