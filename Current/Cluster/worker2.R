@@ -24,6 +24,7 @@ sourceCpp("../src/lenfind.cpp")
 # Source data and functions
 source("../../Data/model_global.R")
 source("gridsearch1_mpi.R")
+source("../Parameterized/get_popvalues.R")
 print("All dependencies loaded.")
 
 # Run 2 mod 1 pt 2
