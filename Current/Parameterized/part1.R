@@ -424,17 +424,21 @@ save(measles_land, file="../../Data/gridsearch_part1.dat")
 
 # By the end of the night, I should have a dat file with the measles_land environment
 # along with the following models :
-# 1. Run 1 - 0.90% seroprevalence - Crashed. Will re-run
-# 2. Run 2 - 0.92% seroprevalence - In progress (HP PC) (2000 sims) ETA 12h
-# 3. Run 3 - 0.94% seroprevalence - In progress (HP PC / cluster) (2000 sims) ETA 24h
-# 4. Run 4 - 0.95% seroprevalence - Done (In dat file)
-# 5. Run 5 - 0.96% seroprevalence - Done (In dat file)
+# 1. Run 1 - 0.90% seroprevalence - Done (In dat file) 2000 depth
+# 2. Run 2 - 0.92% seroprevalence - Done (In dat file) 2000 depth
+# 3. Run 3 - 0.94% seroprevalence - Done (In dat file) 10000 depth
+# 4. Run 4 - 0.95% seroprevalence - Done (In dat file) 10000 depth
+# 5. Run 5 - 0.96% seroprevalence - Done (In dat file) 10000 depth
 
 
 # We will also want to look at more real world countries in Europe to get an
 # idea for how they might look under new case importation
 # Let's start with Sweden since we already have the data for that
 
+# Taking data from UN DESA in 2015: 
+# 1,688,811 Below the age of 15
+# 8,074,754 15+
+# 
 # we will want to vary two things : effective vaccination rate, and case introduction rate
 # We can also look at weighting how likely an old/young case gets inserted into the model 
 # Let's look at a smaller area this time.
@@ -506,5 +510,242 @@ print(paste0("Run 2 done - "), solutions$t2[3]))
 save(solutions, file = "../../Data/gridsearch2.dat")
 print(paste0("All done - ", date()))
 
+# And now we're back...with all the data that we needed up until this point as well!
+# Let's recap what we did: 
+# We took a somewhat open ended question: 
+# what is the largest population size that can avoid a measles outbreak lasting 
+# longer than x many months following new case introduction?
+#
+# and we approached that in two ways: 
+# 1. Fixing our introduction rate, and grid searching population size and MMR vacc rate
+# 2. Fixing our population size (to Sweden), and grid searching introduction rate and  MMR vacc rate
+# 
+# In both of these scenarios, we already did some sensitivity analyses by default:
+# 1. We looked at how outbreak length would vary given different baseline seroprevalence estimates
+# 2. We looked at how changing who is more likely to be introduced as a case (young or old) affected it
+# 
+# It's also of note that we made the young compartment larger in the Sweden Model
+# (19 years v. 15 for the first one)
+#
+# What we didn't consider already was the following:
+# 1. How might the results be different with different introduction rates / 
+#    weighting who gets introduced more frequently / 
+#    different seroprevalence for young and old / Increasing or decreasing population dynamics
+# 2. DIfferent seroprevalence values / different R0 / Different CBR and CDR
+
+# So we might as well do some of that now and see how/if that changes things
+# but maybe we don't run it on all of runs we just did, yeah? Just a few. 
+# Let's also split the grid in half so we can make them run a bit faster on a cluster
+#
+# For the first approach: 
+# Let's test the sensitivity of the results if we did case introduction weighting 
+# like we had in the second one.
+# Since it was seen that 92% baseline seroprevalence had the highest outcomes 
+# we will start with this one. If the results suggest significant differences
+# we can always do other ones as well.
+
+# Run 2 mod 1 pt 1
+#-------
+# Testing sensitivity to more of the older population being measles cases
+# Population sizes : 300,000 - 390,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 10 x 11 = 110
+print(paste0("Begining Run 1 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$t2_1 <- system.time(measles_land$run_2_1 <- solutionSpace(measles_land,
+                                    count = 2000,
+                                    insbound = seq(300000, 390000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    grp = c(0.5, 1),
+                                    sero.p = c(0.92, 0.92)))
+print(paste0("Run 1 done - ", measles_land$t2_1[3]))
+save(measles_land, file="../../Data/worker1.dat")
+
+# Run 2 mod 1 pt 2
+#-------
+# Testing sensitivity to more of the older population being measles cases
+# Population sizes : 400,000 - 500,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 11 x 11 = 121
+print(paste0("Begining Run 1 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$t2_2 <- system.time(measles_land$run_2_2 <- solutionSpace(measles_land,
+                                    count = 2000,
+                                    insbound = seq(400000, 500000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    grp = c(0.5, 1),
+                                    sero.p = c(0.92, 0.92)))
+print(paste0("Run 1 done - ", measles_land$t2_2[3]))
+save(measles_land, file="../../Data/worker2.dat")
 
 
+# Run 2 mod 2 pt 1
+#-------
+# Testing sensitivity to more of the younger population being measles cases
+# Population sizes : 300,000 - 390,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 10 x 11 = 110
+print(paste0("Begining Run 2 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$t2_21 <- system.time(measles_land$run_2_21 <- solutionSpace(measles_land,
+                                    # Reduced search depth:
+                                    count = 2000,
+                                    insbound = seq(300000, 390000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    grp = c(1, 0.5),
+                                    sero.p = c(0.92, 0.92)))
+print(paste0("Run 2 done - ", measles_land$t2_21[3]))
+save(measles_land, file="../../Data/worker1.dat")
+
+# Run 2 mod 2 pt 2
+#-------
+# Testing sensitivity to more of the younger population being measles cases
+# Population sizes : 400,000 - 500,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 11 x 11 = 121
+print(paste0("Begining Run 2 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$t2_22 <- system.time(measles_land$run_2_22 <- solutionSpace(measles_land,
+                                    # Reduced search depth:
+                                    count = 2000,
+                                    insbound = seq(400000, 500000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    grp = c(1, 0.5)
+                                    sero.p = c(0.92, 0.92)))
+print(paste0("Run 2 done - ", measles_land$t2_22[3]))
+save(measles_land, file="../../Data/worker2.dat")
+
+# Next, Let's look at how heterogeny of seroprevalence estimates of the two groups
+# might make a difference. Let's do the same 92% seroprevalence, but toggle having
+# One at 94% instead :
+
+# Run 2 mod 3 pt 1
+#-------
+# Testing sensitivity to higher proportion of younger population seronegative
+# Population sizes : 300,000 - 390,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 10 x 11 = 110
+print(paste0("Begining Run 3 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$t2_31 <- system.time(measles_land$run_2_31 <- solutionSpace(measles_land,
+                                    # Reducded search depth:
+                                    count = 2000,
+                                    insbound = seq(300000, 390000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    grp = c(1, 1)
+                                    sero.p = c(0.92, 0.94)))
+print(paste0("Run 3 done - ", measles_land$t2_31[3]))
+save(measles_land, file="../../Data/worker1.dat")
+
+# Run 2 mod 3 pt 2
+#-------
+# Testing sensitivity to higher proportion of younger population seronegative
+# Population sizes : 400,000 - 500,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 11 x 11 = 121
+print(paste0("Begining Run 3 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$t2_32 <- system.time(measles_land$run_2_32 <- solutionSpace(measles_land,
+                                    # Reducded search depth:
+                                    count = 2000,
+                                    insbound = seq(400000, 500000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    grp = c(1, 1)
+                                    sero.p = c(0.92, 0.94)))
+print(paste0("Run 3 done - ", measles_land$t2_32[3]))
+save(measles_land, file="../../Data/worker2.dat")
+
+# Run 2 mod 4 pt 1
+#-------
+# Testing sensitivity to higher proportion of older population seronegative
+# Population sizes : 300,000 - 390,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 10 x 11 = 110
+print(paste0("Begining Run 4 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$t2_41 <- system.time(measles_land$run_2_41 <- solutionSpace(measles_land,
+                                    # Reducded search depth:
+                                    count = 2000,
+                                    insbound = seq(300000, 390000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    grp = c(1, 1)
+                                    sero.p = c(0.94, 0.92)))
+print(paste0("Run 4 done - ", measles_land$t2_41[3]))
+save(measles_land, file="../../Data/worker1.dat")
+
+# Run 2 mod 4 pt 2
+#-------
+# Testing sensitivity to higher proportion of older population seronegative
+# Population sizes : 400,000 - 500,000 by 10,000
+# Vaccination rates : 0.90 - 1 by 0.01
+# Baseline Seroprevalence : 92%
+# Case introduction rate : 0.01 (approximately 1 per 100 days)
+# Equal introduction likelihood in either group
+# Total grid area: 10 x 11 = 110
+print(paste0("Begining Run 4 - ", date()))
+measles_land$parameters["introduction.rate"] <- 0.01
+measles_land$t2_42 <- system.time(measles_land$run_2_42 <- solutionSpace(measles_land,
+                                    # Reducded search depth:
+                                    count = 2000,
+                                    insbound = seq(400000, 500000, 10000),
+                                    vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                    len = 365,
+                                    offset = 2000,
+                                    grp = c(1, 1)
+                                    sero.p = c(0.94, 0.92)))
+print(paste0("Run 4 done - ", measles_land$t2_42[3]))
+save(measles_land, file="../../Data/worker2.dat")
+
+# So that works out to be 8 tasks total, split between two clusters
+# which, even at a reduced search depth of 2000, is going to take a good while
+# In the mean time, we should be thinking about maybe running the data on countries
+# other than Sweden in the second approach, and then go back to 
+
+# That last part of splitting up tasks manually was complicated even for two systems
+# and short of writing more code to do this for me automatically, or creating a
+# complex MPI-based gridsearch solution, this is the best I'm going to get. 
+
+# Let's lo
