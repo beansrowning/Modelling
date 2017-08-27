@@ -2,11 +2,11 @@
 require(doMPI)
 # Make Cluster
 cl1 <- startMPIcluster(4, comm = 1)
-registerDoMPI(cl)
+registerDoMPI(cl1)
 require(parallel)
 require(foreach)
 require(iterators)
-print(cl)
+print(cl1)
 set.seed(1000)
 foreach(i = 1:(getDoParWorkers())) %dopar% {
   #---Report primary node----------------------
@@ -21,7 +21,8 @@ foreach(i = 1:(getDoParWorkers())) %dopar% {
   foreach(j = 1:(goDoParWorkers())) %dopar% {
     paste(Sys.getpid(), mpi.comm.rank(), "of", mpi.comm.size())
   }
+  closeCluster(paste0("cl", i))
 }
 #---Done-----------
-closeCluster(cl)
+closeCluster(cl1)
 mpi.quit()
