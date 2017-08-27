@@ -17,8 +17,7 @@ foreach(i = 1:(getDoParWorkers())) %dopar% {
   registerDoMPI(paste0("cl",i))
   #---Have those slaves report themselves-------
   foreach(j = 1:(goDoParWorkers())) %dopar% {
-    paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
-    "of", mpi.comm.size())
+    paste(Sys.getpid(), mpi.comm.rank(), "of", mpi.comm.size())
   }
 }
 #---Done-----------
