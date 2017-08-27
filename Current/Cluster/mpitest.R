@@ -9,8 +9,18 @@ require(iterators)
 
 set.seed(1000)
 foreach(i = 1:(getDoParWorkers())) %dopar% {
-  paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
-        "of", mpi.comm.size())
+  #---Report primary node----------------------
+  cat(Sys.info()[["nodename"]], "\n")
+  #---Assign slaves to primary node------------
+  cluster <- startMPIcluster(2, comm = i)
+  assign(paste0("cl",i),cluster, envir = environment())
+  registerDoMPI(paste0("cl",i))
+  #---Have those slaves report themselves-------
+  foreach(j = 1:(goDoParWorkers())) %dopar% {
+    paste(Sys.info()[["nodename"]], Sys.getpid(), mpi.comm.rank(),
+    "of", mpi.comm.size())
+  }
 }
+#---Done-----------
 closeCluster(cl)
 mpi.quit()
