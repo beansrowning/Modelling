@@ -17,7 +17,7 @@ foreach(i = 1:(getDoParWorkers())) %dopar% {
   cluster <- startMPIcluster(2, comm = (i+1))
   assign(paste0("cl", i), cluster, envir = environment())
   registerDoMPI(paste0("cl", i))
-  cat("DoParWorkers : "getDoParWorkers(), "\n")
+  cat("DoParWorkers : ", getDoParWorkers(), "\n")
   #---Have those slaves report themselves-------
   foreach(j = 1:(goDoParWorkers())) %dopar% {
     paste(Sys.getpid(), mpi.comm.rank(), "of", mpi.comm.size())
