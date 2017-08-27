@@ -7,9 +7,8 @@ require(parallel)
 print(cl1)
 set.seed(1000)
 foreach(i = 1:(getDoParWorkers())) %dopar% {
-  paste(Sys.getpid(), mpi.comm.rank(), mpi.comm.size(), "\n", sep = " ") 
+  cat(Sys.getpid(), mpi.comm.rank(), mpi.comm.size(), "\n", sep = " ") 
 }
-mpi.comm.rank(), mpi.comm.size(), "\n")
 foreach(i = 1:(getDoParWorkers())) %dopar% {
   #---Report primary node----------------------
   cat(Sys.info()[["nodename"]],Sys.getpid(), 
