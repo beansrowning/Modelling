@@ -17,7 +17,7 @@ if ("worker2.dat" %in% dir(path = "../../Data/")) {
   load("../../Data/worker2.dat")
 }
 print("All dependencies loaded.")
-.
+
 # # Run 2 mod 1 pt 2
 # #-------
 # # Testing sensitivity to more of the older population being measles cases
