@@ -23,6 +23,7 @@ slavedoWorkers <- function(x) {
   }
   closeCluster(slavecluster)
 }
+mpi.remote.exec(slavedoWorkers, m)
 #---Done-----------
 closeCluster(cl1)
 mpi.quit()
