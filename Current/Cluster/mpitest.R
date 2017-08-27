@@ -2,6 +2,7 @@
 require(doMPI)
 # Spawn R Slaves
 args <- commandArgs(TRUE)
+print(args)
 universe <- as.integer(args[1])
 print(universe)
 n <- (universe - 1) / 3
