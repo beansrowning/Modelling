@@ -3,7 +3,7 @@ require(doMPI)
 # Spawn R Slaves
 # universe <- 13
 # n <- (universe - 1) / 3
-tryCatch(mpi.spawn.Rslaves(4),
+tryCatch(mpi.spawn.Rslaves(nslaves = 4),
          error = function(e) {
           stop(e),
          warning = function(w) {
