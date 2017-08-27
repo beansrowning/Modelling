@@ -1,7 +1,7 @@
 # require(Rmpi)
 require(doMPI)
 # Spawn R Slaves
-print(Rmpi::mpi.unviverse.size())
+print(Rmpi::mpi.universe.size())
 n <- (Rmpi::mpi.universe.size() - 1) / 3
 mpi.spawn.Rslaves(n)
 mpi.remote.exec(print(mpi.comm.rank()))
