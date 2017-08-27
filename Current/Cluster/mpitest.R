@@ -5,7 +5,10 @@ require(doMPI)
 # n <- (universe - 1) / 3
 tryCatch(mpi.spawn.Rslaves(4),
          error = function(e) {
-          stop(e)
+          stop(e),
+         warning = function(w) {
+          warning(w)
+         }
          })
 mpi.remote.exec(print(mpi.comm.rank()))
 
