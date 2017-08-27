@@ -3,7 +3,10 @@ require(doMPI)
 # Spawn R Slaves
 # universe <- 13
 # n <- (universe - 1) / 3
-mpi.spawn.Rslaves(4)
+tryCatch(mpi.spawn.Rslaves(4),
+         error = function(e) {
+          stop(e)
+         })
 mpi.remote.exec(print(mpi.comm.rank()))
 
 #---Define the number of workers we will assign to each slave----
