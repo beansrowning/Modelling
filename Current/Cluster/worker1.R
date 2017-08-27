@@ -1,7 +1,7 @@
 # require(Rmpi)
 require(doMPI)
 # Make Cluster
-cl <- startMPIcluster(16, comm = 1)
+cl <- startMPIcluster(20, comm = 1)
 registerDoMPI(cl)
 
 clusterSize(cl)
