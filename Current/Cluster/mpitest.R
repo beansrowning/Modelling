@@ -1,10 +1,7 @@
 # require(Rmpi)
 require(doMPI)
 # Spawn R Slaves
-args <- commandArgs(TRUE)
-print(args)
-universe <- as.integer(args[1])
-print(universe)
+universe <- 13
 n <- (universe - 1) / 3
 mpi.spawn.Rslaves(n)
 mpi.remote.exec(print(mpi.comm.rank()))
