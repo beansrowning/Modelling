@@ -1,5 +1,5 @@
 # Hyperparameter space mapping
-# Approach 1 : Population Size * Vaccine Rate
+# Approach 2 : Insertion rate * Vaccination Rate
 # Functions: soluntionSpace()
 # Subroutines: mod_sub(), mod_thread(), ed_sub()
 # Consider using Bytecode or JIT compilier
@@ -17,8 +17,8 @@ sourceCpp("../src/lenfind.cpp")
 }
 
 solutionSpace <- function(envir, count = 10000, insbound,
-                          vaccbound = c(0.94),
-                          len, grp = c(1, 1), offset = 600, ...) {
+                          vaccbound = c(0.94), len,
+                          grp = c(1, 1), offset = 600) {
   # A function to perform a whole grid search on the hyperparmeters
   # ins and vacc, with the domain of the cartesian space defined by insbound
   # and vaccbound respectively.
@@ -29,7 +29,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   # Args :
   #   envir     : (env)ironment where the model parameters can be found
   #   count     : (int) the number of simulations to run for each point
-  #   insbound  : (numeric vector) domain of "ins" to search (population size)
+  #   insbound  : (numeric vector) domain of "ins" to search (Insertion Rate)
   #   vaccbound : (numeric vector) domain of "vacc" to search
   #   len       : (int) length of each model run in days
   #   grp       : (numeric vector) signifying what group will get introductions
@@ -39,7 +39,6 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #                  c(n,m) = both will be introduced with some weights n and m
   #   offset    : (int) length to append to the end of `len` to overrun the
   #               simulation can also be used to determine endemic spread.
-  #   ...       : Additional arguments to pass to get_popvalues()
   # Returns :
   #     output : (data.table) three column data.table containing the maximum
   #              outbreak observed given each value of "ins" and "vacc" as inputs
@@ -69,8 +68,6 @@ solutionSpace <- function(envir, count = 10000, insbound,
   fun_list$p["grp.yng"] <- grp[1]
   fun_list$p["grp.old"] <- grp[2]
   maxl <- integer()
-  #---Get population values for part 1--------------------------------
-  popvalues <- get_popvalues(insbound, ...)
   #---Initialize parallel backend-------------------------------------
   gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
   cl <- makeCluster(detectCores(), type = gettype)
@@ -91,12 +88,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
     # Returns :
     #   mod_run : (data.table) containing model data from all iterations
     #---Assign parameters being checked------------------------
-    fun_list$init["S1"] <- as.integer(popvalues[[j]]$S1)
-    fun_list$init["S2"] <- as.integer(popvalues[[j]]$S2)
-    fun_list$init["R1"] <- as.integer(popvalues[[j]]$R1)
-    fun_list$init["R2"] <- as.integer(popvalues[[j]]$R2)
+    fun_list$p["introduction.rate"] <- coord[1]
     fun_list$p["vacc.pro"] <- coord[2]
-    cat(" ...Modelling")
+    # cat(" ...Modelling")
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
                        .packages = "adaptivetau",
@@ -139,7 +133,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     iter_num <- vector()
     proc <- vector()
     outbreaks <- vector()
-    cat(" Analyzing", "\n")
+    cat("...Analyzing")
     #---Error check for outbreaks that ran over simulation time------
     # This would cause errors in the analysis
     setkey(mod_run, time)
@@ -147,6 +141,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     if (any(proc != 0)) {
       #---Let's try to up the length by just 100 before giving up------
       len <- len + 100
+      cat("...Remodelling")
       mod_sub()
       setkey(mod_run, time)
       proc <- mod_run[.(tf)][, I]
@@ -154,11 +149,11 @@ solutionSpace <- function(envir, count = 10000, insbound,
       #---Better to just dump what we have and move on-----------------
       save(output, file = paste0("bailout", i, j, ".dat"), compress = "bzip2")
       save(mod_run, file = paste0("fail", i, j, ".dat"), compress = "bzip2")
-      cat(date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
+      cat("\n", date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
           "Outbreak ran over simulation at least once, check sim length!", "\n")
-      #---Remember to assign some values here or it will halt-----------
-      maxl <<- NA
-      modl <<- NA
+      #---Remember to assign some values here or it will halt----------
+      maxl <- NA
+      modl <- NA
       return()
       }
     }
@@ -173,6 +168,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     outbreaks <- lenFind(mat[, time], mat[, I])
     maxl <<- max(outbreaks)
     modl <<- median(outbreaks)
+    cat("\n")
   }
   #---Cartesian whole grid search-------------------------------------
   for (i in 1:length(vaccbound)) {
@@ -180,6 +176,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
       #---Store value of ins and vacc to be evaluated------------------
       coord <- c(insbound[j], vaccbound[i])
       cat(date(), ": Running :",vaccbound[i], "-", insbound[j])
+      cat(" ...Modelling")
       mod_sub()
       ed_sub()
       #---Append coord to output space--------------------------------
