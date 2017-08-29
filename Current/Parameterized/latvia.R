@@ -7,14 +7,7 @@ require(foreach)
 require(iterators)
 require(doParallel)
 require(data.table)
-# Run 1
-# Insertion rates :   0.01-0.1 
-# vaccinations rates: 0.9-1
-# Total grid size : 10 * 11 = 110
-# Search depth : 10,000 runs
-# All other population values fixed
-# Case introduction over the course of 1 year
-# Offest by 2000 days beyond
+
 source("../../Data/model_global.R")
 source("gridsearch2.R")
 sourceCpp("../src/Croots.cpp")
@@ -25,6 +18,14 @@ if ("latvia.dat" %in% dir(path = "../../Data/")) {
 } else{
   solutions <- new.env()
 }
+# Run 1
+# Insertion rates :   0.01-0.1 
+# vaccinations rates: 0.9-1
+# Total grid size : 10 * 11 = 110
+# Search depth : 10,000 runs
+# All other population values fixed
+# Case introduction over the course of 1 year
+# Offest by 2000 days beyond
 print(paste0("Begining Run 1 - ", date()))
 solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(latvia,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
