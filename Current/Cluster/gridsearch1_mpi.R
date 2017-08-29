@@ -73,8 +73,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Initialize parallel backend-------------------------------------
   opts <- get("opts", parent.frame())
   #---Stop cluster on exit--------------------------------------------
-  on.exit(stopCluster())
-  on.exit(closeAllConnections())
+  # on.exit(stopCluster())
+  # on.exit(closeAllConnections())
   #---Define function subroutines-------------------------------------
   mod_sub <- function() {
     # Batch model run subroutine
