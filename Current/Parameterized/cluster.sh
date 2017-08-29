@@ -6,4 +6,4 @@
 #$ -R y
 
 R --vanilla --no-save -q -f worker1.R
-R --vanilla --no-save -q -f worker2.R
+#R --vanilla --no-save -q -f worker2.R

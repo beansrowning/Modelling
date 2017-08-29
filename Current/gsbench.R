@@ -1,6 +1,6 @@
 require(doMPI)
 # Make Cluster
-cl <- startMPIcluster(32, comm = 1)
+cl <- startMPIcluster()
 registerDoMPI(cl)
 require(Rcpp)
 require(data.table)
