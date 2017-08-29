@@ -1,4 +1,5 @@
 #!/bin/bash
+#$ -N MPI_Solution_Benchmark
 #$ -cwd -V
 #$ -M lsh1604217@student.lshtm.ac.uk
 #$ -m e
@@ -6,4 +7,4 @@
 #$ -q parallel.q
 #$ -pe openmpi 11
 #$ -R y
-mpirun -np 11 R --vanilla -f gsbench.R 
+mpirun -np 1 R --vanilla -f gsbench.R

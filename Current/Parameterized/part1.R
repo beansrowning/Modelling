@@ -485,7 +485,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(swe,
                                     len = 365,
                                     grp = c(0.5, 1),
                                     offset = 2000))
-print(paste0("Run 2 done - "), solutions$t2[3]))
+print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/gridsearch2.dat")
 
 # Run 3
@@ -506,7 +506,7 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(swe,
                                     len = 365,
                                     grp = c(1, 05),
                                     offset = 2000))
-print(paste0("Run 2 done - "), solutions$t2[3]))
+print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/gridsearch2.dat")
 print(paste0("All done - ", date()))
 
@@ -861,7 +861,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(malta,
                                     len = 365,
                                     grp = c(0.5, 1),
                                     offset = 2000))
-print(paste0("Run 2 done - "), solutions$t2[3]))
+print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/malta.dat")
 
 # Run 3
@@ -882,5 +882,5 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(malta,
                                     len = 365,
                                     grp = c(1, 0.5),
                                     offset = 2000))
-print(paste0("Run 2 done - "), solutions$t2[3]))
+print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/malta.dat")
