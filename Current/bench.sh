@@ -4,6 +4,6 @@
 #$ -m e
 #$ -l mem_free=1G,h_vmem=1G
 #$ -q parallel.q
-#$ -pe openmpi 32
+#$ -pe openmpi 11
 #$ -R y
-mpirun -np 32 R --vanilla -f gsbench.R 
+mpirun -np 11 R --vanilla -f gsbench.R 
