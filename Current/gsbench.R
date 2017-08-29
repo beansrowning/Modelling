@@ -1,9 +1,17 @@
-# Benchmark for Fork Vs PSOCK on the same PC
+require(doMPI)
+# Make Cluster
+cl <- startMPIcluster(32, comm = 1)
+registerDoMPI(cl)
 require(Rcpp)
 require(data.table)
 require(adaptivetau)
-require(doParallel)
-require(foreach)
+
+initEnvir <- function() {
+  library(adaptivetau)
+  len <- get("len", parent.frame())
+}
+opts <- list(chunkSize = ceiling(2000/(getDoParWorkers())), 
+initEnvir = initEnvir)
 
 if (!"Croots" %in% ls()) {
 sourceCpp("./src/Croots.cpp")
@@ -11,10 +19,8 @@ sourceCpp("./src/Croots.cpp")
 if (!"lenFind" %in% ls()) {
 sourceCpp("./src/lenfind.cpp")
 }
-cat("Running as a ", ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK"), " cluster", "\n")
-cat("On", detectCores(), " cores", "\n")
 
-
+#---MPI based solution-------------------------------------
 
 solutionSpace <- function(envir, count = 10000, insbound,
                           vaccbound = c(0.94),
@@ -23,7 +29,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   # ins and vacc, with the domain of the cartesian space defined by insbound
   # and vaccbound respectively.
   # The modelling subroutine is parallelized through
-  # foreach and doParallel and will scalewith thread count of the host machine.
+  # foreach and doParallel and will scale with thread count of the host machine.
   # Due to limitations with the doParallel package, virtualized systems may
   # fail to create a cluster.
   # Args :
@@ -72,12 +78,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Get population values for part 1--------------------------------
   popvalues <- get_popvalues(insbound, ...)
   #---Initialize parallel backend-------------------------------------
-  gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
-  cl <- makeCluster(8, type = gettype)
-  registerDoParallel(cl)
+  opts <- get("opts", parent.frame())
   #---Stop cluster on exit--------------------------------------------
-  on.exit(stopCluster())
-  on.exit(closeAllConnections())
+  # on.exit(stopCluster())
+  # on.exit(closeAllConnections())
   #---Define function subroutines-------------------------------------
   mod_sub <- function() {
     # Batch model run subroutine
@@ -96,12 +100,13 @@ solutionSpace <- function(envir, count = 10000, insbound,
     fun_list$init["R1"] <- as.integer(popvalues[[j]]$R1)
     fun_list$init["R2"] <- as.integer(popvalues[[j]]$R2)
     fun_list$p["vacc.pro"] <- coord[2]
-    cat(" ...Modelling")
+    # cat(" ...Modelling")
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
                        .packages = "adaptivetau",
                        .combine = "rbind",
-                       .export = "len") %dopar% {
+                       .export = "len",
+                       .options.mpi = opts) %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,
                                            fun_list$t,
@@ -156,7 +161,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
       save(mod_run, file = paste0("fail", i, j, ".dat"), compress = "bzip2")
       cat(date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
           "Outbreak ran over simulation at least once, check sim length!", "\n")
-      #---Remember to assign some values here or it will halt-----------
+      #---Remember to assign some values here or it will halt----------
       maxl <<- NA
       modl <<- NA
       return()
@@ -180,6 +185,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
       #---Store value of ins and vacc to be evaluated------------------
       coord <- c(insbound[j], vaccbound[i])
       cat(date(), ": Running :",vaccbound[i], "-", insbound[j])
+      cat(" ...Modelling")
       mod_sub()
       ed_sub()
       #---Append coord to output space--------------------------------
@@ -199,7 +205,6 @@ solutionSpace <- function(envir, count = 10000, insbound,
   return(output)
 }
 
-
 source("../Data/model_global.R")
 source("./Parameterized/get_popvalues.R")
 measles_land$parameters["introduction.rate"] <- 0.01
@@ -210,3 +215,4 @@ t1 <- system.time(solution <- solutionSpace(measles_land,
                           len = 365,
                           offset = 2000,
                           sero.p = c(0.92, 0.92)))
+cat(t1)
