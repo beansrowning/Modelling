@@ -2,16 +2,31 @@ Sys.setenv("plotly_username"="beansrowning")
 Sys.setenv("plotly_api_key"="JjiwmDmYu4pZIx40sedg")
 require(plotly)
 source("../Current/Parameterized/plot.R")
-threedPlot(run_2_4,
+threedPlot(malta$run_3,
            variables = c("max"),
-           cutoff = c(365, 730, 1095),
-           xlab ="Population Size",
+           cutoff = c(365),
+           xlab ="Case Introduction Rate",
            ylab ="MMR Vaccination Rate",
            zlab = "Outbreak Length (days)",
-           title = "")
-measles_land$p2_mod4 <- plot
-measles_land$pd2_mod4 <- plot_dat
-save(measles_land, file = "sense_and_sensitivity.dat")
+           title = "Malta - Run 3")
+malta$p3 <- plot
+malta$pd3 <- plot_dat
+# malta$run_3 <- solutions$run_3
+# malta$t3 <- solutions$t3
+# save(malta, file = "malta.dat")
+# load("malta1.dat")
+# malta$run_1 <- solutions$run_1
+# malta$t_1 <- solutions$t1
+threedPlot(malta$run_1,
+           variables = c("max"),
+           cutoff = c(365),
+           xlab ="Case Introduction Rate",
+           ylab ="MMR Vaccination Rate",
+           zlab = "Outbreak Length (days)",
+           title = "Malta - Run 1")
+malta$p1 <- plot
+malta$pd1 <- plot_dat
+save(malta, file = "malta.dat")
 # base$z3 <- plot_dat$z
 # mask1 <- matrix(365, nrow = nrow(base$z), ncol = ncol(base$z))
 # mask2 <- matrix(730, nrow = nrow(base$z), ncol = ncol(base$z))
@@ -62,5 +77,5 @@ save(measles_land, file = "sense_and_sensitivity.dat")
 # swe$pd3 <- plot_dat
 # save(measles_land, file="sense_and_sensitivity.dat")
 # api_create(plot, filename = "Meales Land: 92% Seroprevalence (combined)", fileopt = "overwrite")
-# api_create(swe$p2, filename = "Swedent Older Introduction", fileopt = "overwrite")
-# api_create(swe$p3, filename = "Sweden Younger Introduction", fileopt = "overwrite")
+api_create(malta$p1, filename = "Malta Run 1 - Equal Case Introduction", fileopt = "overwrite")
+api_create(malta$p3, filename = "Malta Run 3 - Younger Case Introduction", fileopt = "overwrite")

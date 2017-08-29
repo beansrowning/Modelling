@@ -10,8 +10,8 @@ initEnvir <- function() {
   library(adaptivetau)
   len <- get("len", parent.frame())
 }
-opts <- list(chunkSize = ceiling(10000/(getDoParWorkers())), 
-initEnvir = initEnvir)
+opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()),
+             initEnvir = initEnvir)
 
 
 if (!"Croots" %in% ls()) {
@@ -23,7 +23,7 @@ sourceCpp("./src/lenfind.cpp")
 
 solutions <- new.env()
 # Run 1 - 12 month delay
-# Insertion rates :   0.01-0.1 
+# Insertion rates :   0.01-0.1
 # vaccinations rates: 0.9-1
 # Total grid size : 10 * 11 = 110
 # Search depth : 10,000 runs
@@ -38,7 +38,7 @@ solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(malta,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
-                                    # Len is start.time + insertion time 
+                                    # Len is start.time + insertion time
                                     len = 730,
                                     # Offset is appended at the end of insertion
                                     offset = 2000))
@@ -46,7 +46,7 @@ print(paste0("Run 1 done - ", solutions$t1[3]))
 save(solutions, file = "../../Data/malta_2.dat")
 
 # Run 2 - 24 month delay
-# Insertion rates :   0.01-0.1 
+# Insertion rates :   0.01-0.1
 # vaccinations rates: 0.9-1
 # Total grid size : 10 * 11 = 110
 # Search depth : 10,000 runs
@@ -61,7 +61,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(malta,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
-                                    # Len is start.time + insertion time 
+                                    # Len is start.time + insertion time
                                     len = 1095,
                                     # Offset is appended at the end of insertion
                                     offset = 2000))
@@ -69,7 +69,7 @@ print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/malta_2.dat")
 
 # Run 3 - 36 month delay
-# Insertion rates :   0.01-0.1 
+# Insertion rates :   0.01-0.1
 # vaccinations rates: 0.9-1
 # Total grid size : 10 * 11 = 110
 # Search depth : 10,000 runs
@@ -84,7 +84,7 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(malta,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
-                                    # Len is start.time + insertion time 
+                                    # Len is start.time + insertion time
                                     len = 1460,
                                     # Offset is appended at the end of insertion
                                     offset = 2000))
