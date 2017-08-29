@@ -7,7 +7,8 @@ require(data.table)
 require(adaptivetau)
 source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")
-
+sourceCpp("../src/Croots.cpp")
+sourceCpp("../src/lenfind.cpp")
 opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
 
 solutions <- new.env()

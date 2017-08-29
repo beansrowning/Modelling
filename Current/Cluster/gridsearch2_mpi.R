@@ -9,10 +9,30 @@ require("data.table")
 require("Rcpp")
 
 if (!"Croots" %in% ls()) {
-sourceCpp("../src/Croots.cpp")
+tryCatch(sourceCpp("../src/Croots.cpp"),
+         error = function(e) {
+           owd <- getwd()
+           setwd("../../Data/")
+           system("R CMD INSTALL modelutil")
+           setwd(owd)
+           tryCatch(library("modelutil"),
+           error = function(ee) {
+             stop(e, ee)
+             })
+         })
 }
 if (!"lenFind" %in% ls()) {
-sourceCpp("../src/lenfind.cpp")
+tryCatch(sourceCpp("../src/lenfind.cpp"),
+         error = function(e) {
+           owd <- getwd()
+           setwd("../../Data/")
+           system("R CMD INSTALL modelutil")
+           setwd(owd)
+           tryCatch(library("modelutil"),
+           error = function(ee) {
+             stop(e, ee)
+             })
+         })
 }
 
 solutionSpace <- function(envir, count = 10000, insbound,
