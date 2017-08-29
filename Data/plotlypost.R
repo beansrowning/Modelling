@@ -2,16 +2,16 @@ Sys.setenv("plotly_username"="beansrowning")
 Sys.setenv("plotly_api_key"="JjiwmDmYu4pZIx40sedg")
 require(plotly)
 source("../Current/Parameterized/plot.R")
-threedPlot(run_3,
+threedPlot(run_2_4,
            variables = c("max"),
-           cutoff = c(365),
-           xlab ="Insertion Rate",
+           cutoff = c(365, 730, 1095),
+           xlab ="Population Size",
            ylab ="MMR Vaccination Rate",
            zlab = "Outbreak Length (days)",
-           title = "Sweden - Grid Search Run 3")
-swe$p3 <- plot
-swe$pd3 <- plot_dat
-save(swe, file = "Sweden_run1.dat")
+           title = "")
+measles_land$p2_mod4 <- plot
+measles_land$pd2_mod4 <- plot_dat
+save(measles_land, file = "sense_and_sensitivity.dat")
 # base$z3 <- plot_dat$z
 # mask1 <- matrix(365, nrow = nrow(base$z), ncol = ncol(base$z))
 # mask2 <- matrix(730, nrow = nrow(base$z), ncol = ncol(base$z))
@@ -63,4 +63,4 @@ save(swe, file = "Sweden_run1.dat")
 # save(measles_land, file="sense_and_sensitivity.dat")
 # api_create(plot, filename = "Meales Land: 92% Seroprevalence (combined)", fileopt = "overwrite")
 # api_create(swe$p2, filename = "Swedent Older Introduction", fileopt = "overwrite")
-api_create(swe$p3, filename = "Sweden Younger Introduction", fileopt = "overwrite")
+# api_create(swe$p3, filename = "Sweden Younger Introduction", fileopt = "overwrite")
