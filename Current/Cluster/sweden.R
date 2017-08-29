@@ -5,13 +5,21 @@ registerDoMPI(cl)
 require(Rcpp)
 require(data.table)
 require(adaptivetau)
+if (!"Croots" %in% ls()) {
+sourceCpp("../src/Croots.cpp")
+}
+if (!"lenFind" %in% ls()) {
+sourceCpp("../src/lenfind.cpp")
+}
+
+source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")
 initEnvir <- function() {
   library(adaptivetau)
   len <- get("len", parent.frame())
 }
-opts <- list(chunkSize = ceiling(10000/(getDoParWorkers())),
-initEnvir = initEnvir)
+opts <- list(chunkSize = ceiling(10000/getDoParWorkers()),
+             initEnvir = initEnvir)
 
 solutions <- new.env()
 # Run 1 - 12 month delay
