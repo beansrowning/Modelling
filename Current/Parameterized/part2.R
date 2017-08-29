@@ -76,7 +76,7 @@ save(solutions, file = "../../Data/sweden_2.dat")
 # Offest by 2000 days beyond
 source("../../Data/model_global.R")
 print(paste0("Begining Run 3 - ", date()))
-# Start time at 24 mo
+# Start time at 36 mo
 swe$parameters["start.time"] <- 1095
 solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(swe,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
@@ -151,7 +151,7 @@ save(solutions, file = "../../Data/malta_2.dat")
 # Case introduction over the course of 1 year
 # Offest by 2000 days beyond
 print(paste0("Begining Run 3 - ", date()))
-# Start time at 24 mo
+# Start time at 36 mo
 malta$parameters["start.time"] <- 1095
 solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(malta,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
@@ -226,7 +226,7 @@ save(solutions, file = "../../Data/latvia_2.dat")
 # Case introduction over the course of 1 year
 # Offest by 2000 days beyond
 print(paste0("Begining Run 3 - ", date()))
-# Start time at 24 mo
+# Start time at 36 mo
 latvia$parameters["start.time"] <- 1095
 solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(latvia,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
