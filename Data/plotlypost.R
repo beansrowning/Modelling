@@ -2,31 +2,34 @@ Sys.setenv("plotly_username"="beansrowning")
 Sys.setenv("plotly_api_key"="JjiwmDmYu4pZIx40sedg")
 require(plotly)
 source("../Current/Parameterized/plot.R")
-threedPlot(malta$run_3,
+load("latvia1.dat")
+latvia <- new.env()
+threedPlot(solutions$run_1,
            variables = c("max"),
            cutoff = c(365),
            xlab ="Case Introduction Rate",
            ylab ="MMR Vaccination Rate",
            zlab = "Outbreak Length (days)",
-           title = "Malta - Run 3")
-malta$p3 <- plot
-malta$pd3 <- plot_dat
-# malta$run_3 <- solutions$run_3
-# malta$t3 <- solutions$t3
-# save(malta, file = "malta.dat")
-# load("malta1.dat")
-# malta$run_1 <- solutions$run_1
-# malta$t_1 <- solutions$t1
-threedPlot(malta$run_1,
+           title = "Latvia - Run 1")
+latvia$p1 <- plot
+latvia$pd1 <- plot_dat
+latvia$run_1 <- solutions$run_1
+latvia$t1 <- solutions$t1
+save(latvia, file = "latvia.dat")
+load("latvia3.dat")
+
+threedPlot(solutions$run_3,
            variables = c("max"),
            cutoff = c(365),
            xlab ="Case Introduction Rate",
            ylab ="MMR Vaccination Rate",
            zlab = "Outbreak Length (days)",
-           title = "Malta - Run 1")
-malta$p1 <- plot
-malta$pd1 <- plot_dat
-save(malta, file = "malta.dat")
+           title = "Latvia - Run 3")
+ latvia$p3 <- plot
+ latvia$pd3 <- plot_dat
+ latvia$run_3 <- solutions$run_3
+ latvia$t3 <- solutions$t3
+save(latvia, file = "latvia.dat")
 # base$z3 <- plot_dat$z
 # mask1 <- matrix(365, nrow = nrow(base$z), ncol = ncol(base$z))
 # mask2 <- matrix(730, nrow = nrow(base$z), ncol = ncol(base$z))
@@ -77,5 +80,5 @@ save(malta, file = "malta.dat")
 # swe$pd3 <- plot_dat
 # save(measles_land, file="sense_and_sensitivity.dat")
 # api_create(plot, filename = "Meales Land: 92% Seroprevalence (combined)", fileopt = "overwrite")
-api_create(malta$p1, filename = "Malta Run 1 - Equal Case Introduction", fileopt = "overwrite")
-api_create(malta$p3, filename = "Malta Run 3 - Younger Case Introduction", fileopt = "overwrite")
+api_create(latvia$p1, filename = "Latvia Run 1 - Equal Case Introduction", fileopt = "overwrite")
+api_create(latvia$p3, filename = "Latvia Run 3 - Younger Case Introduction", fileopt = "overwrite")
