@@ -5,13 +5,6 @@ registerDoMPI(cl)
 require(Rcpp)
 require(data.table)
 require(adaptivetau)
-if (!"Croots" %in% ls()) {
-sourceCpp("../src/Croots.cpp")
-}
-if (!"lenFind" %in% ls()) {
-sourceCpp("../src/lenfind.cpp")
-}
-
 source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")
 initEnvir <- function() {
