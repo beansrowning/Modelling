@@ -7,4 +7,4 @@
 #$ -q parallel.q
 #$ -pe openmpi 11
 #$ -R y
-mpirun -np 11 R --vanilla -f latvia.R 
+mpirun -np 11 R CMD BATCH latvia.R 
