@@ -772,7 +772,7 @@ solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(latvia,
                                     len = 365,
                                     offset = 2000))
 print(paste0("Run 1 done - ", solutions$t1[3]))
-save(solutions, file = "../../Data/gridsearch2.dat")
+save(solutions, file = "../../Data/latvia.dat")
 # Run 2
 # Insertion rates :   0.01-0.1 
 # vaccinations rates: 0.9-1
@@ -792,7 +792,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(latvia,
                                     grp = c(0.5, 1),
                                     offset = 2000))
 print(paste0("Run 2 done - "), solutions$t2[3]))
-save(solutions, file = "../../Data/gridsearch2.dat")
+save(solutions, file = "../../Data/latvia.dat")
 
 # Run 3
 # Insertion rates :   0.01-0.1 
@@ -813,5 +813,5 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(latvia,
                                     grp = c(1, 0.5),
                                     offset = 2000))
 print(paste0("Run 2 done - "), solutions$t2[3]))
-save(solutions, file = "../../Data/gridsearch2.dat")
+save(solutions, file = "../../Data/latvia.dat")
 print(paste0("All done - ", date()))
