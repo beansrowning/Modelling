@@ -7,5 +7,5 @@ R --vanilla -f latvia.R
 R --vanilla -f malta.R
 git add ../../Data/malta.dat
 git add ../../Data/latvia.dat
-git commit -m"Google cloud compute all done"
+git commit -m"Malta & Latvia runs 2 done"
 gcloud compute instances stop debian-1 --zone=europe-west1-b
