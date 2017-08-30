@@ -18,7 +18,7 @@ sourceCpp("../src/lenfind.cpp")
 
 solutionSpace <- function(envir, count = 10000, insbound,
                           vaccbound = c(0.94), len,
-                          grp = c(1, 1), offset = 600) {
+                          grp = c(1, 1)) {
   # A function to perform a whole grid search on the hyperparmeters
   # ins and vacc, with the domain of the cartesian space defined by insbound
   # and vaccbound respectively.
@@ -58,9 +58,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
                    rf = get("RateF", envir = envir),
                    p = get("parameters", envir = envir))
   #---Set the end time for the case introductions to be the given length-
-  fun_list$p["end.time"] <- len
-  #---Overrun the time period specified to avoid infected persons left at end
-  len <- len + offset
+  len <- len
+  fun_list$p["end.time"] <- len - 500
   #---Fix to avoid FP issues-----------------------------------------------
   output <- data.table(ins = integer(), vacc = integer(), min = integer(),
                        mean = integer(), median = integer(), iqr = integer(),
@@ -92,15 +91,11 @@ solutionSpace <- function(envir, count = 10000, insbound,
     #        environment
     # Returns :
     #   mod_run : (data.table) containing model data from all iterations
-    #---Assign parameters being checked------------------------
-    fun_list$p["introduction.rate"] <- coord[1]
-    fun_list$p["vacc.pro"] <- coord[2]
-    # cat(" ...Modelling")
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
                        .packages = "adaptivetau",
                        .combine = "rbind",
-                       .export = "len") %dopar% {
+                       .export = c("len", "fun_list")) %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,
                                            fun_list$t,
@@ -143,27 +138,14 @@ solutionSpace <- function(envir, count = 10000, insbound,
     # This would cause errors in the analysis
     setkey(mod_run, time)
     proc <- mod_run[.(tf)][, I]
-    if (any(proc != 0)) {
-      #---Let's try to up the length by just 100 before giving up------
-      len <- len + 100
-      cat("...Remodelling")
-      mod_sub()
-      setkey(mod_run, time)
-      proc <- mod_run[.(tf)][, I]
-      if (any(proc != 0)) {
-      #---Better to just dump what we have and move on-----------------
-      save(output, file = paste0("bailout", i, j, ".dat"), compress = "bzip2")
-      save(mod_run, file = paste0("fail", i, j, ".dat"), compress = "bzip2")
-      cat("\n", date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
-          "Outbreak ran over simulation at least once, check sim length!", "\n")
-      #---Remember to assign some values here or it will halt----------
+    if (any(proc != 0) || nrow(mod_run[I > 0]) == 0) {
+      cat(date(), ": ", vaccbound[i], "-", insbound[j], "FAILED", "\n")
       minl <<- NA
-      meanl <<- NA
       modl <<- NA
+      meanl <<- NA
       iqrl <<- NA
       maxl <<- NA
       return()
-      }
     }
     # re-sort to ensure Croots will work correctly
     setkey(mod_run, iter, time)
@@ -191,6 +173,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
       coord <- c(insbound[j], vaccbound[i])
       cat(date(), ": Running :",vaccbound[i], "-", insbound[j])
       cat(" ...Modelling")
+      fun_list$p["introduction.rate"] <- coord[1]
+      fun_list$p["vacc.pro"] <- coord[2]
       mod_sub()
       ed_sub()
       #---Append coord to output space--------------------------------
