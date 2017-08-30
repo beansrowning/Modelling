@@ -23,8 +23,14 @@ tryCatch(require(parallel),
           require(parallel)
 })
 Sys.sleep(2) # DEBUG
-sourceCpp("../src/Croots.cpp")
-sourceCpp("../src/lenfind.cpp")
+tryCatch(sourceCpp("../src/Croots.cpp"),
+          error = function(e) {
+            library(modelutil)
+          })
+tryCatch(sourceCpp("../src/lenfind.cpp"),
+          error = function(e) {
+            library(modelutil)
+          })
 source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")
 opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
