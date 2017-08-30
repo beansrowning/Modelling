@@ -22,14 +22,11 @@ tryCatch(require(parallel),
           Sys.sleep(2)
           require(parallel)
 })
-tryCatch(sourceCpp("../src/Croots.cpp"),
-          error = function(e) {
-            library(modelutil)
-          })
-tryCatch(sourceCpp("../src/lenfind.cpp"),
-          error = function(e) {
-            library(modelutil)
-          })
+tryCatch(require(modelutil),
+         error = function(e) {
+          Sys.sleep(2)
+          require(modelutil)
+})
 source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")
 
