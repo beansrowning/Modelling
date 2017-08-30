@@ -22,10 +22,11 @@ tryCatch(require(parallel),
           Sys.sleep(2)
           require(parallel)
 })
-source("../../Data/model_global.R")
-source("gridsearch2_mpi.R")
 sourceCpp("../src/Croots.cpp")
 sourceCpp("../src/lenfind.cpp")
+source("../../Data/model_global.R")
+source("gridsearch2_mpi.R")
+
 opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
 
 solutions <- new.env()
