@@ -29,7 +29,7 @@ solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(malta,
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     # Len is start.time + insertion time
-                                    len = 3000))
+                                    len = 5000))
 print(paste0("Run 1 done - ", solutions$t1[3]))
 save(solutions, file = "../../Data/malta_2.dat")
 
@@ -50,7 +50,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(malta,
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     # Len is start.time + insertion time
-                                    len = 3000))
+                                    len = 5000))
 print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/malta_2.dat")
 
@@ -71,7 +71,7 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(malta,
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     # Len is start.time + insertion time
-                                    len = 3000))
+                                    len = 5000))
 print(paste0("Run 3 done - ", solutions$t3[3]))
 save(solutions, file = "../../Data/malta_2.dat")
 cat("All Done -", date())

@@ -78,7 +78,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
                    rf = get("RateF", envir = envir),
                    p = get("parameters", envir = envir))
   #---Set the end time for the case introductions to be the given length-
-  fun_list$p["end.time"] <- len
+  fun_list$p["end.time"] <- len - 1000
   #---Fix to avoid FP issues-----------------------------------------------
   output <- data.table(ins = integer(), vacc = integer(), min = integer(),
                        mean = integer(), median = integer(), iqr = integer(),
