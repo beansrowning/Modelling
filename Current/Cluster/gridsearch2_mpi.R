@@ -37,7 +37,7 @@ tryCatch(sourceCpp("../src/lenfind.cpp"),
 
 solutionSpace <- function(envir, count = 10000, insbound,
                           vaccbound = c(0.94),
-                          len, grp = c(1, 1), offset = 600, ...) {
+                          len, grp = c(1, 1), offset = 600) {
   # A function to perform a whole grid search on the hyperparmeters
   # ins and vacc, with the domain of the cartesian space defined by insbound
   # and vaccbound respectively.
@@ -58,12 +58,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #                  c(n,m) = both will be introduced with some weights n and m
   #   offset    : (int) length to append to the end of `len` to overrun the
   #               simulation can also be used to determine endemic spread.
-  #   ...       : Additional arguments to pass to get_popvalues()
   # Returns :
   #     output : (data.table) three column data.table containing the maximum
   #              outbreak observed given each value of "ins" and "vacc" as inputs
   #---Check parameters-----------------------------------------------
-  # Check provided Args
   .vars <- c("init.values", "transitions", "parameters", "RateF")
   stopifnot(any(.vars %in% ls(envir)), is.environment(envir),
             (length(count) == 1 && count > 0), is.vector(insbound),
@@ -72,7 +70,6 @@ solutionSpace <- function(envir, count = 10000, insbound,
             !any(insbound < 0), !any(vaccbound < 0))
 
   #---Initialize parameters-------------------------------------------
-  # TODO : Is this the best way to deal with parameters?
   fun_list <- list(init = get("init.values", envir = envir),
                    t = get("transitions", envir = envir),
                    rf = get("RateF", envir = envir),
@@ -93,13 +90,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
   meanl <- integer()
   iqrl <- integer()
   maxl <- integer()
-  #---Get population values for part 1--------------------------------
-  # popvalues <- get_popvalues(insbound, ...)
   #---Initialize parallel backend-------------------------------------
   opts <- get("opts", parent.frame())
-  #---Stop cluster on exit--------------------------------------------
-  # on.exit(stopCluster())
-  # on.exit(closeAllConnections())
   #---Define function subroutines-------------------------------------
   mod_sub <- function() {
     # Batch model run subroutine
@@ -112,26 +104,19 @@ solutionSpace <- function(envir, count = 10000, insbound,
     #        environment
     # Returns :
     #   mod_run : (data.table) containing model data from all iterations
-    #---Assign parameters being checked------------------------
-    # fun_list$init["S1"] <- as.integer(popvalues[[j]]$S1)
-    # fun_list$init["S2"] <- as.integer(popvalues[[j]]$S2)
-    # fun_list$init["R1"] <- as.integer(popvalues[[j]]$R1)
-    # fun_list$init["R2"] <- as.integer(popvalues[[j]]$R2)
-    fun_list$p["introduction.rate"] <- coord[1]
-    fun_list$p["vacc.pro"] <- coord[2]
-    # cat(" ...Modelling")
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
                        .packages = "adaptivetau",
                        .combine = "rbind",
-                       .export = "len",
+                       .export = c("len", "fun_list"),
                        .options.mpi = opts) %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,
                                            fun_list$t,
                                            fun_list$rf,
                                            fun_list$p,
-                                           len)
+                                           len,
+                                           tl.params = list(maxtau = 365))
                 out <- cbind(out, I = rowSums(out[, c("I1", "I2")]), iter = i)
                 out <- out[, c("time", "I", "iter"), drop = FALSE]
                 out
@@ -159,7 +144,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
 
     #---init----------------------------------------------------------
     # mod_run <- get("mod_run", parent.frame())
-    tf <- mod_run[nrow(mod_run), "time"]
+    tf <- mod_run[.N, "time"]
     iter_num <- vector()
     proc <- vector()
     outbreaks <- vector()
@@ -187,10 +172,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
       modl <<- NA
       iqrl <<- NA
       maxl <<- NA
-      return()
+      return(0)
       }
     }
-    # re-sort to ensure Croots will work correctly
+    #---re-sort to ensure Croots will work correctly-------------------
     setkey(mod_run, iter, time)
     #---Call root finder function on the Infection counts-------------
     mod_run[, roots := Croots(I)]
@@ -216,6 +201,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
       coord <- c(insbound[j], vaccbound[i])
       cat(date(), ": Running :",vaccbound[i], "-", insbound[j])
       cat(" ...Modelling")
+      fun_list$p["introduction.rate"] <- coord[1]
+      fun_list$p["vacc.pro"] <- coord[2]
       mod_sub()
       ed_sub()
       #---Append coord to output space--------------------------------
