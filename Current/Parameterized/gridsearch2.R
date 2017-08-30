@@ -62,11 +62,16 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Overrun the time period specified to avoid infected persons left at end
   len <- len + offset
   #---Fix to avoid FP issues-----------------------------------------------
-  output <- data.table(ins = integer(), vacc = integer(), max = integer(),
-                       median = integer())
+  output <- data.table(ins = integer(), vacc = integer(), min = integer(),
+                       mean = integer(), median = integer(), iqr = integer(),
+                       max = integer())
   mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
   fun_list$p["grp.yng"] <- grp[1]
   fun_list$p["grp.old"] <- grp[2]
+  minl <- integer()
+  modl <- integer()
+  meanl <- integer()
+  iqrl <- integer()
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
   gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
@@ -152,8 +157,11 @@ solutionSpace <- function(envir, count = 10000, insbound,
       cat("\n", date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
           "Outbreak ran over simulation at least once, check sim length!", "\n")
       #---Remember to assign some values here or it will halt----------
-      maxl <<- NA
+      minl <<- NA
+      meanl <<- NA
       modl <<- NA
+      iqrl <<- NA
+      maxl <<- NA
       return()
       }
     }
@@ -166,8 +174,14 @@ solutionSpace <- function(envir, count = 10000, insbound,
     mat <- mod_run[J(TRUE)] # Take only roots
     #---Pass time and I columns as vectors for the C++ function to process
     outbreaks <- lenFind(mat[, time], mat[, I])
-    maxl <<- max(outbreaks)
+    #---Summary Stats------------------------
+    minl <<- min(outbreaks)
     modl <<- median(outbreaks)
+    meanl <<- mean(outbreaks)
+    iqrl <<- iqr(outbreaks)
+    maxl <<- max(outbreaks)
+    #---Clear this from memory-----------------
+    outbreaks <- NULL
     cat("\n")
   }
   #---Cartesian whole grid search-------------------------------------
@@ -183,13 +197,19 @@ solutionSpace <- function(envir, count = 10000, insbound,
       # Using the data.table function rbindlist to populate the data.table
       output <- rbindlist(list(output, data.frame(ins = insbound[j],
                                                   vacc = vaccbound[i],
-                                                  max = maxl,
-                                                  median = modl)),
+                                                  min = minl,
+                                                  mean = meanl,
+                                                  median = modl,
+                                                  iqr = iqrl,
+                                                  max = maxl)),
                           fill = TRUE)
       #---Clear vars for next iteration-------------------------------
       mod_run <- NULL
-      maxl <- NULL
+      minl <- NULL
+      meanl <- NULL
       modl <- NULL
+      iqrl <- NULL
+      maxl <- NULL
     }
   }
   #---Return results----------------------------------------------------
