@@ -2,9 +2,26 @@ require(doMPI)
 # Make Cluster
 cl <- startMPIcluster()
 registerDoMPI(cl)
-require(Rcpp)
-require(data.table)
-require(adaptivetau)
+tryCatch(require(Rcpp),
+         error = function(e) {
+           Sys.sleep(2)
+           require(Rcpp)
+         })
+tryCatch(require(data.table),
+         error = function(e) {
+          Sys.sleep(2)
+          require(data.table)
+})
+tryCatch(require(adaptivetau),
+         error = function(e) {
+          Sys.sleep(2)
+          require(adaptivetau)
+})
+tryCatch(require(parallel),
+         error = function(e) {
+          Sys.sleep(2)
+          require(parallel)
+})
 Sys.sleep(2) # DEBUG
 source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")

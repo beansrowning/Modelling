@@ -1,12 +1,27 @@
-# Approach 2 gridsearch on the Latvia model
-# 3 Runs, looking at how age of inserted case affects outcome
 require(doMPI)
 # Make Cluster
 cl <- startMPIcluster()
 registerDoMPI(cl)
-require(Rcpp)
-require(data.table)
-require(adaptivetau)
+tryCatch(require(Rcpp),
+         error = function(e) {
+           Sys.sleep(2)
+           require(Rcpp)
+         })
+tryCatch(require(data.table),
+         error = function(e) {
+          Sys.sleep(2)
+          require(data.table)
+})
+tryCatch(require(adaptivetau),
+         error = function(e) {
+          Sys.sleep(2)
+          require(adaptivetau)
+})
+tryCatch(require(parallel),
+         error = function(e) {
+          Sys.sleep(2)
+          require(parallel)
+})
 source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")
 sourceCpp("../src/Croots.cpp")
