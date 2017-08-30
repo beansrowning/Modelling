@@ -1,5 +1,5 @@
 # Hyperparameter space mapping
-# Functions: soluntionSpace()
+# Functions: solutionSpace()
 # Subroutines: mod_sub(), mod_thread(), ed_sub()
 # Consider using Bytecode or JIT compilier
 require("adaptivetau")

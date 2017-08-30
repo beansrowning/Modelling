@@ -152,8 +152,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
       cat("\n", date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
           "Outbreak ran over simulation at least once, check sim length!", "\n")
       #---Remember to assign some values here or it will halt----------
-      maxl <- NA
-      modl <- NA
+      maxl <<- NA
+      modl <<- NA
       return()
       }
     }

@@ -2,33 +2,44 @@ Sys.setenv("plotly_username"="beansrowning")
 Sys.setenv("plotly_api_key"="JjiwmDmYu4pZIx40sedg")
 require(plotly)
 source("../Current/Parameterized/plot.R")
-load("latvia1.dat")
-latvia <- new.env()
-threedPlot(solutions$run_1,
-           variables = c("max"),
-           cutoff = c(365),
-           xlab ="Case Introduction Rate",
-           ylab ="MMR Vaccination Rate",
-           zlab = "Outbreak Length (days)",
-           title = "Latvia - Run 1")
-latvia$p1 <- plot
-latvia$pd1 <- plot_dat
-latvia$run_1 <- solutions$run_1
-latvia$t1 <- solutions$t1
-save(latvia, file = "latvia.dat")
-load("latvia3.dat")
+# load("latvia1.dat")
+# latvia <- new.env()
+# threedPlot(solutions$run_1,
+#            variables = c("max"),
+#            cutoff = c(365),
+#            xlab ="Case Introduction Rate",
+#            ylab ="MMR Vaccination Rate",
+#            zlab = "Outbreak Length (days)",
+#            title = "Latvia - Run 1")
+# latvia$p1 <- plot
+# latvia$pd1 <- plot_dat
+# latvia$run_1 <- solutions$run_1
+# latvia$t1 <- solutions$t1
+# save(latvia, file = "latvia.dat")
+# load("latvia3.dat")
+#
+# threedPlot(solutions$run_3,
+#            variables = c("max"),
+#            cutoff = c(365),
+#            xlab ="Case Introduction Rate",
+#            ylab ="MMR Vaccination Rate",
+#            zlab = "Outbreak Length (days)",
+#            title = "Latvia - Run 3")
+#  latvia$p3 <- plot
+#  latvia$pd3 <- plot_dat
+#  latvia$run_3 <- solutions$run_3
+#  latvia$t3 <- solutions$t3
 
-threedPlot(solutions$run_3,
-           variables = c("max"),
-           cutoff = c(365),
-           xlab ="Case Introduction Rate",
-           ylab ="MMR Vaccination Rate",
-           zlab = "Outbreak Length (days)",
-           title = "Latvia - Run 3")
- latvia$p3 <- plot
- latvia$pd3 <- plot_dat
- latvia$run_3 <- solutions$run_3
- latvia$t3 <- solutions$t3
+ threedPlot(latvia$run_2,
+            variables = c("max"),
+            cutoff = c(365),
+            xlab ="Case Introduction Rate",
+            ylab ="MMR Vaccination Rate",
+            zlab = "Outbreak Length (days)",
+            title = "Latvia - Run 2")
+  latvia$p2 <- plot
+  latvia$pd2 <- plot_dat
+
 save(latvia, file = "latvia.dat")
 # base$z3 <- plot_dat$z
 # mask1 <- matrix(365, nrow = nrow(base$z), ncol = ncol(base$z))
@@ -81,4 +92,5 @@ save(latvia, file = "latvia.dat")
 # save(measles_land, file="sense_and_sensitivity.dat")
 # api_create(plot, filename = "Meales Land: 92% Seroprevalence (combined)", fileopt = "overwrite")
 api_create(latvia$p1, filename = "Latvia Run 1 - Equal Case Introduction", fileopt = "overwrite")
+api_create(latvia$p2, filename = "Latvia Run 2 - Older Case Introduction", fileopt = "overwrite")
 api_create(latvia$p3, filename = "Latvia Run 3 - Younger Case Introduction", fileopt = "overwrite")
