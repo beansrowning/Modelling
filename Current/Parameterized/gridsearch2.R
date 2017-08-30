@@ -178,7 +178,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     minl <<- min(outbreaks)
     modl <<- median(outbreaks)
     meanl <<- mean(outbreaks)
-    iqrl <<- iqr(outbreaks)
+    iqrl <<- IQR(outbreaks)
     maxl <<- max(outbreaks)
     #---Clear this from memory-----------------
     outbreaks <- NULL
