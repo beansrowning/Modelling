@@ -1,15 +1,15 @@
-require(doMPI)
-# Make Cluster
-cl <- startMPIcluster()
-registerDoMPI(cl)
 require(Rcpp)
 require(data.table)
 require(adaptivetau)
+require(doParallel)
+require(foreach)
+require(iterators)
 source("../../Data/model_global.R")
-source("gridsearch2_mpi.R")
+source("gridsearch2.R")
 sourceCpp("../src/Croots.cpp")
 sourceCpp("../src/lenfind.cpp")
-opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
+cat("Running as a ", ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK"),
+    " Cluster on ", detectCores(), "Cores", "\n")
 
 solutions <- new.env()
 # Run 1 - 12 month delay
@@ -80,7 +80,5 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(latvia,
                                     offset = 2000))
 print(paste0("Run 3 done - ", solutions$t3[3]))
 save(solutions, file = "../../Data/latvia_2.dat")
-cat("All Done -", date())
 
-closeCluster(cl)
-mpi.quit()
+cat("All Done -", date())
