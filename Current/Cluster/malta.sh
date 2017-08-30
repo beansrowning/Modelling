@@ -5,6 +5,6 @@
 #$ -m e
 #$ -l mem_free=1G,h_vmem=1G
 #$ -q parallel.q
-#$ -pe openmpi 11
+#$ -pe openmpi 32
 #$ -R y
-mpirun -np 11 R CMD BATCH malta.R 
+mpirun -np 32 R CMD BATCH malta.R 

@@ -1,6 +1,6 @@
 require(doMPI)
 # Make Cluster
-cl <- startMPIcluster()
+cl <- startMPIcluster(31, comm = 1)
 registerDoMPI(cl)
 require(Rcpp)
 require(data.table)
@@ -10,7 +10,7 @@ initEnvir <- function() {
   library(adaptivetau)
   len <- get("len", parent.frame())
 }
-opts <- list(chunkSize = ceiling(2000/(getDoParWorkers())), 
+opts <- list(chunkSize = ceiling(10000/(getDoParWorkers())), 
 initEnvir = initEnvir)
 
 if (!"Croots" %in% ls()) {

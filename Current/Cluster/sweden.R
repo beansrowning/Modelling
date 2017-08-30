@@ -5,6 +5,7 @@ registerDoMPI(cl)
 require(Rcpp)
 require(data.table)
 require(adaptivetau)
+Sys.sleep(2) # DEBUG
 source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")
 sourceCpp("../src/Croots.cpp")
@@ -34,7 +35,7 @@ solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(swe,
                                     offset = 2000))
 print(paste0("Run 1 done - ", solutions$t1[3]))
 save(solutions, file = "../../Data/sweden_2.dat")
-
+warnings()
 # Run 2 - 24 month delay
 # Insertion rates :   0.01-0.1
 # vaccinations rates: 0.9-1
