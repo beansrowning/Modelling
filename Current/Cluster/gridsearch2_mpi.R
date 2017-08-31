@@ -7,37 +7,15 @@ require("parallel")
 require("foreach")
 require("data.table")
 require("Rcpp")
-
-# if (!"Croots" %in% ls()) {
-# tryCatch(sourceCpp("../src/Croots.cpp"),
-#          error = function(e) {
-#            owd <- getwd()
-#            setwd("../../Data/")
-#            system("R CMD INSTALL modelutil")
-#            setwd(owd)
-#            tryCatch(library("modelutil"),
-#            error = function(ee) {
-#              stop(e, ee)
-#              })
-#          })
-# }
-# if (!"lenFind" %in% ls()) {
-# tryCatch(sourceCpp("../src/lenfind.cpp"),
-#          error = function(e) {
-#            owd <- getwd()
-#            setwd("../../Data/")
-#            system("R CMD INSTALL modelutil")
-#            setwd(owd)
-#            tryCatch(library("modelutil"),
-#            error = function(ee) {
-#              stop(e, ee)
-#              })
-#          })
-# }
+tryCatch(require(modelutil),
+         error = function(e) {
+           sourceCpp("../src/Croots")
+           sourceCpp("../src/lenfind")
+           })
 
 solutionSpace <- function(envir, count = 10000, insbound,
-                          vaccbound = c(0.94),
-                          len, grp = c(1, 1), offset = 600) {
+                          vaccbound = c(0.94), len,
+                          grp = c(1, 1), offset = 600) {
   # A function to perform a whole grid search on the hyperparmeters
   # ins and vacc, with the domain of the cartesian space defined by insbound
   # and vaccbound respectively.

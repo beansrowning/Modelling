@@ -8,6 +8,8 @@
 #   4.00% 0-19
 #   2.34% 20+
 # Current birth / death values reflect 2000-2005 estimates
+# 10.5 CDR
+# 10.8 CBR
 # Consider 2010-2015 birth/death estimates:
 # 9.5 CDR
 # 12 CBR
@@ -34,13 +36,13 @@ swe$parameters <- c(
   latent.period = 8,     # days
   vacc.pro = 0.94,       # proportion vacc at birth
   young.size = 19,       # years in the young compartment
-  birth.rate = 10.8,     # per 1000, anum
-  death.rate = 10.5,       # per 1000, anum
+  birth.rate = 12,     # per 1000, anum
+  death.rate = 9.5,       # per 1000, anum
   # Let's have some values that can be set by a wrapper function to
   # change how our model funtions, as well.
   introduction.rate = 0, # Some rate of new case introduction
   start.time = 0, # Time between start of sim and new case introduction
-  end.time = 0, # Time between end of case introduction and end of sim
+  end.time = 0, # Time between start of sim and end of case introduction period
   grp.yng = 0, # Bool, will new cases be introduced in this compartment?
   grp.old = 0 # Bool, same as above
 )
@@ -133,7 +135,7 @@ swe$RateF <- function(x, p, t) {
    # change how our model funtions, as well.
    introduction.rate = 0, # Some rate of new case introduction
    start.time = 0, # Time between start of sim and new case introduction
-   end.time = 0, # Time between end of case introduction and end of sim
+   end.time = 0, # Time between start of sim and end of case introduction period
    grp.yng = 0, # Bool, will new cases be introduced in this compartment?
    grp.old = 0 # Bool, same as above
  )
@@ -236,7 +238,7 @@ latvia$parameters <- c(
   # change how our model funtions, as well.
   introduction.rate = 0, # Some rate of new case introduction
   start.time = 0, # Time between start of sim and new case introduction
-  end.time = 0, # Time between end of case introduction and end of sim
+  end.time = 0, # Time between start of sim and end of case introduction period
   grp.yng = 0, # Bool, will new cases be introduced in this compartment?
   grp.old = 0 # Bool, same as above
 )
@@ -339,7 +341,7 @@ malta$parameters <- c(
   # change how our model funtions, as well.
   introduction.rate = 0, # Some rate of new case introduction
   start.time = 0, # Time between start of sim and new case introduction
-  end.time = 0, # Time between end of case introduction and end of sim
+  end.time = 0, # Time between start of sim and end of case introduction period
   grp.yng = 0, # Bool, will new cases be introduced in this compartment?
   grp.old = 0 # Bool, same as above
 )

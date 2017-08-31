@@ -8,13 +8,11 @@ require("parallel")
 require("foreach")
 require("data.table")
 require("Rcpp")
-
-if (!"Croots" %in% ls()) {
-sourceCpp("../src/Croots.cpp")
-}
-if (!"lenFind" %in% ls()) {
-sourceCpp("../src/lenfind.cpp")
-}
+tryCatch(require(modelutil),
+         error = function(e) {
+           sourceCpp("../src/Croots")
+           sourceCpp("../src/lenfind")
+           })
 
 solutionSpace <- function(envir, count = 10000, insbound,
                           vaccbound = c(0.94), len,

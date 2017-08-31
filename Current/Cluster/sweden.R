@@ -53,7 +53,7 @@ solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(swe,
                                     # Offset is appended at the end of insertion
                                     offset = 2000))
 print(paste0("Run 1 done - ", solutions$t1[3]))
-save(solutions, file = "../../Data/sweden_2.dat")
+save(solutions, file = "../../Data/sweden_2_new.dat")
 warnings()
 # Run 2 - 24 month delay
 # Insertion rates :   0.01-0.1
@@ -76,7 +76,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(swe,
                                     # Offset is appended at the end of insertion
                                     offset = 2000))
 print(paste0("Run 2 done - ", solutions$t2[3]))
-save(solutions, file = "../../Data/sweden_2.dat")
+save(solutions, file = "../../Data/sweden_2_new.dat")
 
 # Run 3 - 36 month delay
 # Insertion rates :   0.01-0.1
@@ -100,7 +100,7 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(swe,
                                     # Offset is appended at the end of insertion
                                     offset = 2000))
 print(paste0("Run 3 done - ", solutions$t3[3]))
-save(solutions, file = "../../Data/sweden_2.dat")
+save(solutions, file = "../../Data/sweden_2_new.dat")
 
 cat("All Done -", date())
 
