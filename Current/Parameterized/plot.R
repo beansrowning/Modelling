@@ -1,3 +1,5 @@
+# Defines 2 and 3 dimensional plotting functions for a single run
+# threedPlot(), twodPlot()
 require(ggplot2)
 require(plotly)
 require(data.table)
@@ -87,7 +89,7 @@ twodPlot <- function(dat, xvar, yvar, zvar, zval,
                      ylab = NULL, title = NULL,
                      sub = NULL) {
   # This function will look at two dimensions of output, with the option
-  # of having multiple levels of the y variable (such as different summary
+  # of having multiple y variable levels (such as different summary
   # measures of outbreak length). Additionally, a z variable must be specified
   # to determine which observations to get the data from.
   # Args :
@@ -111,6 +113,8 @@ twodPlot <- function(dat, xvar, yvar, zvar, zval,
                       measure.vars = yvar,
                       variable.name = "Measure",
                       value.name = "Length")
+  #---check to see if we are comparing runs---------------
+  if (length(compare))
   #---Ploting--------------------------------------------
   graph <- ggplot(plot_dat, aes(x = get(xvar), y = Length, colour = Measure)) +
             geom_line()
