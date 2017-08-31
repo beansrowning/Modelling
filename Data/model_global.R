@@ -4,22 +4,17 @@
 # 10-19 : 4.7%
 # 20-39 : 5.9%
 # 40+ : 0.5%
-# When weighted to 2015 population averages:
-#   4.00% 0-19
-#   2.34% 20+
-# Current birth / death values reflect 2000-2005 estimates
-# 10.5 CDR
-# 10.8 CBR
+# Assuming 5% 0-39, 0.5% 40+
 # Consider 2010-2015 birth/death estimates:
 # 9.5 CDR
 # 12 CBR
 swe <- new.env()
 
 swe$init.values <- c(
-  S = c(87805, 176865),
+  S = c(238444, 24973),
   E = c(0, 0),
   I = c(0, 0),
-  R = c(2106625, 7392270)
+  R = c(4530426, 4969722)
   )
 
 swe$transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2"),
@@ -35,7 +30,7 @@ swe$parameters <- c(
   infectious.period = 7, # days
   latent.period = 8,     # days
   vacc.pro = 0.94,       # proportion vacc at birth
-  young.size = 19,       # years in the young compartment
+  young.size = 39,       # years in the young compartment
   birth.rate = 12,     # per 1000, anum
   death.rate = 9.5,       # per 1000, anum
   # Let's have some values that can be set by a wrapper function to
@@ -315,10 +310,10 @@ latvia$RateF <- function(x, p, t) {
 malta <- new.env()
 
 malta$init.values <- c(
-  S = c(10430, 67896),
+  S = c(10430, 6790),
   E = c(0, 0),
   I = c(0, 0),
-  R = c(198167, 151123)
+  R = c(198167, 212229)
   )
 
 malta$transitions <- ssa.maketrans(c("S1", "E1", "I1", "R1", "S2", "E2", "I2", "R2"),
