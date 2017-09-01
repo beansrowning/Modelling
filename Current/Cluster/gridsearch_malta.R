@@ -126,29 +126,21 @@ solutionSpace <- function(envir, count = 10000, insbound,
       setkey(mod_run, time)
       proc <- mod_run[.(tf)][, I]
       if (any(proc != 0)) {
-        #---Let's try to up the length by just 100 before giving up------
-        len <- len + 100
-        cat("...Remodelling")
-        mod_sub()
-        setkey(mod_run, time)
-        proc <- mod_run[.(tf)][, I]
-        if (any(proc != 0)) {
-          #---Let me know--------------------------------------------------
-          cat("\n", "Endemic at time =", len, "!", "\n")
-          #---Remember to assign some values here or it will halt----------
-          output <- rbindlist(list(output, data.frame(ins = insbound[j],
-                                                      vacc = vaccbound[i],
-                                                      min = NA,
-                                                      mean = NA,
-                                                      median = NA,
-                                                      iqr = NA,
-                                                      max = NA,
-                                                      endemic = length(which(proc != 0)))),
-                              fill = TRUE)
+        #---Let me know--------------------------------------------------
+        cat("\n", "Endemic at time =", len, "!", "\n")
+        #---Remember to assign some values here or it will halt----------
+        output <- rbindlist(list(output, data.frame(ins = insbound[j],
+                                                    vacc = vaccbound[i],
+                                                    min = NA,
+                                                    mean = NA,
+                                                    median = NA,
+                                                    iqr = NA,
+                                                    max = NA,
+                                                    endemic = length(which(proc != 0)))),
+                            fill = TRUE)
         #---Skip to the next combination-----------------------------------
         next
         }
-      }
       #---re-sort to ensure Croots will work correctly-------------------
       setkey(mod_run, iter, time)
       #---Call root finder function on the Infection counts-------------
