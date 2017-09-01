@@ -5,7 +5,7 @@
 #$ -m e
 #$ -l mem_free=1.5G,h_vmem=1.5G
 #$ -q parallel.q
-#$ -pe openmpi 128
+#$ -pe openmpi 80
 #$ -R y
-mpirun -np 128 R CMD BATCH maltapt1_wc.R
-mpirun -np 128 R CMD BATCH malta_wc.R
+mpirun -np 80 R CMD BATCH maltapt1_wc.R
+mpirun -np 80 R CMD BATCH malta_wc.R

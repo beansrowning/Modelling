@@ -28,7 +28,7 @@ tryCatch(require(modelutil),
           require(modelutil)
 })
 source("../../Data/worst_case.R")
-source("gridsearch2_mpi.R")
+source("gridsearch_malta.R")
 
 opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
 
