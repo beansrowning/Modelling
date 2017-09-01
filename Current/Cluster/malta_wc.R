@@ -40,7 +40,7 @@ solutions <- new.env()
 # Search depth : 10,000 runs
 # All other population values fixed
 # Case introduction over the course of 1 year
-# Offest by 2000 days beyond
+# Offest by 3500 days beyond
 print(paste0("Begining Run 1 - ", date()))
 # Start time at 12 mo
 malta$parameters["start.time"] <- 365
@@ -52,7 +52,7 @@ solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(malta,
                                     # Len is start.time + insertion time
                                     len = 730,
                                     # Offset is appended at the end of insertion
-                                    offset = 2000))
+                                    offset = 3500))
 print(paste0("Run 1 done - ", solutions$t1[3]))
 save(solutions, file = "../../Data/malta_2_wc.dat")
 
@@ -63,7 +63,7 @@ save(solutions, file = "../../Data/malta_2_wc.dat")
 # Search depth : 10,000 runs
 # All other population values fixed
 # Case introduction over the course of 1 year
-# Offest by 2000 days beyond
+# Offest by 3500 days beyond
 print(paste0("Begining Run 2 - ", date()))
 # Start time at 24 mo
 malta$parameters["start.time"] <- 730
@@ -75,7 +75,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(malta,
                                     # Len is start.time + insertion time
                                     len = 1095,
                                     # Offset is appended at the end of insertion
-                                    offset = 2000))
+                                    offset = 3500))
 print(paste0("Run 2 done - ", solutions$t2[3]))
 save(solutions, file = "../../Data/malta_2_wc.dat")
 
@@ -86,7 +86,7 @@ save(solutions, file = "../../Data/malta_2_wc.dat")
 # Search depth : 10,000 runs
 # All other population values fixed
 # Case introduction over the course of 1 year
-# Offest by 2000 days beyond
+# Offest by 3500 days beyond
 print(paste0("Begining Run 3 - ", date()))
 # Start time at 36 mo
 malta$parameters["start.time"] <- 1095
@@ -98,7 +98,7 @@ solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(malta,
                                     # Len is start.time + insertion time
                                     len = 1460,
                                     # Offset is appended at the end of insertion
-                                    offset = 2000))
+                                    offset = 3500))
 print(paste0("Run 3 done - ", solutions$t3[3]))
 save(solutions, file = "../../Data/malta_2_wc.dat")
 cat("All Done -", date())
