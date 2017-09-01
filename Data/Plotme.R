@@ -8,5 +8,6 @@ require(data.table)
 source("Runcheck.R")
 # Go
 source("sweden_plotting.R")
-source("malta_plotting.R")
+# source("malta_plotting.R")
 source("latvia_plotting.R")
+source("combo_plotting.R")

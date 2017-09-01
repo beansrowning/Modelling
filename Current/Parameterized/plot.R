@@ -113,8 +113,6 @@ twodPlot <- function(dat, xvar, yvar, zvar, zval,
                       measure.vars = yvar,
                       variable.name = "Measure",
                       value.name = "Length")
-  #---check to see if we are comparing runs---------------
-  if (length(compare))
   #---Ploting--------------------------------------------
   graph <- ggplot(plot_dat, aes(x = get(xvar), y = Length, colour = Measure)) +
             geom_line()

@@ -1,10 +1,9 @@
 require(ggplot2)
 require(data.table)
 source("../Current/Parameterized/plot.R")
-
-#---First Task, lower vital dynamics--------------------
+source("comboplots.R")
+#---First Task--------------------
 load("sweden_1.dat")
-
 # First run
 # ---------
 # 3d Surface plot to see where to take cuts at
@@ -92,7 +91,7 @@ ggsave(filename="3_2.jpg", plot = graph, path = "./output/Sweden/Base")
 
 rm("graph", "plot_dat", "solutions")
 
-#---Second Task, lower vital dynamics--------------------
+#---Second Task--------------------
 load("sweden_2.dat")
 
 # First run
@@ -105,7 +104,6 @@ threedPlot(solutions$run_1, variables = c("max", "mean", "median"),
            title = "Sweden Run 1 - 12 month delay")
 save(graph, file = "./output/Sweden/Base/4_3d.dat")
 # Looking at changes in outbreak length along MMR rate
-
 ## lowest introduction rate
 twodPlot(solutions$run_1, "vacc", c("mean", "median", "iqr", "max"),
          "ins", 0.01, logy = TRUE,
@@ -182,7 +180,7 @@ ggsave(filename="6_2.jpg", plot = graph, path = "./output/Sweden/Base")
 
 rm("graph", "plot_dat", "solutions")
 
-#---First Task, Higher vital dynamics--------------------
+#---First Task, Higher seronegativity--------------------
 load("sweden_1_wc.dat")
 
 # First run
@@ -195,7 +193,6 @@ threedPlot(solutions$run_1, variables = c("max", "mean", "median"),
            title = "Sweden Run 1 - Equal Case Introduction")
 save(graph, file = "./output/Sweden/Worst Case/1_3d.dat")
 # Looking at changes in outbreak length along MMR rate
-
 ## lowest introduction rate
 twodPlot(solutions$run_1, "vacc", c("mean", "median", "iqr", "max"),
          "ins", 0.01, logy = TRUE,
@@ -272,7 +269,7 @@ ggsave(filename="3_2.jpg", plot = graph, path = "./output/Sweden/Worst Case")
 
 rm("graph", "plot_dat", "solutions")
 
-#---Second Task, Higher vital dynamics--------------------
+#---Second Task, Higher seronegativity--------------------
 load("sweden_2_wc.dat")
 
 # First run
@@ -285,7 +282,6 @@ threedPlot(solutions$run_1, variables = c("max", "mean", "median"),
            title = "Sweden Run 1 - 12 month delay")
 save(graph, file = "./output/Sweden/Worst Case/4_3d.dat")
 # Looking at changes in outbreak length along MMR rate
-
 ## lowest introduction rate
 twodPlot(solutions$run_1, "vacc", c("mean", "median", "iqr", "max"),
          "ins", 0.01, logy = TRUE,
