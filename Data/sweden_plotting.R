@@ -1,7 +1,6 @@
 require(ggplot2)
 require(data.table)
 source("../Current/Parameterized/plot.R")
-source("comboplots.R")
 #---First Task--------------------
 load("sweden_1.dat")
 # First run

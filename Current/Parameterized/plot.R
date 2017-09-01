@@ -115,7 +115,8 @@ twodPlot <- function(dat, xvar, yvar, zvar, zval,
                       value.name = "Length")
   #---Ploting--------------------------------------------
   graph <- ggplot(plot_dat, aes(x = get(xvar), y = Length, colour = Measure)) +
-            geom_line()
+            geom_line() +
+            theme_bw()
   #---Adjust if LOG--------------------------------------
   if (logy) {
     graph <- graph + scale_y_log10()
@@ -129,7 +130,8 @@ twodPlot <- function(dat, xvar, yvar, zvar, zval,
                     theme(plot.title = element_text(size = 20,
                                                     hjust = 0.5),
                           plot.subtitle = element_text(size = 17,
-                                                       hjust = 0.5))
+                                                       hjust = 0.5),
+                          panel.grid.major.y = element_line(colour = "#d5d5d5"))
   }
   #---Return---------------------------------------------
   graph <<- graph

@@ -1,5 +1,7 @@
 
-source("comboplots.R")
+if (!"makeplotOne" %in% ls()) {
+  source("../Current/Parameterized/plots.R")
+}
 
 # SWEDEN
 load("sweden_1.dat")
