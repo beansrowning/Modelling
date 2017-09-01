@@ -150,7 +150,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
       modl <<- NA
       iqrl <<- NA
       maxl <<- NA
-      return(0)
+      return()
       }
     }
     #---re-sort to ensure Croots will work correctly-------------------

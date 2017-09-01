@@ -159,7 +159,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
       #---Clear this from memory-----------------
       outbreaks <- NULL
       cat("\n")
-      #---Append coord to output space--------------------------------
+      #---output--------------------------------
       # Using the data.table function rbindlist to populate the data.table
       output <- rbindlist(list(output, data.frame(ins = insbound[j],
                                                   vacc = vaccbound[i],
