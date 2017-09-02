@@ -17,4 +17,4 @@ The plotting functions used to produce all the plots can be found in the
 `Current/Parameterized` folder in the `plot.R` file
 
 A Sample
-[example](https://github.com/beansrowning/Modelling/blob/master/Data/output/Latvia/Base/6_1.jpg)
+![example](https://github.com/beansrowning/Modelling/blob/master/Data/output/Latvia/Base/6_1.jpg)
