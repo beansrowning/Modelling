@@ -40,7 +40,7 @@ solutions$t1 <- system.time(solutions$swe_01 <- solutionSpace(swe,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     offset = 2000))
-solutions$graph1 <- boxyPlot(solutions$swe_01)
+save(solutions, file = "../../Data/fivenum.dat")
 
 solutions$t2 <- system.time(solutions$malta_01 <- solutionSpace(malta,
                                     insbound = c(0.1),
@@ -48,7 +48,7 @@ solutions$t2 <- system.time(solutions$malta_01 <- solutionSpace(malta,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     offset = 2000))
-solutions$graph2 <- boxyPlot(solutions$malta_01)
+save(solutions, file = "../../Data/fivenum.dat")
 
 solutions$t3 <- system.time(solutions$latvia_01 <- solutionSpace(latvia,
                                     insbound = c(0.1),
@@ -56,6 +56,9 @@ solutions$t3 <- system.time(solutions$latvia_01 <- solutionSpace(latvia,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     offset = 2000))
-solutions$graph3 <- boxyPlot(solutions$latvia_01)
+save(solutions, file = "../../Data/fivenum.dat")
 
+solutions$graph1 <- boxyPlot(solutions$swe_01)
+solutions$graph2 <- boxyPlot(solutions$malta_01)
+solutions$graph3 <- boxyPlot(solutions$latvia_01)
 save(solutions, file = "../../Data/fivenum.dat")
