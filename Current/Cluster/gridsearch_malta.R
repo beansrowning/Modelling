@@ -125,6 +125,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
       # This would cause errors in the analysis
       setkey(mod_run, time)
       proc <- mod_run[.(tf)][, I]
+
       if (any(proc != 0)) {
         #---Let me know--------------------------------------------------
         cat("\n", "Endemic at time =", len, "!", "\n")

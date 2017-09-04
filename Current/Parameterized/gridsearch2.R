@@ -59,14 +59,16 @@ solutionSpace <- function(envir, count = 10000, insbound,
   len <- len + offset
   #---Fix to avoid FP issues-----------------------------------------------
   output <- data.table(ins = integer(), vacc = integer(), min = integer(),
-                       mean = integer(), median = integer(), iqr = integer(),
-                       max = integer())
+                       mean = integer(), lb = integer(), median = integer(),
+                        ub = integer(), iqr = integer(), max = integer())
   mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
   fun_list$p["grp.yng"] <- grp[1]
   fun_list$p["grp.old"] <- grp[2]
   minl <- integer()
+  lb <- integer()
   modl <- integer()
   meanl <- integer()
+  ub <- integer()
   iqrl <- integer()
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
@@ -153,7 +155,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
       #---Remember to assign some values here or it will halt----------
       minl <<- NA
       meanl <<- NA
+      lb <<- NA
       modl <<- NA
+      ub <<- NA
       iqrl <<- NA
       maxl <<- NA
       return(0)
@@ -171,7 +175,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
     #---Summary Stats------------------------
     minl <<- min(outbreaks)
     modl <<- median(outbreaks)
+    lb <<- quantile(outbreaks, probs = c(0.25))
     meanl <<- mean(outbreaks)
+    ub <<- quantile(outbreaks, probs = c(0.75))
     iqrl <<- IQR(outbreaks)
     maxl <<- max(outbreaks)
     #---Clear this from memory-----------------
@@ -195,7 +201,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
                                                   vacc = vaccbound[i],
                                                   min = minl,
                                                   mean = meanl,
+                                                  lb = lb,
                                                   median = modl,
+                                                  ub = ub,
                                                   iqr = iqrl,
                                                   max = maxl)),
                           fill = TRUE)
@@ -203,7 +211,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
       mod_run <- NULL
       minl <- NULL
       meanl <- NULL
+      lb <- NULL
       modl <- NULL
+      ub <- NULL
       iqrl <- NULL
       maxl <- NULL
     }

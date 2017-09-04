@@ -183,3 +183,21 @@ makeplotOne <- function(ins_val, logy = FALSE, xlab = NULL, ylab = NULL,
   #---Return------------------------------------------------------
   graph <<- plot_1
 }
+
+boxyPlot <- function(dat) {
+  #---plot--------------------
+  graph <- ggplot(dat, aes(x = vacc)) +
+              theme_bw() +
+              theme(plot.title = element_text(size = 20,
+                                            hjust = 0.5),
+                  plot.subtitle = element_text(size = 17,
+                                               hjust = 0.5),
+                  panel.grid.major.y = element_line(colour = "#d5d5d5"))
+for (i in nrow(dat)) {
+  graph <- graph + geom_boxplot(data = dat[i, ],
+                                aes(x = vacc, ymin = min, lower = lb,
+                                    middle = median, upper = ub, max = max),
+                                stat = "identity")
+}
+  return(graph)
+}
