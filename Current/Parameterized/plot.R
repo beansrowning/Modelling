@@ -115,7 +115,7 @@ twodPlot <- function(dat, xvar, yvar, zvar, zval,
                       value.name = "Length")
   #---Ploting--------------------------------------------
   graph <- ggplot(plot_dat, aes(x = get(xvar), y = Length, colour = Measure)) +
-            geom_line() +
+            geom_line(size = 1.1) +
             theme_bw()
   #---Adjust if LOG--------------------------------------
   if (logy) {
@@ -186,14 +186,17 @@ makeplotOne <- function(ins_val, logy = FALSE, xlab = NULL, ylab = NULL,
 
 boxyPlot <- function(dat) {
   #---plot--------------------
-  graph <- ggplot(dat, aes(x = vacc)) +
+  graph <- ggplot(dat, aes(factor(vacc))) +
               theme_bw() +
-              theme(panel.grid.major.y = element_line(colour = "#d5d5d5"))
-for (i in nrow(dat)) {
-  graph <- graph + geom_boxplot(data = dat[i, ],
-                                aes(x = vacc, ymin = min, lower = lb,
-                                    middle = median, upper = ub, max = max),
-                                stat = "identity")
-}
+              theme(panel.grid.major.y = element_line(colour = "#d5d5d5")) +
+              geom_boxplot(data = dat,
+                           fill = "#d5d5d5",
+                           aes(ymin = min,
+                                lower = lb, middle = median,
+                                upper = ub, max = max),
+                           stat = "identity") +
+               labs(x = "Effective Vaccination Rate",
+                    y = "Outbreak Length (days)")
+
   return(graph)
 }

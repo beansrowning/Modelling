@@ -40,15 +40,18 @@ solutions$t1 <- system.time(solutions$swe_01 <- solutionSpace(swe,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     offset = 2000))
-save(solutions, file = "../../Data/fivenum.dat")
+save(solutions, file = "../../Data/fivenum_2.dat")
 
-solutions$t2 <- system.time(solutions$malta_01 <- solutionSpace(malta,
+tryCatch(solutions$t2 <- system.time(solutions$malta_01 <- solutionSpace(malta,
                                     insbound = c(0.1),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
-                                    offset = 2000))
-save(solutions, file = "../../Data/fivenum.dat")
+                                    offset = 2000)),
+                                    error = function(e) {
+                                      cat(e, "\n")
+                                    })
+save(solutions, file = "../../Data/fivenum_2.dat")
 
 solutions$t3 <- system.time(solutions$latvia_01 <- solutionSpace(latvia,
                                     insbound = c(0.1),
@@ -56,9 +59,9 @@ solutions$t3 <- system.time(solutions$latvia_01 <- solutionSpace(latvia,
                                                   0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     len = 365,
                                     offset = 2000))
-save(solutions, file = "../../Data/fivenum.dat")
+save(solutions, file = "../../Data/fivenum_2.dat")
 
 solutions$graph1 <- boxyPlot(solutions$swe_01)
 solutions$graph2 <- boxyPlot(solutions$malta_01)
 solutions$graph3 <- boxyPlot(solutions$latvia_01)
-save(solutions, file = "../../Data/fivenum.dat")
+save(solutions, file = "../../Data/fivenum_2.dat")
