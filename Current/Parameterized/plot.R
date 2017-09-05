@@ -189,14 +189,38 @@ boxyPlot <- function(dat) {
   graph <- ggplot(dat, aes(factor(vacc))) +
               theme_bw() +
               theme(panel.grid.major.y = element_line(colour = "#d5d5d5")) +
-              geom_boxplot(data = dat,
-                           fill = "#d5d5d5",
+              geom_boxplot(fill = "#d5d5d5",
                            aes(ymin = min,
                                 lower = lb, middle = median,
                                 upper = ub, max = max),
                            stat = "identity") +
                labs(x = "Effective Vaccination Rate",
                     y = "Outbreak Length (days)")
+
+  return(graph)
+}
+threeboxyPlot <- function(dat = list()) {
+
+  #---Make the data-------------------------
+  dat[[1]][, delay := 12]
+  dat[[2]][, delay := 24]
+  dat[[3]][, delay := 36]
+  plot_dat <- rbind(dat[[1]],
+                    dat[[2]],
+                    dat[[3]])
+  #---Plot the data---------------------------
+  graph <- ggplot(plot_dat, aes(vacc)) +
+            geom_boxplot(fill = "#d5d5d5",
+                         aes(ymin = min,
+                             lower = lb,
+                             middle = median,
+                             upper = ub,
+                             max = max),
+                         stat = "identity") +
+            facet_wrap(~delay, ncol = 3) +
+            theme_bw() +
+            labs(x = "Effective Vaccination Rate",
+                 y = "Outbreak Length (days)")
 
   return(graph)
 }
