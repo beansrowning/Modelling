@@ -33,40 +33,40 @@ source("gridsearch2_mpi.R")
 load("../../Data/fivenum_3.dat")
 opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
 
-solutions <- new.env()
-swe$parameters["start.time"] <- 365
-solutions$swe_1 <- solutionSpace(swe,
-                                  insbound = c(0.1),
-                                  vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
-                                                0.95, 0.96, 0.97, 0.98, 0.99, 1),
-                                  len = 730,
-                                  offset = 2000)
-save(solutions, file = "../../Data/fivenum_3.dat")
-
-swe$parameters["start.time"] <- 730
-solutions$swe_2 <- solutionSpace(swe,
-                                  insbound = c(0.1),
-                                  vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
-                                                0.95, 0.96, 0.97, 0.98, 0.99, 1),
-                                  len = 1095,
-                                  offset = 2000)
-save(solutions, file = "../../Data/fivenum_3.dat")
-
-swe$parameters["start.time"] <- 1095
-solutions$swe_3 <- solutionSpace(swe,
-                                  insbound = c(0.1),
-                                  vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
-                                                0.95, 0.96, 0.97, 0.98, 0.99, 1),
-                                  len = 1460,
-                                  offset = 2000)
-save(solutions, file = "../../Data/fivenum_3.dat")
+# solutions <- new.env()
+# swe$parameters["start.time"] <- 365
+# solutions$swe_1 <- solutionSpace(swe,
+#                                   insbound = c(0.1),
+#                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+#                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
+#                                   len = 730,
+#                                   offset = 2000)
+# save(solutions, file = "../../Data/fivenum_3.dat")
+#
+# swe$parameters["start.time"] <- 730
+# solutions$swe_2 <- solutionSpace(swe,
+#                                   insbound = c(0.1),
+#                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+#                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
+#                                   len = 1095,
+#                                   offset = 2000)
+# save(solutions, file = "../../Data/fivenum_3.dat")
+#
+# swe$parameters["start.time"] <- 1095
+# solutions$swe_3 <- solutionSpace(swe,
+#                                   insbound = c(0.1),
+#                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+#                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
+#                                   len = 1460,
+#                                   offset = 2000)
+# save(solutions, file = "../../Data/fivenum_3.dat")
 
 
 
 solutions$swe_1[, delay := 12]
 solutions$swe_2[, delay := 24]
 solutions$swe_3[, delay := 36]
-solutions$swe_01 <- rbind(swe_1, swe_2, swe_3)
+solutions$swe_01 <- rbind(solutions$swe_1, solutions$swe_2, solutions$swe_3)
 
 malta$parameters["start.time"] <- 365
 solutions$malta_1 <- solutionSpace(malta,
@@ -100,7 +100,7 @@ save(solutions, file = "../../Data/fivenum_3.dat")
 solutions$malta_1[, delay := 12]
 solutions$malta_2[, delay := 24]
 solutions$malta_3[, delay := 36]
-solutions$malta_01 <- rbind(malta_1, malta_2, malta_3)
+solutions$malta_01 <- rbind(solutions$malta_1, solutions$malta_2, solutions$malta_3)
 
 latvia$parameters["start.time"] <- 365
 solutions$latvia_1 <- solutionSpace(latvia,
