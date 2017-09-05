@@ -22,15 +22,14 @@ tryCatch(require(parallel),
           Sys.sleep(2)
           require(parallel)
 })
-tryCatch(require(modelutil),
+tryCatch(require(testpkg),
          error = function(e) {
           Sys.sleep(2)
-          require(modelutil)
+          require(testpkg)
 })
 source("../../Data/worst_case.R")
 source("gridsearch2_mpi.R")
 opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
-
 solutions <- new.env()
 # Run 1 - 12 month delay
 # Insertion rates :   0.01-0.1

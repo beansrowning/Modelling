@@ -8,3 +8,6 @@
 #$ -pe openmpi 64
 #$ -R y
 mpirun -np 64 R CMD BATCH sweden.R
+mpirun -np 64 R CMD BATCH swedenpt1.R
+mpirun -np 64 R CMD BATCH sweden_wc.R
+mpirun -np 64 R CMD BATCH swedenpt1_wc.R

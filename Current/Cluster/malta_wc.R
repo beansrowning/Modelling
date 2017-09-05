@@ -22,15 +22,15 @@ tryCatch(require(parallel),
           Sys.sleep(2)
           require(parallel)
 })
-tryCatch(require(modelutil),
+tryCatch(require(testpkg),
          error = function(e) {
           Sys.sleep(2)
-          require(modelutil)
+          require(testpkg)
 })
 source("../../Data/worst_case.R")
 source("gridsearch_malta.R")
 
-opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
+opts <- list(chunkSize = ceiling(2000 / getDoParWorkers()))
 
 solutions <- new.env()
 # Run 1 - 12 month delay
@@ -45,6 +45,7 @@ print(paste0("Begining Run 1 - ", date()))
 # Start time at 12 mo
 malta$parameters["start.time"] <- 365
 solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(malta,
+                                    count = 2000,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.93, 0.94, 0.95, 0.96, 0.97,
@@ -68,6 +69,7 @@ print(paste0("Begining Run 2 - ", date()))
 # Start time at 24 mo
 malta$parameters["start.time"] <- 730
 solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(malta,
+                                    count = 2000,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.93, 0.94, 0.95, 0.96, 0.97,
@@ -91,6 +93,7 @@ print(paste0("Begining Run 3 - ", date()))
 # Start time at 36 mo
 malta$parameters["start.time"] <- 1095
 solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(malta,
+                                    count = 2000,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.93, 0.94, 0.95, 0.96, 0.97,

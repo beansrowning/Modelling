@@ -199,15 +199,11 @@ boxyPlot <- function(dat) {
 
   return(graph)
 }
-threeboxyPlot <- function(dat = list()) {
-
-  #---Make the data-------------------------
-  dat[[1]][, delay := 12]
-  dat[[2]][, delay := 24]
-  dat[[3]][, delay := 36]
-  plot_dat <- rbind(dat[[1]],
-                    dat[[2]],
-                    dat[[3]])
+threeboxyPlot <- function(plot_dat) {
+  #---Facet labels----------------------------
+  run_names <- c("12" = "12 Months",
+                 "24" = "24 Months",
+                 "36" = "36 Months")
   #---Plot the data---------------------------
   graph <- ggplot(plot_dat, aes(vacc)) +
             geom_boxplot(fill = "#d5d5d5",
@@ -217,7 +213,8 @@ threeboxyPlot <- function(dat = list()) {
                              upper = ub,
                              max = max),
                          stat = "identity") +
-            facet_wrap(~delay, ncol = 3) +
+            facet_wrap(~delay, ncol = 3,
+                       labeller = as_labeller(run_names)) +
             theme_bw() +
             labs(x = "Effective Vaccination Rate",
                  y = "Outbreak Length (days)")

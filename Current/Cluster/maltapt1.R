@@ -24,10 +24,10 @@ tryCatch(require(parallel),
           Sys.sleep(2)
           require(parallel)
 })
-tryCatch(require(modelutil),
+tryCatch(require(testpkg),
          error = function(e) {
           Sys.sleep(2)
-          require(modelutil)
+          require(testpkg)
 })
 source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")

@@ -1,13 +1,14 @@
-# Hyperparameter space mapping
-# Functions: solutionSpace()
-# Subroutines: mod_sub(), mod_thread(), ed_sub()
-# Consider using Bytecode or JIT compilier
 require("adaptivetau")
 require("parallel")
 require("foreach")
+require("doParallel")
 require("data.table")
 require("Rcpp")
-require("testpkg")
+tryCatch(require(testpkg),
+         warning = function(w) {
+           sourceCpp("./src/Croots.cpp")
+           sourceCpp("./src/lenfind.cpp")
+           })
 
 solutionSpace <- function(envir, count = 10000, insbound,
                           vaccbound = c(0.94), len,
@@ -22,7 +23,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   # Args :
   #   envir     : (env)ironment where the model parameters can be found
   #   count     : (int) the number of simulations to run for each point
-  #   insbound  : (numeric vector) domain of "ins" to search
+  #   insbound  : (numeric vector) domain of "ins" to search (Insertion Rate)
   #   vaccbound : (numeric vector) domain of "vacc" to search
   #   len       : (int) length of each model run in days
   #   grp       : (numeric vector) signifying what group will get introductions
@@ -55,10 +56,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Fix to avoid FP issues-----------------------------------------------
   output <- data.table(ins = integer(), vacc = integer(), min = integer(),
                        mean = integer(), lb = integer(), median = integer(),
-                        ub = integer(), iqr = integer(), max = integer(),
-                        prop = integer())
-  mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric(),
-                        epi = logical(), roots = logical())
+                        ub = integer(), iqr = integer(), max = integer())
+  mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
   fun_list$p["grp.yng"] <- grp[1]
   fun_list$p["grp.old"] <- grp[2]
   minl <- integer()
@@ -69,7 +68,13 @@ solutionSpace <- function(envir, count = 10000, insbound,
   iqrl <- integer()
   maxl <- integer()
   #---Initialize parallel backend-------------------------------------
-  opts <- get("opts", parent.frame())
+  gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
+  cl <- makeCluster(detectCores(), type = gettype)
+  cat("Running as a", gettype, "cluster on", detectCores(), "threads", "\n")
+  registerDoParallel(cl)
+  #---Stop cluster on exit--------------------------------------------
+  on.exit(stopCluster())
+  on.exit(closeAllConnections())
   #---Define function subroutines-------------------------------------
   mod_sub <- function() {
     # Batch model run subroutine
@@ -86,8 +91,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
     mod_run <- foreach(i = 1:count,
                        .packages = c("adaptivetau", "testpkg"),
                        .combine = "rbind",
-                       .export = c("len", "fun_list"),
-                       .options.mpi = opts) %dopar% {
+                       .export = c("len", "fun_list", "epidemic")) %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,
                                            fun_list$t,
@@ -140,24 +144,27 @@ solutionSpace <- function(envir, count = 10000, insbound,
       setkey(mod_run, time)
       proc <- mod_run[.(tf)][, I]
       if (any(proc != 0)) {
-        #---Better to just dump what we have and move on-----------------
-        save(output, file = paste0("bailout", i, j, ".dat"), compress = "bzip2")
-        save(mod_run, file = paste0("fail", i, j, ".dat"), compress = "bzip2")
-        cat("\n", date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
-            "Outbreak ran over simulation at least once, check sim length!", "\n")
-        #---Remember to assign some values here or it will halt----------
-        minl <<- NA
-        meanl <<- NA
-        lb <<- NA
-        modl <<- NA
-        ub <<- NA
-        iqrl <<- NA
-        maxl <<- NA
-        prop <<- NA
-        return()
+      #---Better to just dump what we have and move on-----------------
+      save(output, file = paste0("bailout", i, j, ".dat"), compress = "bzip2")
+      save(mod_run, file = paste0("fail", i, j, ".dat"), compress = "bzip2")
+      cat("\n", date(), ": In ", vaccbound[i],"-", insbound[j], "\n",
+          "Outbreak ran over simulation at least once, check sim length!", "\n")
+      #---Remember to assign some values here or it will halt----------
+      minl <<- NA
+      meanl <<- NA
+      lb <<- NA
+      modl <<- NA
+      ub <<- NA
+      iqrl <<- NA
+      maxl <<- NA
+      return(0)
       }
     }
     #---re-sort to ensure Croots will work correctly-------------------
+    setkey(mod_run, iter, time)
+    #---Call root finder function on the Infection counts-------------
+    # mod_run[, roots := Croots(I)]
+    #---The meat of 'er------------------------------------------------
     setkey(mod_run, roots)
     mat <- mod_run[J(TRUE)] # Take only roots
     #---Pass time and I columns as vectors for the C++ function to process
@@ -170,8 +177,6 @@ solutionSpace <- function(envir, count = 10000, insbound,
     ub <<- quantile(outbreaks, probs = c(0.75))
     iqrl <<- IQR(outbreaks)
     maxl <<- max(outbreaks)
-    # Proportion of runs containing outbreaks longer than 365 days
-    prop <<- (length(unique(mod_run[epi == 1][, iter])) / count)
     #---Clear this from memory-----------------
     outbreaks <- NULL
     cat("\n")
@@ -197,10 +202,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
                                                   median = modl,
                                                   ub = ub,
                                                   iqr = iqrl,
-                                                  max = maxl,
-                                                  prop = prop)),
+                                                  max = maxl)),
                           fill = TRUE)
       #---Clear vars for next iteration-------------------------------
+      mod_run <<- mod_run
       mod_run <- NULL
       minl <- NULL
       meanl <- NULL
@@ -209,9 +214,17 @@ solutionSpace <- function(envir, count = 10000, insbound,
       ub <- NULL
       iqrl <- NULL
       maxl <- NULL
-      prop <- NULL
     }
   }
   #---Return results----------------------------------------------------
   return(output)
 }
+
+source("../Data/model_global.R")
+solutions$run_1 <- solutionSpace(swe,
+                                insbound = c(0.1),
+                                vaccbound = c(0.90),
+                                # Len is start.time + insertion time
+                                len = 730,
+                                # Offset is appended at the end of insertion
+                                offset = 2000)
