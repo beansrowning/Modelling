@@ -28,39 +28,37 @@ tryCatch(require(modelutil),
           Sys.sleep(2)
           require(modelutil)
 })
-source("../../Data/worst_case.R")
+source("../../Data/model_global.R")
 source("gridsearch2_mpi.R")
-load("../../Data/fivenum_3.dat")
 opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
 
-# solutions <- new.env()
-# swe$parameters["start.time"] <- 365
-# solutions$swe_1 <- solutionSpace(swe,
-#                                   insbound = c(0.1),
-#                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
-#                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
-#                                   len = 730,
-#                                   offset = 2000)
-# save(solutions, file = "../../Data/fivenum_3.dat")
-#
-# swe$parameters["start.time"] <- 730
-# solutions$swe_2 <- solutionSpace(swe,
-#                                   insbound = c(0.1),
-#                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
-#                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
-#                                   len = 1095,
-#                                   offset = 2000)
-# save(solutions, file = "../../Data/fivenum_3.dat")
-#
-# swe$parameters["start.time"] <- 1095
-# solutions$swe_3 <- solutionSpace(swe,
-#                                   insbound = c(0.1),
-#                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
-#                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
-#                                   len = 1460,
-#                                   offset = 2000)
-# save(solutions, file = "../../Data/fivenum_3.dat")
+solutions <- new.env()
+swe$parameters["start.time"] <- 365
+solutions$swe_1 <- solutionSpace(swe,
+                                   insbound = c(0.1),
+                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                   len = 730,
+                                   offset = 2000)
+save(solutions, file = "../../Data/fivenum_3.dat")
 
+ swe$parameters["start.time"] <- 730
+solutions$swe_2 <- solutionSpace(swe,
+                                   insbound = c(0.1),
+                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                   len = 1095,
+                                   offset = 2000)
+ save(solutions, file = "../../Data/fivenum_3.dat")
+
+ swe$parameters["start.time"] <- 1095
+ solutions$swe_3 <- solutionSpace(swe,
+                                   insbound = c(0.1),
+                                   vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
+                                                 0.95, 0.96, 0.97, 0.98, 0.99, 1),
+                                   len = 1460,
+                                   offset = 2000)
+ save(solutions, file = "../../Data/fivenum_3.dat")
 
 
 solutions$swe_1[, delay := 12]
@@ -134,7 +132,7 @@ save(solutions, file = "../../Data/fivenum_3.dat")
 solutions$latvia_1[, delay := 12]
 solutions$latvia_2[, delay := 24]
 solutions$latvia_3[, delay := 36]
-solutions$latvia_01 <- rbind(latvia_1, latvia_2, latvia_3)
+solutions$latvia_01 <- rbind(solutions$latvia_1, solutions$latvia_2, solutions$latvia_3)
 save(solutions, file = "../../Data/fivenum_3.dat")
 
 closeCluster(cl)
