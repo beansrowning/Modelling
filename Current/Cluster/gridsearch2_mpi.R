@@ -158,8 +158,9 @@ solutionSpace <- function(envir, count = 10000, insbound,
       }
     }
     #---re-sort to ensure Croots will work correctly-------------------
+    setkey(mod_run, iter, time)
     setkey(mod_run, roots)
-    mat <- mod_run[J(TRUE)] # Take only roots
+    mat <- mod_run[J(1)] # Take only roots
     #---Pass time and I columns as vectors for the C++ function to process
     outbreaks <- lenFind(mat[, time], mat[, I])
     #---Summary Stats------------------------

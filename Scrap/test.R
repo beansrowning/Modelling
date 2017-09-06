@@ -4,11 +4,7 @@ require("foreach")
 require("doParallel")
 require("data.table")
 require("Rcpp")
-tryCatch(require(testpkg),
-         warning = function(w) {
-           sourceCpp("./src/Croots.cpp")
-           sourceCpp("./src/lenfind.cpp")
-           })
+require(testpkg)
 
 solutionSpace <- function(envir, count = 10000, insbound,
                           vaccbound = c(0.94), len,
@@ -56,8 +52,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
   #---Fix to avoid FP issues-----------------------------------------------
   output <- data.table(ins = integer(), vacc = integer(), min = integer(),
                        mean = integer(), lb = integer(), median = integer(),
-                        ub = integer(), iqr = integer(), max = integer())
-  mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric())
+                        ub = integer(), iqr = integer(), max = integer(),
+                        prop = integer())
+  mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric(),
+                        epi = logical(), roots = logical())
   fun_list$p["grp.yng"] <- grp[1]
   fun_list$p["grp.old"] <- grp[2]
   minl <- integer()
@@ -67,6 +65,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
   ub <- integer()
   iqrl <- integer()
   maxl <- integer()
+  prop <- integer()
   #---Initialize parallel backend-------------------------------------
   gettype <- ifelse(.Platform$OS.type == "windows", "PSOCK", "FORK")
   cl <- makeCluster(detectCores(), type = gettype)
@@ -157,11 +156,12 @@ solutionSpace <- function(envir, count = 10000, insbound,
       ub <<- NA
       iqrl <<- NA
       maxl <<- NA
+      prop <<- NA
       return(0)
       }
     }
     #---re-sort to ensure Croots will work correctly-------------------
-    setkey(mod_run, iter, time)
+    # setkey(mod_run, iter, time)
     #---Call root finder function on the Infection counts-------------
     # mod_run[, roots := Croots(I)]
     #---The meat of 'er------------------------------------------------
@@ -177,6 +177,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
     ub <<- quantile(outbreaks, probs = c(0.75))
     iqrl <<- IQR(outbreaks)
     maxl <<- max(outbreaks)
+    # Proportion of runs containing outbreaks longer than 365 days
+    prop <<- (length(unique(mod_run[epi == 1][, iter])) / count)
     #---Clear this from memory-----------------
     outbreaks <- NULL
     cat("\n")
@@ -202,10 +204,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
                                                   median = modl,
                                                   ub = ub,
                                                   iqr = iqrl,
-                                                  max = maxl)),
+                                                  max = maxl,
+                                                  prop = prop)),
                           fill = TRUE)
       #---Clear vars for next iteration-------------------------------
-      mod_run <<- mod_run
       mod_run <- NULL
       minl <- NULL
       meanl <- NULL
@@ -214,16 +216,17 @@ solutionSpace <- function(envir, count = 10000, insbound,
       ub <- NULL
       iqrl <- NULL
       maxl <- NULL
+      prop <- NULL
     }
   }
   #---Return results----------------------------------------------------
   return(output)
 }
-
+solutions <- new.env()
 source("../Data/model_global.R")
 solutions$run_1 <- solutionSpace(swe,
-                                insbound = c(0.1),
-                                vaccbound = c(0.90),
+                                insbound = c(0.04),
+                                vaccbound = c(0.90, 0.91),
                                 # Len is start.time + insertion time
                                 len = 730,
                                 # Offset is appended at the end of insertion
