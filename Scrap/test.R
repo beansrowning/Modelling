@@ -161,12 +161,12 @@ solutionSpace <- function(envir, count = 10000, insbound,
       }
     }
     #---re-sort to ensure Croots will work correctly-------------------
-    # setkey(mod_run, iter, time)
+    setkey(mod_run, iter, time)
     #---Call root finder function on the Infection counts-------------
     # mod_run[, roots := Croots(I)]
     #---The meat of 'er------------------------------------------------
     setkey(mod_run, roots)
-    mat <- mod_run[J(TRUE)] # Take only roots
+    mat <- mod_run[J(1)] # Take only roots
     #---Pass time and I columns as vectors for the C++ function to process
     outbreaks <- lenFind(mat[, time], mat[, I])
     #---Summary Stats------------------------
@@ -226,7 +226,7 @@ solutions <- new.env()
 source("../Data/model_global.R")
 solutions$run_1 <- solutionSpace(swe,
                                 insbound = c(0.04),
-                                vaccbound = c(0.90, 0.91),
+                                vaccbound = c(0.91),
                                 # Len is start.time + insertion time
                                 len = 730,
                                 # Offset is appended at the end of insertion

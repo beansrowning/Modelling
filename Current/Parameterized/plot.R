@@ -201,7 +201,8 @@ boxyPlot <- function(dat) {
 }
 threeboxyPlot <- function(plot_dat) {
   #---Facet labels----------------------------
-  run_names <- c("12" = "12 Months",
+  run_names <- c("0" = "No Delay",
+                "12" = "12 Months",
                  "24" = "24 Months",
                  "36" = "36 Months")
   #---Plot the data---------------------------
@@ -213,11 +214,22 @@ threeboxyPlot <- function(plot_dat) {
                              upper = ub,
                              max = max),
                          stat = "identity") +
-            facet_wrap(~delay, ncol = 3,
+            facet_wrap(~delay, ncol = 2,
                        labeller = as_labeller(run_names)) +
             theme_bw() +
             labs(x = "Effective Vaccination Rate",
                  y = "Outbreak Length (days)")
 
+  return(graph)
+}
+
+densityPlot <- function(dat) {
+  graph <- ggplot(dat, aes(vacc, ins, fill = prop)) +
+            geom_raster(hjust = 0, vjust = 0) +
+            theme_bw() +
+            labs(x = "Effective Vaccination Rate",
+                 y = "Case Introduction Rate",
+                 fill = "Proportion") +
+            guides(fill = guide_legend(title.hjust = 0.5))
   return(graph)
 }
