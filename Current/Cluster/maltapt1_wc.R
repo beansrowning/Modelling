@@ -30,7 +30,7 @@ tryCatch(require(testpkg),
           require(testpkg)
 })
 source("../../Data/worst_case.R")
-source("gridsearch_malta.R")
+source("gridsearch2_mpi.R")
 opts <- list(chunkSize = ceiling(2000 / getDoParWorkers()))
 
 solutions <- new.env()
