@@ -233,3 +233,16 @@ densityPlot <- function(dat) {
             guides(fill = guide_legend(title.hjust = 0.5))
   return(graph)
 }
+
+medianPlot <- function(dat, val) {
+  plot_dat <- dat[vacc == val]
+  graph <- ggplot(plot_dat, aes(x = delay, y = median)) +
+            geom_errorbar(width = .2, aes(ymin = (median-1.57*(iqr/sqrt(10000))),
+                                          ymax = (median+1.57*(iqr/sqrt(10000))))) +
+            geom_point(shape=21, size=3, fill="white") +
+            theme_bw() +
+            labs(x = "Case Introduction Delay",
+                 y = "Outbreak Length (days)") +
+            scale_x_discrete()
+  return(graph)
+}
