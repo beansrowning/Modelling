@@ -31,7 +31,7 @@ source("../../Data/worst_case.R")
 source("gridsearch2_mpi.R")
 load("../../Data/latvia_2_wc.dat")
 opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
-solutions <- new.env()
+# solutions <- new.env()
 # Run 1 - 12 month delay
 # Insertion rates :   0.01-0.1
 # vaccinations rates: 0.9-1

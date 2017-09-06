@@ -34,7 +34,7 @@ load("../../Data/malta_1_wc.dat")
 source("gridsearch2_mpi.R")
 opts <- list(chunkSize = ceiling(2000 / getDoParWorkers()))
 
-solutions <- new.env()
+# solutions <- new.env()
 # Run 1
 # Insertion rates :   0.01-0.1
 # vaccinations rates: 0.9-1
