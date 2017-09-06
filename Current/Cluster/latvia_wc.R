@@ -66,16 +66,16 @@ save(solutions, file = "../../Data/latvia_2_wc.dat")
 print(paste0("Begining Run 2 - ", date()))
 # Start time at 24 mo
 latvia$parameters["start.time"] <- 730
-solutions$t22 <- system.time(solutions$run_22 <- solutionSpace(latvia,
+solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(latvia,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
-                                    vaccbound = c(0.90, 0.91, 0.92),
+                                    vaccbound = c(0.90, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     # Len is start.time + insertion time
                                     len = 1095,
                                     # Offset is appended at the end of insertion
                                     offset = 2000))
 print(paste0("Run 2 done - ", solutions$t22[3]))
-solutions$run_2 <- rbind(solutions$run_22, solutions$run_2)
 save(solutions, file = "../../Data/latvia_2_wc.dat")
 
 # Run 3 - 36 month delay
@@ -89,16 +89,16 @@ save(solutions, file = "../../Data/latvia_2_wc.dat")
 print(paste0("Begining Run 3 - ", date()))
 # Start time at 36 mo
 latvia$parameters["start.time"] <- 1095
-solutions$t33 <- system.time(solutions$run_33 <- solutionSpace(latvia,
+solutions$t3 <- system.time(solutions$run_3 <- solutionSpace(latvia,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
-                                    vaccbound = c(0.90, 0.91, 0.92),
+                                    vaccbound = c(0.90, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99, 1),
                                     # Len is start.time + insertion time
                                     len = 1460,
                                     # Offset is appended at the end of insertion
                                     offset = 2000))
-print(paste0("Run 3 done - ", solutions$t33[3]))
-solutions$run_3 <- rbind(solutions$run_33, solutions$run_3)
+print(paste0("Run 3 done - ", solutions$t3[3]))
 save(solutions, file = "../../Data/latvia_2_wc.dat")
 cat("All Done -", date())
 

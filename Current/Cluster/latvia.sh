@@ -10,4 +10,4 @@
 # mpirun -np 128 R CMD BATCH latvia.R
 # mpirun -np 128 R CMD BATCH latviapt1.R
 mpirun -np 128 R CMD BATCH latvia_wc.R
-# mpirun -np 128 R CMD BATCH latviapt1_wc.R
+mpirun -np 128 R CMD BATCH latviapt1_wc.R
