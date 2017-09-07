@@ -30,11 +30,11 @@ tryCatch(require(testpkg),
           require(testpkg)
 })
 source("../../Data/worst_case.R")
-load("../../Data/malta_1_wc.dat")
+# load("../../Data/malta_1_wc.dat")
 source("gridsearch2_mpi.R")
-opts <- list(chunkSize = ceiling(2000 / getDoParWorkers()))
+opts <- list(chunkSize = ceiling(10000 / getDoParWorkers()))
 
-# solutions <- new.env()
+solutions <- new.env()
 # Run 1
 # Insertion rates :   0.01-0.1
 # vaccinations rates: 0.9-1
@@ -45,15 +45,17 @@ opts <- list(chunkSize = ceiling(2000 / getDoParWorkers()))
 # Offest by 3500 days beyond
 print(paste0("Begining Run 1 - ", date()))
 solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(malta,
-                                    count = 2000,
+                                    count = 10000,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
                                                 0.06, 0.07, 0.08, 0.09, 0.1),
-                                    vaccbound = c(0.90, 0.91, 0.92),
+                                    vaccbound = c(0.90, 0.91, 0.92, 0.93, 0.94,
+                                                  0.95, 0.96, 0.97, 0.98, 0.99,
+                                                  1.00),
                                     len = 365,
-                                    offset = 10000))
+                                    offset = 2000))
 print(paste0("Run 1 done - ", solutions$t2[3]))
 solutions$run_1 <- rbind(solutions$run_2, solutions$run_1)
-save(solutions, file = "../../Data/malta_1_wc.dat")
+save(solutions, file = "../../Data/malta_1_wcalt.dat")
 # # Run 2
 # # Insertion rates :   0.01-0.1
 # # vaccinations rates: 0.9-1
@@ -72,7 +74,7 @@ save(solutions, file = "../../Data/malta_1_wc.dat")
 #                                                   0.98, 0.99, 1),
 #                                     len = 365,
 #                                     grp = c(0.5, 1),
-#                                     offset = 10000))
+#                                     offset = 2000))
 # print(paste0("Run 2 done - ", solutions$t2[3]))
 # save(solutions, file = "../../Data/malta_1_wc.dat")
 #
@@ -94,7 +96,7 @@ save(solutions, file = "../../Data/malta_1_wc.dat")
 #                                                   0.98, 0.99, 1),
 #                                     len = 365,
 #                                     grp = c(1, 0.5),
-#                                     offset = 10000))
+#                                     offset = 2000))
 # print(paste0("Run 2 done - ", solutions$t2[3]))
 # save(solutions, file = "../../Data/malta_1_wc.dat")
 print(paste0("All done - ", date()))

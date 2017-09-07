@@ -205,6 +205,11 @@ threeboxyPlot <- function(plot_dat) {
                 "12" = "12 Months",
                  "24" = "24 Months",
                  "36" = "36 Months")
+  vacc_breaks <- c("0.9" = "90%",
+                   "0.925" = "92.5%",
+                   "0.950" = "95%",
+                   "0.975" = "97.5%",
+                   "1.000" = "100%")
   #---Plot the data---------------------------
   graph <- ggplot(plot_dat, aes(vacc)) +
             geom_boxplot(fill = "#d5d5d5",
@@ -217,8 +222,10 @@ threeboxyPlot <- function(plot_dat) {
             facet_wrap(~delay, ncol = 2,
                        labeller = as_labeller(run_names)) +
             theme_bw() +
+            # theme(axis.text.x = element_text(angle = 315)) +
             labs(x = "Effective Vaccination Rate",
                  y = "Outbreak Length (days)")
+
 
   return(graph)
 }
@@ -234,15 +241,19 @@ densityPlot <- function(dat) {
   return(graph)
 }
 
-medianPlot <- function(dat, val) {
-  plot_dat <- dat[vacc == val]
-  graph <- ggplot(plot_dat, aes(x = delay, y = median)) +
-            geom_errorbar(width = .2, aes(ymin = (median-1.57*(iqr/sqrt(10000))),
+medianPlot <- function(dat) {
+  run_names <- c("0" = "No Delay",
+                "12" = "12 Months",
+                 "24" = "24 Months",
+                 "36" = "36 Months")
+  graph <- ggplot(dat, aes(x = vacc, y = median)) +
+            geom_errorbar(width = .01, aes(ymin = (median-1.57*(iqr/sqrt(10000))),
                                           ymax = (median+1.57*(iqr/sqrt(10000))))) +
-            geom_point(shape=21, size=3, fill="white") +
+            geom_point(shape=21, size=3, aes(fill = run)) +
+            facet_wrap(~delay, ncol = 2,
+                       labeller = as_labeller(run_names)) +
             theme_bw() +
-            labs(x = "Case Introduction Delay",
-                 y = "Outbreak Length (days)") +
-            scale_x_discrete()
+            labs(x = "Effective Vaccination Rate",
+                 y = "Outbreak Length (days)")
   return(graph)
 }
