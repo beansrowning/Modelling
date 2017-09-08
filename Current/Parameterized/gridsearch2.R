@@ -90,7 +90,6 @@ solutionSpace <- function(envir, count = 10000, insbound,
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
                        .packages = c("adaptivetau", "data.table"),
-                      #  .combine = "rbind",
                       .combine = function(...) rbindlist(list(mod_run, ...),
                                                          fill = TRUE),
                       .multicombine = TRUE,
@@ -107,8 +106,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
                 as.data.table(out)
               }
     #---Return as data.table to parent environment-------------
-    # mod_run <<- as.data.table(mod_run) #DEBUG
-    mod_run <<- mod_run #DEBUG
+    mod_run <<- mod_run
   }
 
   ed_sub <- function() {
@@ -194,7 +192,6 @@ solutionSpace <- function(envir, count = 10000, insbound,
       fun_list$p["introduction.rate"] <- coord[1]
       fun_list$p["vacc.pro"] <- coord[2]
       mod_sub()
-      mod_run <<- mod_run # DEBUG
       ed_sub()
       #---Append coord to output space--------------------------------
       # Using the data.table function rbindlist to populate the data.table

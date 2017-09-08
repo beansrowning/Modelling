@@ -135,9 +135,12 @@ solutionSpace <- function(envir, count = 10000, insbound,
     setkey(mod_run, time)
     proc <- mod_run[.(tf)][, I]
     if (any(proc != 0)) {
-      #---Let's try to up the length by just 100 before giving up------
-      len <- len + 100
+      #---Let's try to up the length by just 500 before giving up------
+      len <- len + 500
       cat("...Remodelling")
+      #---Reinitialize-------------------------------------------------
+      mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric(),
+                            epi = logical(), roots = logical())
       mod_sub()
       setkey(mod_run, time)
       proc <- mod_run[.(tf)][, I]
