@@ -3,7 +3,7 @@
 #
 # Check and load dependencies
 depends <- list("adaptivetau", "Rcpp", "parallel",
-            "doParallel", "data.table")
+            "doParallel", "data.table", "testpkg")
 for (pkg in depends) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dep = TRUE)
@@ -12,6 +12,7 @@ for (pkg in depends) {
     require(pkg, character.only = TRUE)
   }
 }
+source("gridsearch2.R")
 # tryCatch(sourceCpp("../src/Croots.cpp"),
 #          warning = function(w) {
 #            print("Croots couldn't load, trying package instead... ")
@@ -192,6 +193,7 @@ for (pkg in depends) {
 #   return(output)
 # }
 
+source("../../Data/model_global.R")
 print("All dependencies loaded.")
 print("Creating New Environment")
 set.seed(1000)
@@ -207,11 +209,9 @@ print(paste0("Starting Run 1 - ", date()))
 # Introduction rates : 0.01-0.1
 # Vaccination rates  : 0.90-0.98
 # Parameter space area : 9x10 = 90
-solutions$t1 <- system.time(solutions$run_1 <- sS(swe,
-                                insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
-                                              0.06, 0.07, 0.08, 0.09, 0.1),
-                                vaccbound = c(0.90, 0.91, 0.92, 0.93,
-                                              0.94, 0.95, 0.96, 0.97, 0.98),
+solutions$t1 <- system.time(solutions$run_1 <- solutionSpace(swe,
+                                insbound = c(0.01),
+                                vaccbound = c(0.90, 0.91),
                                 len = 365))
 print("Run 1 finished")
 print(solutions$t1)

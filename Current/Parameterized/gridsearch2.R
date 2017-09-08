@@ -8,11 +8,7 @@ require("parallel")
 require("foreach")
 require("data.table")
 require("Rcpp")
-tryCatch(require(modelutil),
-         error = function(e) {
-           sourceCpp("../src/Croots")
-           sourceCpp("../src/lenfind")
-           })
+require("testpkg")
 
 solutionSpace <- function(envir, count = 10000, insbound,
                           vaccbound = c(0.94), len,
@@ -93,9 +89,12 @@ solutionSpace <- function(envir, count = 10000, insbound,
     #   mod_run : (data.table) containing model data from all iterations
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
-                       .packages = "adaptivetau",
-                       .combine = "rbind",
-                       .export = c("len", "fun_list")) %dopar% {
+                       .packages = c("adaptivetau", "data.table"),
+                      #  .combine = "rbind",
+                      .combine = function(...) rbindlist(list(mod_run, ...),
+                                                         fill = TRUE),
+                      .multicombine = TRUE,
+                      .export = c("len", "fun_list")) %dopar% {
                 # Run several iteration of the model and append into data.frame
                 out <- ssa.adaptivetau(fun_list$init,
                                            fun_list$t,
@@ -105,10 +104,11 @@ solutionSpace <- function(envir, count = 10000, insbound,
                                            tl.params = list(maxtau = 365))
                 out <- cbind(out, I = rowSums(out[, c("I1", "I2")]), iter = i)
                 out <- out[, c("time", "I", "iter"), drop = FALSE]
-                out
+                as.data.table(out)
               }
     #---Return as data.table to parent environment-------------
-    mod_run <<- as.data.table(mod_run)
+    # mod_run <<- as.data.table(mod_run) #DEBUG
+    mod_run <<- mod_run #DEBUG
   }
 
   ed_sub <- function() {
@@ -194,6 +194,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
       fun_list$p["introduction.rate"] <- coord[1]
       fun_list$p["vacc.pro"] <- coord[2]
       mod_sub()
+      mod_run <<- mod_run # DEBUG
       ed_sub()
       #---Append coord to output space--------------------------------
       # Using the data.table function rbindlist to populate the data.table

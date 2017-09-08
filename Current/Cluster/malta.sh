@@ -3,7 +3,7 @@
 #$ -cwd -V
 #$ -M lsh1604217@student.lshtm.ac.uk
 #$ -m e
-#$ -l mem_free=2G,h_vmem=2G
+#$ -l mem_free=3G,h_vmem=3G
 #$ -q parallel.q
 #$ -pe openmpi 140
 #$ -R y

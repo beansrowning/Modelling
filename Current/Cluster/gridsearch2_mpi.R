@@ -84,8 +84,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
     #   mod_run : (data.table) containing model data from all iterations
     #---Model in parallel--------------------------------------
     mod_run <- foreach(i = 1:count,
-                       .packages = c("adaptivetau", "testpkg"),
-                       .combine = "rbind",
+                       .packages = c("adaptivetau", "testpkg", "data.table"),
+                       .combine = function(...) rbindlist(list(mod_run, ...),
+                                                         fill = TRUE),
+                       .multicombine = TRUE,
                        .export = c("len", "fun_list"),
                        .options.mpi = opts) %dopar% {
                 # Run several iteration of the model and append into data.frame
@@ -98,10 +100,10 @@ solutionSpace <- function(envir, count = 10000, insbound,
                 out <- cbind(out, I = rowSums(out[, c("I1", "I2")]), iter = i)
                 out <- out[, c("time", "I", "iter"), drop = FALSE]
                 out <- cbind(out, epi = epidemic(out), roots = Croots(out[, "I"]))
-                out
+                as.data.table(out)
               }
     #---Return as data.table to parent environment-------------
-    mod_run <<- as.data.table(mod_run)
+    mod_run <<- mod_run
   }
 
   ed_sub <- function() {
