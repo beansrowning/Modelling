@@ -118,7 +118,7 @@ print(paste0("Begining Run 4 - ", date()))
 # Start time at 36 mo
 malta$parameters["start.time"] <- 1825
 solutions$t4 <- system.time(solutions$run_4 <- solutionSpace(malta,
-                                    count = 2000,
+                                    count = 1000,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,

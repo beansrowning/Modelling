@@ -52,7 +52,7 @@ solutions$t2 <- system.time(solutions$run_2 <- solutionSpace(malta,
                                                   0.95, 0.96, 0.97, 0.98, 0.99,
                                                   1.00),
                                     len = 365,
-                                    offset = 2000))
+                                    offset = 2500))
 print(paste0("Run 1 done - ", solutions$t2[3]))
 solutions$run_1 <- rbind(solutions$run_2, solutions$run_1)
 save(solutions, file = "../../Data/malta_1_wcalt.dat")

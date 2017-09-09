@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -N Worker 1
+#$ -N Worker_1
 #$ -cwd -V
 #$ -M lsh1604217@student.lshtm.ac.uk
 #$ -m e
