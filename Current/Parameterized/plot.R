@@ -211,7 +211,7 @@ threeboxyPlot <- function(plot_dat) {
                    "0.975" = "97.5%",
                    "1.000" = "100%")
   #---Plot the data---------------------------
-  graph <- ggplot(plot_dat, aes(vacc)) +
+  graph <- ggplot(plot_dat, aes(ins)) +
             geom_boxplot(fill = "#d5d5d5",
                          aes(ymin = min,
                              lower = lb,
@@ -246,12 +246,12 @@ medianPlot <- function(dat) {
                 "12" = "12 Months",
                  "24" = "24 Months",
                  "36" = "36 Months")
-  graph <- ggplot(dat, aes(x = vacc, y = median)) +
-            geom_errorbar(width = .01, aes(ymin = (median-1.57*(iqr/sqrt(10000))),
-                                          ymax = (median+1.57*(iqr/sqrt(10000))))) +
-            geom_point(shape=21, size=3, aes(fill = run)) +
-            facet_wrap(~delay, ncol = 2,
-                       labeller = as_labeller(run_names)) +
+  graph <- ggplot(dat, aes(x = ins, y = median)) +
+            geom_errorbar(width = .005, aes(ymin = ifelse((median - 1.57 * (ub-lb/sqrt(10000))) < 0, 0, (median - 1.57 * (ub-lb/sqrt(10000)))),
+                                          ymax = (median + 1.57 * (ub-lb/sqrt(10000))))) +
+            geom_point(shape=21, size=3, aes(fill = delay)) +
+            # facet_wrap(~delay, ncol = 2,
+            #            labeller = as_labeller(run_names)) +
             theme_bw() +
             labs(x = "Effective Vaccination Rate",
                  y = "Outbreak Length (days)")

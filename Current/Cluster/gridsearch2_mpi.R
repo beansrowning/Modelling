@@ -1,6 +1,6 @@
 # Hyperparameter space mapping
 # Functions: solutionSpace()
-# Subroutines: mod_sub(), mod_thread(), ed_sub()
+# Subroutines: mod_sub(), ed_sub()
 # Consider using Bytecode or JIT compilier
 require("adaptivetau")
 require("parallel")
@@ -90,7 +90,7 @@ solutionSpace <- function(envir, count = 10000, insbound,
                        .multicombine = TRUE,
                        .export = c("len", "fun_list"),
                        .options.mpi = opts) %dopar% {
-                # Run several iteration of the model and append into data.frame
+                # Run several iterations of the model and append into data.table
                 out <- ssa.adaptivetau(fun_list$init,
                                            fun_list$t,
                                            fun_list$rf,
@@ -207,7 +207,8 @@ solutionSpace <- function(envir, count = 10000, insbound,
                                                   prop = prop)),
                           fill = TRUE)
       #---Clear vars for next iteration-------------------------------
-      mod_run <- NULL
+      mod_run <- data.table(time = numeric(), I = numeric(), iter = numeric(),
+                            epi = logical(), roots = logical())
       minl <- NULL
       meanl <- NULL
       lb <- NULL
