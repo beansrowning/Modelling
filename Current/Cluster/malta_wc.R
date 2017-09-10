@@ -30,7 +30,7 @@ tryCatch(require(testpkg),
 source("../../Data/worst_case.R")
 source("gridsearch2_mpi.R")
 
-opts <- list(chunkSize = ceiling(2000 / getDoParWorkers()))
+opts <- list(chunkSize = ceiling(200 / getDoParWorkers()))
 
 # solutions <- new.env()
 # # Run 1 - 12 month delay
@@ -118,7 +118,7 @@ print(paste0("Begining Run 4 - ", date()))
 # Start time at 36 mo
 malta$parameters["start.time"] <- 1825
 solutions$t4 <- system.time(solutions$run_4 <- solutionSpace(malta,
-                                    count = 1000,
+                                    count = 2000,
                                     insbound = c(0.01, 0.02, 0.03, 0.04, 0.05,
                                                  0.06, 0.07, 0.08, 0.09, 0.1),
                                     vaccbound = c(0.9, 0.91, 0.92, 0.93, 0.94,
@@ -126,7 +126,7 @@ solutions$t4 <- system.time(solutions$run_4 <- solutionSpace(malta,
                                     # Len is start.time + insertion time
                                     len = 2190,
                                     # Offset is appended at the end of insertion
-                                    offset = 2000))
+                                    offset = 3000))
 print(paste0("Run 4 done - ", solutions$t4[3]))
 save(solutions, file = "../../Data/malta_wc_3.dat")
 cat("All Done -", date())
