@@ -1,3 +1,0 @@
-useDynLib(Croots, .registration=TRUE)
-exportPattern("^[[:alpha:]]+")
-importFrom(Rcpp, evalCpp)

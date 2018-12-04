@@ -4,10 +4,18 @@
 **/.Rproj.user
 *.Rprofile
 *.Rhistory
+.Rproj.user
+
 # LSHTM environment
 *.bat
+
+# WIP model data / documents
+*.xlsx
+*.pdf
+
 # Zed
 *.zedstate
+
 # LaTeX
 /Paper/figures/*
 /Paper/*.gz
@@ -17,10 +25,15 @@
 /Paper/*.fdb_latexmk
 /Paper/*.fls
 /Paper/*.xdv
+
 # Plotly
 *.plotly
+
 # VIM
 .viminfo
+
 # SSH
 /.ssh
-.Rproj.user
+
+# VSCode
+.vscode/*
